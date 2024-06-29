@@ -1,0 +1,36 @@
+li{
+    list-style: none;
+}
+.navbar-container {
+    padding: 0.8rem 5rem;
+    background: linear-gradient(to right, #eed622, #eed622);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo-container {
+    cursor: pointer;
+  }
+  
+  .logo {
+    width: 80px;
+    height: 40px;
+  }
+  
+  .navbar-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .navbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .avatar-container {
+    display: flex;
+    align-items: center;
+  }
+  
