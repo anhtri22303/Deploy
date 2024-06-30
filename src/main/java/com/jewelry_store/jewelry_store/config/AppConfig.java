@@ -43,7 +43,7 @@ public class AppConfig {
 
                 cfg.setAllowedOrigins(Arrays.asList(
                         "http://localhost:3000",
-                        "https://jewelry-store-djlxzrjid-anhtri22303s-projects.vercel.app/"));
+                        "https://jewelry-store-app.vercel.app/"));
                 cfg.setAllowedMethods(Collections.singletonList("*"));
                 cfg.setAllowCredentials(true);
                 cfg.setAllowedHeaders(Collections.singletonList("*"));
