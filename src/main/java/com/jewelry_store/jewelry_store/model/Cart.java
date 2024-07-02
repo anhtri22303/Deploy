@@ -27,6 +27,8 @@ public class Cart {
     @OneToOne
     private User staff;
 
+    private Double totalamount;
+
     private Double total = 0.0;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)

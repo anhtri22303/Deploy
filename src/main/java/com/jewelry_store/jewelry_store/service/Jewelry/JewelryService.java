@@ -8,7 +8,7 @@ import com.jewelry_store.jewelry_store.request.CreateJewelryRequest;
 
 public interface JewelryService {
 
-    public Jewelry createJewelry(CreateJewelryRequest req,Category category) throws Exception;
+    public Jewelry createJewelry(CreateJewelryRequest req) throws Exception;
     
     public void deleteJewelry(Long jewelryid) throws Exception;
 
@@ -23,6 +23,10 @@ public interface JewelryService {
     public void updatePricesFromComponentChanges();
 
     public List<Jewelry> getAllJewelry() throws Exception;
+    
+    public double calculateBuybackPrice(Jewelry jewelry);
+
+    public double calculateBuybackPriceOut(double goldWeight,double diamondWeight,List<String> componentsName);
 
     public Jewelry findJewelryByCode(String code) throws Exception;
 

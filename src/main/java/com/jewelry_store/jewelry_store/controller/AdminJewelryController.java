@@ -33,7 +33,7 @@ public class AdminJewelryController {
     public ResponseEntity<Jewelry> createJewelry(@RequestBody CreateJewelryRequest req,
                                                 @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
-        Jewelry jewelry = jewelryService.createJewelry(req, req.getJewelryCategory());
+        Jewelry jewelry = jewelryService.createJewelry(req);
         
         return new ResponseEntity<>(jewelry, HttpStatus.CREATED);
     }

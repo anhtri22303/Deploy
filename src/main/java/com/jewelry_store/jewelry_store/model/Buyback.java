@@ -10,15 +10,24 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class BuybackTransaction {
+public class Buyback {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @ManyToOne
+    private User staff;
+
+    @JsonIgnore
+    @ManyToOne
+    private Area area ;
 
     @ManyToOne
     private Jewelry jewelry;

@@ -29,15 +29,15 @@ public class JewelryServiceImp implements JewelryService {
     private CategoryRepository categoryRepository;
     
     @Override
-    public Jewelry createJewelry(CreateJewelryRequest req, Category category) throws Exception {
-        Optional<Category> existingCategoryOpt = categoryRepository.findByName(req.getJewelryCategory().getName());
-
+    public Jewelry createJewelry(CreateJewelryRequest req) throws Exception {
+        Category category = new Category();
+        Optional<Category> existingCategoryOpt = categoryRepository.findByName(req.getJewelryCategory());
         if (existingCategoryOpt.isPresent()) {
             category = existingCategoryOpt.get();
         } else {
             // Save the category if it does not exist
             category = new Category();
-            category.setName(req.getJewelryCategory().getName());
+            category.setName(req.getJewelryCategory());
             category = categoryRepository.save(category);
         }
 
@@ -151,6 +151,58 @@ public class JewelryServiceImp implements JewelryService {
             jewelryRepository.save(jewelry);
         }
     }
+
+    public double calculateBuybackPrice(Jewelry jewelry) {
+        double goldWeight = jewelry.getGoldWeight();
+        double diamondWeight = jewelry.getDiamondWeight() ;
+        List<Component> components = jewelry.getComponents();
+
+        double goldBuybackPrice = 0.0;
+        double diamondBuybackPrice = 0.0;
+
+        for (Component component : components) {
+            if (component.getName().contains("gold")) {
+                goldBuybackPrice = component.getPricebuyback();
+            } else if (component.getName().contains("diamond")) {
+                diamondBuybackPrice = (component.getPrice()*85)/100;
+            }
+        }
+
+        return (goldWeight * goldBuybackPrice) + (diamondWeight * diamondBuybackPrice);
+    }   
+
+    public double calculateBuybackPriceOut(double goldWeight,double diamondWeight,List<String> componentsName) {
+        
+        double goldBuybackPrice = 0.0;
+    double diamondBuybackPrice = 0.0;
+
+    // Duyệt qua danh sách tên các components
+    List<Component> components = componentRepository.findAll(); // Lấy tất cả components từ repository
+
+    for (String componentName : componentsName) {
+        Component component = findComponentByName(componentName, components);
+
+        if (component == null) {
+            continue;
+        }
+
+        if (component.getName().toLowerCase().contains("gold")) {
+            goldBuybackPrice = component.getPricebuyback();
+        } else if (component.getName().toLowerCase().contains("diamond")) {
+            diamondBuybackPrice = (component.getPrice() * 85) / 100;
+        }
+    }
+
+    return (goldWeight * goldBuybackPrice) + (diamondWeight * diamondBuybackPrice);
+}
+private Component findComponentByName(String componentName, List<Component> components) {
+    for (Component component : components) {
+        if (component.getName().equalsIgnoreCase(componentName)) {
+            return component;
+        }
+    }
+    return null;
+}
 
     @Override
     public List<Jewelry> getAllJewelry() {

@@ -22,6 +22,8 @@ public class Coupon {
 
     private String name;
 
+    private String description;
+
     private String code;
 
     private double discountPercentage;
@@ -29,5 +31,7 @@ public class Coupon {
     private Date validFrom;
 
     private Date validUntil;
+
+    private String images;
 
 }

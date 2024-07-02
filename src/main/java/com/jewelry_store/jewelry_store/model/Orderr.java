@@ -3,8 +3,7 @@ package com.jewelry_store.jewelry_store.model;
 import java.util.Date;
 import java.util.List;
 
-
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
@@ -13,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,9 +30,9 @@ public class Orderr {
     @ManyToOne
     private User staff;
 
-    @JsonIgnore
+    @JsonBackReference
     @ManyToOne
-    private Area area ;
+    private Area area;
 
     private double totalAmount;
 
@@ -50,7 +50,14 @@ public class Orderr {
     private double totalPrice;
 
     @ManyToOne
-    private Customer customer;  // Added this line to establish the relationship with Customer
+    private Customer customer;  
+    
+    @JsonIgnore
+    @OneToOne(mappedBy = "order")
+    private Warranty warranty;
 
+    public String getAreaName() {
+        return this.area != null ? this.area.getName() : null;
+    }
 
 }

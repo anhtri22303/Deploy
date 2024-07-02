@@ -22,6 +22,6 @@ public class Customer {
     private String mobile;
 
     private String email;
-
+    
     private int point;
 }

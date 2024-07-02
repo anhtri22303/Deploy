@@ -19,6 +19,8 @@ public class CouponRequest {
     @Size(max = 50, message = "Code should not exceed 50 characters")
     private String code;
 
+    private String description;
+
     @Positive(message = "Discount percentage must be positive")
     private double discountPercentage;
 
@@ -27,6 +29,8 @@ public class CouponRequest {
 
     @NotNull(message = "Valid until date is mandatory")
     private Date validUntil;
+
+    private String images;
 
 }
 

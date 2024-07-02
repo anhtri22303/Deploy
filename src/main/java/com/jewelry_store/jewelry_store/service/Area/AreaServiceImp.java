@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 import com.jewelry_store.jewelry_store.model.Area;
 import com.jewelry_store.jewelry_store.model.User;
 import com.jewelry_store.jewelry_store.repository.AreaRepository;
+import com.jewelry_store.jewelry_store.repository.UserRepository;
 import com.jewelry_store.jewelry_store.request.CreateAreaRequest;
 
 @Service
 public class AreaServiceImp implements AreaService {
     @Autowired
     private AreaRepository areaRepository;
+    @Autowired UserRepository userRepository;
 
     @Override
     public Area createArea(CreateAreaRequest req, User user) throws Exception {
@@ -79,9 +81,14 @@ public class AreaServiceImp implements AreaService {
 
     @Override
     public Area getAreabyUserId(Long userId) throws Exception {
-        Area area = areaRepository.findByStaffId(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new Exception("User not found with id " + userId);
+        }
+        User user = userOptional.get();
+        Area area = user.getArea();
         if (area == null) {
-            throw new Exception("Area not found with Staff id " + userId);
+            throw new Exception("Area not found for user with id " + userId);
         }
         return area;
     }

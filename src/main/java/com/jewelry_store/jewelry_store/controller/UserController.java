@@ -1,5 +1,7 @@
 package com.jewelry_store.jewelry_store.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +14,7 @@ import com.jewelry_store.jewelry_store.model.User;
 import com.jewelry_store.jewelry_store.service.User.UserService;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
     
     @Autowired
@@ -22,6 +24,12 @@ public class UserController {
     public ResponseEntity<User> findUserByJwtToken(@RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @GetMapping("/staff")
+    public List<User> getAllStaffUsers(@RequestHeader("Authorization") String jwt) throws Exception {
+        User user = userService.findUserByJwtToken(jwt);
+        return userService.getAllStaffUsers();
     }
 }
 

@@ -1,9 +1,12 @@
 package com.jewelry_store.jewelry_store.service.User;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jewelry_store.jewelry_store.config.JwtProvider;
+import com.jewelry_store.jewelry_store.model.USER_ROLE;
 import com.jewelry_store.jewelry_store.model.User;
 import com.jewelry_store.jewelry_store.repository.UserRepository;
 
@@ -30,6 +33,11 @@ public class UserServiceImp implements UserService {
         throw new Exception("User not found");
     }
     return user;
+    }
+
+    @Override
+    public List<User> getAllStaffUsers() throws Exception {
+        return userRepository.findByRole(USER_ROLE.ROLE_STAFF);    
     }
 
 }

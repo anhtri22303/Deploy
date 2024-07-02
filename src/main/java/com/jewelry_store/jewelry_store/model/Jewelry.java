@@ -66,7 +66,6 @@ public class Jewelry {
 
     private double price;
 
-    @OneToMany(mappedBy = "jewelry")
-    private List<BuybackTransaction> buybackTransactions;
+
     
 }

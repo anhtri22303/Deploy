@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
@@ -46,6 +47,10 @@ public class User {
     private List<Orderr> orders = new ArrayList<>();
 
     @JsonIgnore
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "staff")
-    private Area area; 
+    @OneToOne(mappedBy = "staff")
+    private Area area;
+
+    public String getAreaName() {
+        return this.area != null ? this.area.getName() : null;
+    }
 }

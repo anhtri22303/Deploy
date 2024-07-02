@@ -242,6 +242,7 @@ public class CartServiceImpl implements CartService {
             if (cartItem.getJewelry().equals(jewelry)) {
                 int newQuantity = cartItem.getQuantity() + req.getQuantity();
                 CartItem updatedItem = updateCartItemQuantity(cartItem.getId(), newQuantity);
+                cart.setTotalamount(cart.getTotalamount());
                 cart.recalculateTotal(); // Recalculate total after adding item
                 cartRepository.save(cart); // Save the cart
                 return updatedItem;
@@ -257,6 +258,7 @@ public class CartServiceImpl implements CartService {
 
         CartItem saveCartItem = cartItemRepository.save(newCartItem);
         cart.getItems().add(saveCartItem);
+        cart.setTotalamount(newCartItem.getTotalPrice());
         cart.recalculateTotal(); // Recalculate total after adding item
         cartRepository.save(cart); // Save the cart
 

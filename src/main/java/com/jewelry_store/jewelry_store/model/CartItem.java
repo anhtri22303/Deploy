@@ -41,13 +41,5 @@ public class CartItem {
     public double getTotalPrice() {
         return this.totalPrice;
     }
-
-    public void setDiscountedPrice(double discountPercentage) {
-        this.discountedPrice = this.totalPrice - (this.totalPrice * discountPercentage / 100);
-    }
-
-    public double getDiscountedPrice() {
-        return this.discountedPrice;
-    }
 }
 

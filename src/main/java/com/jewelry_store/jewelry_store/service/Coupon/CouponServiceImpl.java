@@ -21,10 +21,12 @@ public class CouponServiceImpl implements CouponService {
     public Coupon createCoupon(CouponRequest req) throws Exception {
         Coupon coupon = new Coupon();
         coupon.setName(req.getName());
+        coupon.setDescription(req.getDescription());
         coupon.setCode(req.getCode());
         coupon.setDiscountPercentage(req.getDiscountPercentage());
         coupon.setValidFrom(req.getValidFrom());
         coupon.setValidUntil(req.getValidUntil());
+        coupon.setImages(req.getImages());
         return couponRepository.save(coupon);
     }
     
@@ -33,9 +35,11 @@ public class CouponServiceImpl implements CouponService {
         return couponRepository.findById(id).map(coupon -> {
             coupon.setName(req.getName());
             coupon.setCode(req.getCode());
+            coupon.setDescription(req.getDescription());
             coupon.setDiscountPercentage(req.getDiscountPercentage());
             coupon.setValidFrom(req.getValidFrom());
             coupon.setValidUntil(req.getValidUntil());
+            coupon.setImages(req.getImages());
             return couponRepository.save(coupon);
         });
     }

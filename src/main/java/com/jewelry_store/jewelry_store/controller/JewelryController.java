@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,5 +52,30 @@ public class JewelryController {
 
         return ResponseEntity.ok(jewelries);
     }
+    @PostMapping("/calculateBuybackPrice")
+    public double calculateBuybackPrice(@RequestBody Jewelry jewelry,
+    @RequestHeader("Authorization") String jwt) throws Exception {
+
+        User user = userService.findUserByJwtToken(jwt);
+        return jewelryService.calculateBuybackPrice(jewelry);
     }
 
+    @PostMapping("/calculateBuybackPriceOut")
+    public ResponseEntity<Double> calculateBuybackPriceOut(
+        @RequestParam double goldWeight,
+        @RequestParam double diamondWeight,
+        @RequestBody List<String> componentsName,
+        @RequestHeader("Authorization") String jwt) throws Exception {
+
+        User user = userService.findUserByJwtToken(jwt);    
+        double buybackPrice = jewelryService.calculateBuybackPriceOut(goldWeight, diamondWeight, componentsName);
+    return ResponseEntity.ok(buybackPrice);
+    }
+    @GetMapping("/findByCode")
+    public ResponseEntity<Jewelry> findJewelryByCode(@RequestParam String code,
+    @RequestHeader("Authorization") String jwt  ) throws Exception{
+            Jewelry jewelry = jewelryService.findJewelryByCode(code);
+            return ResponseEntity.ok(jewelry);
+
+    }
+}
