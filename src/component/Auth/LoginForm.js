@@ -19,20 +19,17 @@ const LoginForm = () => {
     const handleSubmit = (values) => {
         dispatch(loginUser({ userData: values, navigate }))
             .then(() => {
-                toast.error("Login failed");
-               // toast.success("Login successful!");
+               
+                toast.success("Login successful!");
                 // Optionally, redirect to a different page after a successful login
                 // navigate("/some-page");
             })
             .catch((error) => {
-                if (error.response && error.response.data) {
-                    toast.error(`Login failed: ${error.response.data.message}`);
-                } else {
-                    toast.error("Login failed. Please try again.");
-                }
+                let errorMessage = "Incorrect username or password";
+                // Display error message to the user
+                toast.error(`LOGIN FAIL: ${errorMessage}`);
             });
     };
-
     return (
         <div
             style={{
@@ -127,9 +124,9 @@ const LoginForm = () => {
                 </Formik>
                 <Typography variant="body2" align="center" sx={{ mt: 3, color: 'black' }}>
                     Don't have an account?
-                    <Button size="big" onClick={() => navigate("/register")} sx={{ color: '' }}>
+                    {/* <Button size="big" onClick={() => navigate("/register")} sx={{ color: '' }}>
                         Register
-                    </Button>
+                    </Button> */}
                 </Typography>
                 <ToastContainer />
             </div>

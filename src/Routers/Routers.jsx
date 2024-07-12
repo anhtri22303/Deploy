@@ -1,15 +1,20 @@
+
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { AdminRoute } from './AdminRoute'
-import CustomerRoute from './CustomerRoute'
+import { CustomerRoute} from './CustomerRoute'
+import {ManagerRoute} from './ManagerRoute'
+import LoginForm from '../component/Auth/LoginForm'
+import { useSelector } from 'react-redux'
+import Home from '../component/Home/Home'
 
 
 
 const Routers = () => {
+    const { auth } = useSelector((store) => store);
     return (
         <Routes>
-            <Route path="/admin/jewelry/*" element={<AdminRoute />} />
-            <Route path="/*" element={<CustomerRoute />} />
+            <Route path="/*" element={ auth.user ? <CustomerRoute /> :<LoginForm/>} />
+            <Route path="/admin/jewelry/*" element={<ManagerRoute />} />
         </Routes>
     )
 }

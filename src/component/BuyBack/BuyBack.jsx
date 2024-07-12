@@ -4,9 +4,11 @@ import { Link } from 'react-router-dom';
 
 const BuyBack = () => {
   return (
-    <Box textAlign="center" p={3}>
-      <Typography variant="h4" gutterBottom>
-        Choose an Option:
+    <Box textAlign="center" sx={{ padding: 3, marginTop: "120px", marginBottom: "400px" }}>
+      <Typography variant="h4" gutterBottom 
+        className="text-blue-1000 py-5"
+        sx={{ textAlign: "center", fontWeight: 'bold', fontSize: '3rem' }}>
+        Choose an Option
       </Typography>
       <Box m={2} display="flex" justifyContent="center">
         <Button

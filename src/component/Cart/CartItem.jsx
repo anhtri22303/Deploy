@@ -57,7 +57,13 @@ export const CartItem = ({ item }) => {
               </div>
             </div>
           </div>
-          <p>{item.totalPrice}</p>
+          <div className="flex justify-between text-gray-400">
+      {item.originalPrice === 0 ? (
+      <p>{item.totalPrice}</p>
+    ) : (
+      <p>{item.originalPrice}</p>
+   )}
+        </div>
         </div>
       </div>
     </div>

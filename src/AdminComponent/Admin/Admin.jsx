@@ -13,47 +13,37 @@ import { Orders } from '../Orders/Orders'
 import { AdminSidebar } from './AdminSidebar'
 import Footer from '../Footer/Footer'
 import Home from '../HomeA/Home'
-
+import Teams from '../Staff/Teams'
+import Customer from '../Customer/Customer'
+import Buyback from '../Buyback/Buyback'
 
 export const Admin = () => {
-    const dispatch=useDispatch()
-    const jwt=localStorage.getItem('jwt')
-    const {jewelry} = useSelector (store=>store)
-    const handleClose=()=> {
+    const dispatch = useDispatch();
+    const jwt = localStorage.getItem('jwt');
+    const { jewelry } = useSelector(store => store);
+    const handleClose = () => { }
 
-    }
-    // useEffect(()=>{
-    //     dispatch(getCategory({
-    //         jwt,
-    //         jewelryId:jewelry.userJewelry?.id,
-    //     })
-    //     );
-    //     dispatch(fetchJewelryOrder({
-    //         jwt,
-    //         jewelryId:jewelry.userJewelry?.id,
-    //     }))
-    //     // dispatch(getMenuItemsByJewelryId())
-    //     // dispatch(getJewelryById())
-    // })
 
     return (
         <div>
             <div className='lg:flex justify-between'>
                 <div>
-
-                    <AdminSidebar handleClose={handleClose}/>
+                    <AdminSidebar handleClose={handleClose} />
                 </div>
-                <div className='lg:w-[70%]'>
+                <div className='lg:w-[80%]'>
                     <Routes>
-                    <Route path='/' element={<Home/>}/>
-                        <Route path='/dashboard' element={<Dashboard/>}/>
-                        <Route path='/orders' element={<Orders/>}/>
-                        <Route path='/menu' element={<Menu/>}/>
-                        <Route path='/category' element={<Category/>}/>
-                        <Route path='/ingredients' element={<Ingredients/>}/>
-                        <Route path='/event' element={<Events/>}/>
-                        <Route path='/details' element={<JewelryDetails/>}/>
-                        <Route path='/add-menu' element={<CreateMenuForm/>}/>
+                        <Route path='/' element={<Home />} />
+                        <Route path='/dashboard' element={<Dashboard />} />
+                        <Route path='/orders' element={<Orders />} />
+                        <Route path='/menu' element={<Menu />} />
+                        <Route path='/category' element={<Category />} />
+                        <Route path='/ingredients' element={<Ingredients />} />
+                        <Route path='/event' element={<Events />} />
+                        <Route path='/details' element={<JewelryDetails />} />
+                        <Route path='/add-menu' element={<CreateMenuForm />} />
+                        <Route path='/buyback' element={<Buyback/>} />
+                        <Route path='/teams' element={<Teams/>} />
+                        <Route path='/customer' element={<Customer/>} />
                     </Routes>
                 </div>
             </div>

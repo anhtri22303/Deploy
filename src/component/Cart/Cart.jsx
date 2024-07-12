@@ -5,21 +5,19 @@ import {
   Card,
   Modal,
   Box,
-  Grid,
   TextField,
 } from "@mui/material";
 import { CartItem } from "./CartItem";
-import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { createOrder } from "../State/Order/Action";
+import { toast, ToastContainer } from "react-toastify";
 import {
   addItemToCartByCode,
   applyCoupon,
   clearCartAction,
 } from "../State/Cart/Action";
-import { checkOrCreateCustomer } from "../State/Customer/Action";
 
 const style = {
   position: "absolute",
@@ -41,9 +39,9 @@ const initialValues = {
 
 const Cart = () => {
   const [open, setOpen] = useState(false);
-  const [productCode, setProductCode] = useState(""); // State for product code
-  const [couponCode, setCouponCode] = useState(""); // State for coupon code
-  const [customInvoicePercentage, setCustomInvoicePercentage] = useState(""); // State for custom invoice percentage input
+  const [productCode, setProductCode] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [customInvoicePercentage, setCustomInvoicePercentage] = useState("");
 
   const { cart } = useSelector((store) => store);
   const dispatch = useDispatch();
@@ -72,7 +70,7 @@ const Cart = () => {
 
   const handleOpenAddressModal = () => setOpen(true);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (productCode.trim() === "") {
       alert("Please enter a product code.");
       return;
@@ -86,30 +84,57 @@ const Cart = () => {
       },
     };
 
-    dispatch(addItemToCartByCode(reqData));
-    setProductCode("");
+    try {
+      await dispatch(addItemToCartByCode(reqData));
+      setProductCode("");
+    } catch (error) {
+      if (error.response && error.response.data) {
+        toast.error(`${error.response.data}`); // Show specific error message
+      } else {
+        toast.error("Wrong code. Please try again."); // Fallback error message
+      }
+      console.error("error:", error);
+    }
   };
 
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = async () => {
     if (couponCode.trim() === "") {
       alert("Please enter a coupon code.");
       return;
     }
 
-    dispatch(
-      applyCoupon(cart.cart.id, couponCode, localStorage.getItem("jwt"))
-    );
-    setCouponCode("");
+    try {
+      await dispatch(
+        applyCoupon(cart.cart.id, couponCode, localStorage.getItem("jwt"))
+      );
+      toast.success("COUPON APPLIDED SUCCESSFULLY!"); // Show success message
+      setCouponCode("");
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(`${error.response.data.message}`); // Show specific error message
+      } else {
+        toast.error("Failed to apply coupon. Please try again."); // Fallback error message
+      }
+      console.error("Coupon apply error:", error);
+    }
+  };
+
+  const handleClearCart = () => {
+    dispatch(clearCartAction());
+    window.location.reload(); // This should ideally be handled better in a SPA
   };
 
   const calculateTotal = () => {
+    if (cart.cartItems.length === 0) {
+      return 0;
+    }
+
     const itemTotal = cart.cart?.total || 0;
-    const gstCharges = 33;
-    const tax = 10;
-    const totalBeforeDiscount = itemTotal + gstCharges + tax;
+    const totalBeforeDiscount = itemTotal;
     const customPercent = parseFloat(customInvoicePercentage);
+
     if (isNaN(customPercent)) {
-      return totalBeforeDiscount; // Return total without additional percentage if input is invalid
+      return totalBeforeDiscount;
     } else {
       const invoiceAmount = totalBeforeDiscount * (customPercent / 100);
       return totalBeforeDiscount + invoiceAmount;
@@ -130,6 +155,7 @@ const Cart = () => {
             ))}
 
             <Divider />
+
             {/* Product Code Input */}
             <Card className="flex gap-5 w-96 p-5 mt-5">
               <TextField
@@ -177,56 +203,81 @@ const Cart = () => {
               </Button>
             </Card>
 
+            {/* Clear Cart Button */}
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={handleClearCart}
+              sx={{
+                color: "red",
+                borderColor: "red",
+                fontWeight: "bold",
+                width: "120px",
+                marginTop: "10px",
+                "&:hover": {
+                  borderColor: "darkred",
+                  backgroundColor: "lightcoral",
+                },
+              }}
+            >
+              Clear Cart
+            </Button>
+
+            {/* Bill Details */}
             <div className="billDetails px-5 text-sm">
               <p className="font-extralight py-5">Bill Details</p>
               <div className="space-y-3">
                 <div className="flex justify-between text-gray-400">
                   <p>Item Total</p>
-                  <p>{cart.cart?.total}</p>
+                  {cart.cart?.coupon ? (
+                    <p>{cart.cart?.totalamount}</p>
+                  ) : (
+                    <p>{calculateTotal()}</p>
+                  )}
                 </div>
                 <div className="flex justify-between text-gray-400">
-                  <p>GST and restaurant charges</p>
-                  <p>$33</p>
-                </div>
-                <div className="flex justify-between text-gray-400">
-                  <p>Tax</p>
-                  <p>$10</p>
+                  <p>Discount</p>
+                  {cart.cart?.coupon ? (
+                    <p>{cart.cart.coupon.discountPercentage}%</p>
+                  ) : (
+                    <p>No coupon applied</p>
+                  )}
                 </div>
                 <Divider />
-              </div>
-              <div className="flex justify-between text-gray-400">
-                <p>Total Pay</p>
-                <p>{calculateTotal()}</p>
-              </div>
+                <div className="flex justify-between text-gray-400">
+                  <p>Total Pay</p>
+                  <p>{calculateTotal()}</p>
+                </div>
 
-              {/* Custom Invoice Percentage Input */}
-              <div className="flex justify-between py-3">
-                <TextField
-                  label="Custom Invoice Percentage"
-                  variant="outlined"
-                  fullWidth
-                  value={customInvoicePercentage}
-                  onChange={handleCustomInvoiceChange}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": {
-                        borderColor: "gray",
+                {/* Custom Invoice Percentage Input */}
+                {/* <div className="flex justify-between py-3">
+                  <TextField
+                    label="Custom Invoice Percentage"
+                    variant="outlined"
+                    fullWidth
+                    value={customInvoicePercentage}
+                    onChange={handleCustomInvoiceChange}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "gray",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "gray",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "gray",
+                        },
                       },
-                      "&:hover fieldset": {
-                        borderColor: "gray",
+                      "& .MuiInputLabel-root": {
+                        color: "gray",
                       },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "gray",
+                      "& .MuiInputLabel-root.Mui-focused": {
+                        color: "gray",
                       },
-                    },
-                    "& .MuiInputLabel-root": {
-                      color: "gray",
-                    },
-                    "& .MuiInputLabel-root.Mui-focused": {
-                      color: "gray",
-                    },
-                  }}
-                />
+                    }}
+                  />
+                </div> */}
               </div>
             </div>
 
@@ -277,7 +328,9 @@ const Cart = () => {
               </Button>
             </Card>
           </section>
+
           <Divider orientation="vertical" flexItem />
+
           <section className="lg:w-[60%] flex justify-center px-5 pb-0 lg:pb-0">
             <div>
               <h1 className="text-center font-semibold text-2xl py-10">
@@ -310,6 +363,8 @@ const Cart = () => {
             </div>
           </section>
         </main>
+
+        {/* Modal for Address */}
         <Modal
           open={open}
           onClose={handleClose}
@@ -317,118 +372,57 @@ const Cart = () => {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-              <Form>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <Field
-                      as={TextField}
-                      name="fullname"
-                      label="Full Name"
-                      fullWidth
-                      variant="outlined"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "& fieldset": {
-                            borderColor: "gray",
-                          },
-                          "&:hover fieldset": {
-                            borderColor: "gray",
-                          },
-                          "&.Mui-focused fieldset": {
-                            borderColor: "gray",
-                          },
-                        },
-                        "& .MuiInputLabel-root": {
-                          color: "gray",
-                        },
-                        "& .MuiInputLabel-root.Mui-focused": {
-                          color: "gray",
-                        },
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Field
-                      as={TextField}
-                      name="mobile"
-                      label="Mobile"
-                      fullWidth
-                      variant="outlined"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "& fieldset": {
-                            borderColor: "gray",
-                          },
-                          "&:hover fieldset": {
-                            borderColor: "gray",
-                          },
-                          "&.Mui-focused fieldset": {
-                            borderColor: "gray",
-                          },
-                        },
-                        "& .MuiInputLabel-root": {
-                          color: "gray",
-                        },
-                        "& .MuiInputLabel-root.Mui-focused": {
-                          color: "gray",
-                        },
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Field
-                      as={TextField}
-                      name="email"
-                      label="Email"
-                      fullWidth
-                      variant="outlined"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "& fieldset": {
-                            borderColor: "gray",
-                          },
-                          "&:hover fieldset": {
-                            borderColor: "gray",
-                          },
-                          "&.Mui-focused fieldset": {
-                            borderColor: "gray",
-                          },
-                        },
-                        "& .MuiInputLabel-root": {
-                          color: "gray",
-                        },
-                        "& .MuiInputLabel-root.Mui-focused": {
-                          color: "gray",
-                        },
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button
-                      variant="outlined"
-                      fullWidth
-                      type="submit"
-                      sx={{
-                        color: "green",
-                        borderColor: "green",
-                        fontWeight: "bold",
-                        width: "120px",
-                        "&:hover": {
-                          borderColor: "darkyellow",
-                          backgroundColor: "lightyellow",
-                        },
-                      }}
-                    >
-                      Pay
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Form>
+            <h2 id="modal-modal-title" className="text-xl font-semibold">
+              Enter Address
+            </h2>
+            <Formik
+              initialValues={initialValues}
+              onSubmit={handleSubmit}
+            >
+              {({ handleSubmit, handleChange, values }) => (
+                <Form onSubmit={handleSubmit} className="space-y-3 mt-5">
+                  <TextField
+                    label="Full Name"
+                    variant="outlined"
+                    fullWidth
+                    name="fullname"
+                    value={values.fullname}
+                    onChange={handleChange}
+                    required
+                  />
+                  <TextField
+                    label="Mobile"
+                    variant="outlined"
+                    fullWidth
+                    name="mobile"
+                    value={values.mobile}
+                    onChange={handleChange}
+                    required
+                  />
+                  <TextField
+                    label="Email"
+                    variant="outlined"
+                    fullWidth
+                    name="email"
+                    value={values.email}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                  >
+                    Submit
+                  </Button>
+                </Form>
+              )}
             </Formik>
           </Box>
         </Modal>
       </div>
+
+      <ToastContainer />
     </>
   );
 };

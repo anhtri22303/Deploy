@@ -66,18 +66,19 @@ import { CREATE_AREA_FAILURE, CREATE_AREA_REQUEST,CREATE_AREA_SUCCESS,CREATE_EVE
     };
  };
 
- export const createArea = (reqData) => {
-    console.log("token--------",reqData.token);
+ export const createArea = (Data,jwt) => {
+    console.log("token--------",jwt);
     return async (dispatch) => {
         dispatch({type:CREATE_AREA_REQUEST})
         try{
-            const {data} = await api.post(`/api/admin/area`, reqData.data, {
+            const {data} = await api.post(`/api/admin/area`, Data, {
                 headers: {
-                    Authorization : `Bearer ${reqData.token}`,
+                    Authorization : `Bearer ${jwt}`,
                 },
             });
             dispatch({type:CREATE_AREA_SUCCESS, payload:data});
             console.log("created restaurant ", data);
+            
         } catch (error) {
             console.log("catch error",error);
             dispatch({type:CREATE_AREA_FAILURE, payload:error})

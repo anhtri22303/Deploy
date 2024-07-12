@@ -17,11 +17,12 @@ const areaOrderReducer = (state = initialState, action) => {
         case GET_AREA_ORDER_SUCCESS:
             return { ...state, loading: false, orders: action.payload };
 
-        case UPDATE_ORDER_STATUS_SUCCESS:
-            const updateOrders = state.orders.map((order) =>
-            order.id === action.payload.id? action.payload : order
-        );
-            return { ...state, loading: false, orders: updateOrders };
+            case UPDATE_ORDER_STATUS_SUCCESS:
+    const updatedOrder = action.payload;
+    const updatedOrders = state.orders.map((order) =>
+        order.id === updatedOrder.id ? updatedOrder : order
+    );
+    return { ...state, loading: false, orders: updatedOrders };
         
         case GET_AREA_ORDER_FAILURE:
         case UPDATE_ORDER_STATUS_FAILURE:

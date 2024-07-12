@@ -26,20 +26,64 @@ const StockGold = () => {
   };
 
   return (
-    <Box className="p-5" sx={{ maxWidth: 800, margin: "0 auto" }}>
-      <Typography variant="h4" className="text-blue-1000 py-5" sx={{ textAlign: "center", fontWeight: 'bold', fontSize: '2.5rem' }}>
+    <Box
+      className="p-5"
+      sx={{
+        maxWidth: 1200, // Increase the max width of the container
+        margin: "0 auto",
+        marginTop: "120px", // Khoảng cách với Navbar
+        marginBottom: "180px" // Khoảng cách với Footer
+      }}
+    >
+      <Typography
+        variant="h4"
+        className="text-blue-1000 py-5"
+        sx={{ textAlign: "center", fontWeight: 'bold', fontSize: '3rem' }} // Increase font size
+      >
         Stock Gold Prices
       </Typography>
-      <Typography variant="subtitle1" className="py-3" sx={{ textAlign: "center", fontWeight: 'bold', fontSize: '1.75rem' }}>
+      <Typography
+        variant="subtitle1"
+        className="py-3"
+        sx={{ textAlign: "center", fontWeight: 'bold', fontSize: '2rem' }} // Increase font size
+      >
         Current Time in Vietnam: {vietnamTime}
       </Typography>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ borderRight: "1px solid rgba(224, 224, 224, 1)", fontWeight: 'bold', fontSize: '1.25rem' }}>Component Name</TableCell>
-              <TableCell align="right" sx={{ borderRight: "1px solid rgba(224, 224, 224, 1)", fontWeight: 'bold', fontSize: '1.25rem' }}>Current Price (USD)</TableCell>
-              <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>Purchase Price (USD)</TableCell>
+              <TableCell
+                sx={{
+                  backgroundColor: '#f0f0f0',
+                  borderRight: "1px solid rgba(224, 224, 224, 1)",
+                  fontWeight: 'bold',
+                  fontSize: '1.75rem' // Increase font size
+                }}
+              >
+                Component Name
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  backgroundColor: '#f0f0f0',
+                  borderRight: "1px solid rgba(224, 224, 224, 1)",
+                  fontWeight: 'bold',
+                  fontSize: '1.75rem' // Increase font size
+                }}
+              >
+                Current Price (USD)
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  backgroundColor: '#f0f0f0',
+                  fontWeight: 'bold',
+                  fontSize: '1.75rem' // Increase font size
+                }}
+              >
+                Purchase Price (USD)
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -59,26 +103,54 @@ const StockGold = () => {
             )}
             {components.map((component) => (
               <TableRow key={component.id}>
-                <TableCell sx={{ borderRight: "1px solid rgba(224, 224, 224, 1)", fontSize: '1.25rem' }}>{component.name}</TableCell>
-                <TableCell align="right" sx={{ borderRight: "1px solid rgba(224, 224, 224, 1)", fontSize: '1.25rem' }}>${component.price.toFixed(2)}</TableCell>
-                <TableCell align="right" sx={{ fontSize: '1.25rem' }}>${component.pricebuyback.toFixed(2)}</TableCell>
+                <TableCell
+                  sx={{
+                    borderRight: "1px solid rgba(224, 224, 224, 1)",
+                    fontSize: '1.75rem' // Increase font size
+                  }}
+                >
+                  {component.name}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{
+                    borderRight: "1px solid rgba(224, 224, 224, 1)",
+                    fontSize: '1.75rem' // Increase font size
+                  }}
+                >
+                  ${component.price.toFixed(2)}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{ fontSize: '1.75rem' }} // Increase font size
+                >
+                  ${component.pricebuyback.toFixed(2)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
       <Box sx={{ textAlign: "center", mt: 3 }}>
-        <Button variant="contained" color="primary" onClick={handleCastToScreen} sx={{
-          bgcolor: 'green', // Initial background color
-          color: 'white', // Text color
-          fontWeight: 'bold',
-          '&:hover': {
-            bgcolor: 'red', // Background color on hover
-          },
-          '&:focus': {
-            bgcolor: 'black', // Background color on focus
-          },
-        }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleCastToScreen}
+          sx={{
+            mt: 2,
+            bgcolor: 'orange',
+            color: 'white',
+            fontWeight: 'bold',
+            height: '40px', // Adjust height as needed
+            padding: '8px',
+            '&:hover': {
+              bgcolor: 'darkorange',
+            },
+            '&:focus': {
+              bgcolor: 'black',
+            },
+          }}
+        >
           Cast to TV
         </Button>
       </Box>

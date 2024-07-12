@@ -25,13 +25,14 @@ export const componentReducer = (state = initialState, action) => {
         case CREATE_COMPONENT_SUCCESS:
             return {
                 ...state,
-                loading: false, // Kết thúc loading khi request thành công
+                loading: false,
+                components: [...state.components, action.payload], // Kết thúc loading khi request thành công
             };
         case CREATE_COMPONENT_FAILURE:
             return {
                 ...state,
                 loading: false, // Kết thúc loading khi request thất bại
-                components: [...state.components, action.payload],
+                error: action.payload,
             };
         case GET_ALL_COMPONENT_REQUEST:
             return {

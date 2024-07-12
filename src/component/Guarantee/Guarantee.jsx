@@ -1,117 +1,199 @@
-import React, { useState } from "react";
-import {
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Box,
-} from "@mui/material";
-import { Language } from "@mui/icons-material";
+import React from "react";
+import { Box, Grid, Typography } from "@mui/material";
+import about_1 from '../../assets/about_1.png'
+import about_2 from "../../assets/about_2.png";
+import about_3 from "../../assets/about_3.png";
+import about_4 from "../../assets/about_4.png";
 
-const Guarantee = () => {
-  const [language, setLanguage] = useState("en");
-
-  const programs = {
-    en: [
-      {
-        type: "Warranty Policy",
-        description:
-          " Repairs or Replacements: Outline whether repairs, replacements, or refunds are offered under the warranty, and how these decisions are made. Limitations of Liability: Clarify any limitations on your liability, such as the extent of monetary compensation or the types of damages not covered. Duration: Specify the duration of the warranty period. This could be a set number of days, months, or years from the date of purchase. Modifications: State your right to modify the warranty policy and how customers will be informed of changes. Contact Information: Provide clear contact details for customers to reach out with questions or concerns about the warranty. Legal Compliance: Ensure your warranty policy complies with relevant laws and regulations in your jurisdiction.Claim Process: Explain how customers can make a warranty claim. Include details such as where to contact, what information they need to provide (like proof of purchase), and the expected timeline for resolution.Description for Warranty Policy including various conditions and details...",
-      },
-      {
-        type: "Exchange Policy",
-        description:
-          "Introduction: Start with an overview of what the warranty covers and any key definitions (e.g., warranty period, eligible products Coverage: Detail what aspects of the product or service are covered under warranty. This could include defects in materials, workmanship, or specific components.Exclusions: Clearly state what is not covered by the warranty. Common exclusions include damage from misuse, unauthorized repairs, or natural wear and tear.",
-      },
-      {
-        type: "Custom Design - Client Goods",
-        description:
-          "Custom design products or accessories made from precious metals with or without diamonds, colored stones...",
-      },
-    ],
-    vi: [
-      {
-        type: "CHÍNH SÁCH BẢO HÀNH",
-        description:
-         " Sửa chữa hoặc Thay thế: Nêu rõ liệu việc sửa chữa, thay thế hoặc hoàn tiền có được cung cấp theo bảo hành hay không và cách đưa ra các quyết định này. Giới hạn trách nhiệm pháp lý: Làm rõ mọi giới hạn về trách nhiệm pháp lý của bạn, chẳng hạn như mức bồi thường bằng tiền hoặc các loại thiệt hại không Thời hạn được bảo hiểm: Chỉ định khoảng thời gian bảo hành Đây có thể là một số ngày, tháng hoặc năm nhất định kể từ ngày mua. Sửa đổi: Nêu rõ quyền sửa đổi chính sách bảo hành của bạn và cách khách hàng sẽ được thông báo về các thay đổi. Cung cấp chi tiết liên hệ rõ ràng để khách hàng có thể liên hệ khi có thắc mắc hoặc quan ngại về bảo hành Tuân thủ pháp luật: Đảm bảo chính sách bảo hành của bạn tuân thủ các luật và quy định có liên quan tại khu vực pháp lý của bạn. Quy trình yêu cầu bồi thường: Giải thích cách khách hàng có thể đưa ra yêu cầu bảo hành chi tiết như địa điểm gửi yêu cầu bảo hành. liên hệ, họ cần cung cấp thông tin gì (chẳng hạn như bằng chứng mua hàng) và thời gian giải quyết dự kiến. Mô tả về Chính sách bảo hành bao gồm các điều kiện và chi tiết khác nhau...",
-      },
-      {
-        type: "THU ĐỔI",
-        description:
-         "Giới thiệu: Bắt đầu với phần tổng quan về nội dung bảo hành và bất kỳ định nghĩa chính nào (ví dụ: thời gian bảo hành, sản phẩm đủ điều kiện Phạm vi bảo hiểm: Chi tiết những khía cạnh nào của sản phẩm hoặc dịch vụ được bảo hành. Điều này có thể bao gồm các khiếm khuyết về vật liệu, tay nghề hoặc các lỗi cụ thể các thành phần loại trừ: Nêu rõ những gì không được bảo hành. Các loại trừ phổ biến bao gồm hư hỏng do sử dụng sai, sửa chữa trái phép hoặc hao mòn tự nhiên.",
-      },
-      {
-        type: "Hàng thiết kế riêng - Hàng khách",
-        description:
-          "Sản phẩm trang sức hoặc phụ kiện từ kim loại quý gắn hoặc không gắn kim cương, đá màu...",
-      },
-    ],
-  };
-
-  const toggleLanguage = () => {
-    setLanguage((prevLang) => (prevLang === "en" ? "vi" : "en"));
-  };
-
+const About = () => {
   return (
-    <Box sx={{ padding: 3 }}>
-      <Button
-        variant="contained"
-        startIcon={<Language />}
-        onClick={toggleLanguage}
-        size="medium"
-        style={{
-          marginBottom: "20px",
-          marginRight: "20px", // Added margin to the right to align with table headers
-          backgroundColor: language === "en" ? "white" : "black",
-          color: language === "en" ? "black" : "white",
-          fontWeight: "bold", // Added fontWeight to match table headers
-        }}
-      >
-        {language === "en" ? "to Vn" : "to en"}
-      </Button>
-      <TableContainer component={Paper} elevation={3}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell
-                sx={{
-                  fontWeight: "bold",
-                  fontSize: "1.2rem",
-                  borderRight: "1px solid rgba(224, 224, 224, 1)",
-                }}
-              >
-                {language === "en" ? "Policy Type" : "Loại Chính Sách"}
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "1.2rem" }}>
-                {language === "en" ? "Description" : "Mô tả"}
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {programs[language].map((program, index) => (
-              <TableRow key={index} hover>
-                <TableCell
-                  sx={{
-                    fontSize: "1rem",
-                    borderRight: "1px solid rgba(224, 224, 224, 1)",
-                  }}
-                >
-                  {program.type}
-                </TableCell>
-                <TableCell sx={{ fontSize: "1rem" }}>
-                  {program.description}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+    <Box sx={{ width: "100%", maxWidth: "1252px", margin: "50px 250px 200px" }}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
+          <Typography
+            variant="h4"
+            sx={{
+              color: "#072753",
+              fontSize: "27px",
+              fontWeight: "bold",
+              marginTop: "20px",
+              marginBottom: "10px",
+            }}
+          >
+            About Us
+          </Typography>
+          <Typography
+            sx={{
+              color: "#4f6484",
+              width: "550px",
+            }}
+          >
+            H&TDiamond began as a personal quest to find the right diamond at a
+            fair price. Nowadays we&#39;re helping our users discover their
+            perfect diamond at the lowest price from the top online jewelers.
+            Every day we algorithmically search through millions of diamonds to
+            find the best deals without compromising on quality.
+            <br />
+            <br />
+            Our business model is similar to Kayak or SeatGeek: free for you
+            (the user), and we make a small fee from the jewelers only if you
+            purchase a diamond from their site. We experienced how stressful
+            this search process can be firsthand. Our goal is to make your
+            search easier and align our interests with yours.
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Box
+            component="img"
+            sx={{
+              width: "550px",
+              height: "300px",
+            }}
+            alt="Image"
+            src={about_1}
+          />
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={2} marginTop="30px">
+        <Grid item xs={12} md={6}>
+          <Box
+            component="img"
+            sx={{
+              width: "550px",
+              height: "300px",
+            }}
+            alt="Image"
+            src={about_2}
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Typography
+            variant="h4"
+            sx={{
+              color: "#072753",
+              fontSize: "27px",
+              fontWeight: "bold",
+              marginTop: "20px",
+              marginBottom: "10px",
+            }}
+          >
+            Outstanding Service
+          </Typography>
+
+          <Typography
+            sx={{
+              color: "#4f6484",
+              width: "550px",
+            }}
+          >
+            We cherish our customers like family. Our dedicated team follows a
+            simple principle: providing exceptional care, contributing to theirhappiness, and ensuring fairness. In a world where genuine
+            connections are rare, we value the art of building authentic
+            relationships. We want our customers to feel like they are part of
+            the family.
+            <br />
+            <br />
+            Jewelry holds profound emotional significance. It accompanies us
+            during life&#39;s most treasured moments, from engagements to
+            anniversaries, birthdays to heirlooms. We deeply understand the
+            importance and intimacy of these events, and we consider it a
+            privilege to be a part of them. Trust us to honor your milestones
+            with the utmost care and dedication.
+          </Typography>
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={2} marginTop="30px">
+        <Grid item xs={12} md={6}>
+          <Typography
+            variant="h4"
+            sx={{
+              color: "#072753",
+              fontSize: "27px",
+              fontWeight: "bold",
+              marginTop: "20px",
+              marginBottom: "10px",
+            }}
+          >
+            A Memorable Experience
+          </Typography>
+          <Typography
+            sx={{
+              color: "#4f6484",
+              width: "550px",
+            }}
+          >
+            Explore enchanting natural ethically-sourced GIA certified diamonds
+            and exquisite jewelry at our exclusive store in . By appointment
+            only, we offer a private and personalized experience, ensuring
+            utmost privacy and undivided attention.
+            <br />
+            <br /> With our thoughtful service, exceptional care, and unbeatable
+            value, every visit promises a satisfying and delightful
+            consultation. Build a special relationship that spans a lifetime of
+            diamond and jewel-worthy milestones and successes. Schedule your
+            appointment today for an intimate and unforgettable experience.
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Box
+            component="img"
+            sx={{
+              width: "550px",
+              height: "300px",
+            }}
+            alt="Image"
+            src={about_3}
+          />
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={2} marginTop="30px">
+        <Grid item xs={12} md={6}>
+          <Box
+            component="img"
+            sx={{
+              width: "550px",
+              height: "300px",
+            }}
+            alt="Image"
+            src={about_4}
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Typography
+            variant="h4"
+            sx={{
+              color: "#072753",
+              fontSize: "27px",
+              fontWeight: "bold",
+              marginTop: "20px",
+              marginBottom: "10px",
+            }}
+          >
+            Get To Know Us
+          </Typography>
+          <Typography
+            sx={{
+              color: "#4f6484",width: "550px",
+            }}
+          >
+            Throughout the years, our commitment to customers and the joy we
+            share with them remains steadfast. Our studio exudes warmth and
+            intimacy, ensuring that each person feels truly special and valued.
+            Just like diamonds, our relationships with customers endure,
+            celebrating their most cherished milestones with everlasting
+            brilliance. Join us in creating unforgettable memories that shine
+            bright for a lifetime. Explore our exquisite collection of quality
+            diamonds, precious gems, and fine jewelry. Plan your visit today
+            schedule an appointment online or call our store at 703-536-3600
+            during our store hours. We look forward to working with you.
+          </Typography>
+        </Grid>
+      </Grid>
     </Box>
   );
 };
 
-export default Guarantee;
+export default About;

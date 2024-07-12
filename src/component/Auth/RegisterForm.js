@@ -22,7 +22,7 @@ export default function RegisterForm() {
     dispatch(registerUser({ userData: values, navigate }))
       .then(() => {
         // On successful registration, navigate to the login page or a success page
-        navigate("/account/login"); // or navigate("/registration-success");
+        navigate("/area/:title/:id"); // or navigate("/registration-success");
       })
       .catch((error) => {
         console.error("Registration failed", error);

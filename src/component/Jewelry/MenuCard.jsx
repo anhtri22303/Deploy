@@ -1,11 +1,27 @@
 import React from "react";
-import { Accordion, AccordionDetails, AccordionSummary, Button } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Button,
+  Typography,
+  Card,
+  CardContent,
+  CardActions,
+  IconButton,
+  Tooltip,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { useDispatch } from "react-redux";
 import { addItemToCart } from "../State/Cart/Action";
 
 const MenuCart = ({ item }) => {
   const dispatch = useDispatch();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleAddItemToCart = (e) => {
     e.preventDefault();
@@ -20,39 +36,62 @@ const MenuCart = ({ item }) => {
   };
 
   return (
-    <Accordion>
-      <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
-        aria-controls="panel1-content"
-        id="panel1-header"
-      >
-        <div className="lg:flex items-center justify-between">
-          <div className="lg:flex items-center lg:gap-5">
+    <Card elevation={3} sx={{ mb: 2 }}>
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1-content"
+          id="panel1-header"
+        >
+          <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
             <img
-              className="w-[7rem] h-[7rem] object-cover"
               src={item.images[0]}
-              alt=""
+              alt={item.name}
+              style={{
+                width: isSmallScreen ? "4rem" : "5rem",
+                height: isSmallScreen ? "4rem" : "5rem",
+                objectFit: "cover",
+                borderRadius: "10%",
+                marginRight: "1rem",
+              }}
             />
-            <div className="space-y-1 lg:space-y-5 lg:max-w-2x1">
-              <p className="font-semibold text-xl">{item.name}</p>
-              <p>{item.price} USD</p>
-              <p className="text-gray-400">{item.description}</p>
+            <div style={{ flex: 1 }}>
+              <Typography variant="h6" component="h2" noWrap>
+                {item.name}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                {item.price} USD
+              </Typography>
+              <Typography variant="body2" color="textSecondary" noWrap>
+                {item.description}
+              </Typography>
             </div>
+            <Tooltip title="Add to Cart">
+              <IconButton onClick={handleAddItemToCart} color="primary">
+                <AddShoppingCartIcon />
+              </IconButton>
+            </Tooltip>
           </div>
-        </div>
-      </AccordionSummary>
-      <AccordionDetails>
-        <div className="pt-3">
+        </AccordionSummary>
+        <AccordionDetails>
+          <CardContent>
+            <Typography variant="body1">{item.details}</Typography>
+          </CardContent>
+          <CardActions>
           <Button
-            onClick={handleAddItemToCart}
-            variant="contained"
-            disabled={false} // Adjust disabled condition based on your logic
-          >
-            Add to Cart
-          </Button>
-        </div>
-      </AccordionDetails>
-    </Accordion>
+      variant="contained"
+      onClick={handleAddItemToCart}
+      fullWidth
+      color="primary"  // Thay đổi màu thành primary để có màu xanh dương
+      startIcon={<AddShoppingCartIcon />}
+    >
+      Add to Cart
+    </Button>
+  
+          </CardActions>
+        </AccordionDetails>
+      </Accordion>
+    </Card>
   );
 };
 

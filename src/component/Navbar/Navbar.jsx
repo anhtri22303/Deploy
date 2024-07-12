@@ -1,9 +1,9 @@
 import React from "react";
 import { Avatar, Box, IconButton, Button, Badge } from "@mui/material";
-import { blue } from "@mui/material/colors";
+import { grey } from "@mui/material/colors";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import PersonIcon from "@mui/icons-material/Person";
+import PersonIcon from '@mui/icons-material/Person';
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import "./Navbar.css";
 
@@ -47,6 +47,7 @@ export const Navbar = () => {
             sx={{
               color: "Black",
               fontWeight: "bold",
+              fontSize: "20px",
               "&:hover": {
                 bgcolor: "Black",
                 color: "White",
@@ -64,11 +65,11 @@ export const Navbar = () => {
               onClick={handleAvatarClick}
               sx={{
                 bgcolor: "white",
-                color: blue.A400,
+                color: grey.A400,
+
                 cursor: "pointer",
               }}
             >
-              {auth.user?.fullname[0].toUpperCase()}
             </Avatar>
           ) : (
             <IconButton

@@ -16,6 +16,7 @@ const menuItemReducer = (state = initialState, action) => {
         case actionTypes.SEARCH_MENU_ITEM_REQUEST:
         case actionTypes.UPDATE_MENU_ITEMS_AVAILABILITY_REQUEST:
         case actionTypes.GET_MENU_ITEM_BY_CODE_REQUEST:
+        case actionTypes.UPDATE_JEWELRY_PRICES_REQUEST:
 
             return {
                 ...state,
@@ -54,6 +55,15 @@ const menuItemReducer = (state = initialState, action) => {
                     .payload : menuItem
                 ),
             };
+        case actionTypes.UPDATE_JEWELRY_PRICES_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        menuItems: state.menuItems.map(menuItem =>
+          menuItem.id === action.payload.id ? { ...menuItem, price: action.payload.price } : menuItem
+        ),
+        message: "Jewelry prices updated successfully"
+      };
         case actionTypes.SEARCH_MENU_ITEM_SUCCESS:
         case actionTypes.GET_MENU_ITEM_BY_CODE_SUCCESS :
             
@@ -67,7 +77,8 @@ const menuItemReducer = (state = initialState, action) => {
         case actionTypes.DELETE_MENU_ITEM_FAILURE:
         case actionTypes.SEARCH_MENU_ITEM_FAILURE:
         case actionTypes.UPDATE_MENU_ITEMS_AVAILABILITY_FAILURE:
-            case actionTypes.GET_MENU_ITEM_BY_CODE_FAILURE:
+        case actionTypes.GET_MENU_ITEM_BY_CODE_FAILURE:
+        case actionTypes.UPDATE_JEWELRY_PRICES_FAILURE:
             return {
                 ...state,
                 loading: false,

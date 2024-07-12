@@ -25,7 +25,7 @@ const CreateAreaForm = () => {
     const formik = useFormik({
         initialValues,
         onSubmit: (values) => {
-            const data={
+            const Data={
                 name: values.name,
                 description: values.description,
                 contactInformation:{
@@ -35,9 +35,9 @@ const CreateAreaForm = () => {
                 OpeningHours: values.openingHours,
                 images: values.images,
             };
-            console.log("data ---",data)
+            console.log("data ---",Data)
             
-            dispatch(createArea({data},{jwt}))
+            dispatch(createArea(Data,jwt))
         },
     });
 

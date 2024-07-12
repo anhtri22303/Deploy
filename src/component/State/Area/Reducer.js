@@ -2,7 +2,7 @@ import * as actionTypes from "./ActionType";
 
 const initialState = {
     areas : [],
-    userArea : null,
+    userArea  : null,
     area : null,
     // categories: null,
     loading : false,
@@ -47,7 +47,7 @@ const areaReducer = (state = initialState, action) => {
             return{
                 ...state,
                 loading:false,
-                usersArea : action.payload,
+                userArea : action.payload,
             };
     case actionTypes.DELETE_AREA_SUCCESS:
         return {
@@ -90,18 +90,6 @@ const areaReducer = (state = initialState, action) => {
                     (item) => item.id !== action.payload
                 ),
             };
-        // case actionTypes.CREATE_CATEGORY_SUCCESS:
-        //     return {
-        //         ...state,
-        //         loading : false,
-        //         categories : [...state.categories, action.payload],
-        //     };
-        // case actionTypes.GET_CATEGORY_SUCCESS:
-        //         return {
-        //             ...state,
-        //             loading: false,
-        //             categories : action.payload,
-        //         };
 
         case actionTypes.CREATE_AREA_FAILURE:
         case actionTypes.GET_ALL_AREA_FAILURE:
@@ -109,8 +97,6 @@ const areaReducer = (state = initialState, action) => {
         case actionTypes.UPDATE_AREA_FAILURE:
         case actionTypes.GET_AREA_BY_ID_FAILURE:
         case actionTypes.CREATE_EVENTS_FAILURE:
-        // case actionTypes.CREATE_CATEGORY_FAILURE:
-        // case actionTypes.GET_CATEGORY_FAILURE:
             return {
                 ...state,
                 loading: false,

@@ -1,6 +1,6 @@
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Button, Chip, FormControl, InputLabel, OutlinedInput } from '@mui/material';
+import { Button, FormControl, FormHelperText, InputLabel, OutlinedInput } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
@@ -9,54 +9,75 @@ import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import { useFormik } from 'formik';
 import React, { useEffect, useState } from 'react';
-import { uploadImageToCloudinary } from '../util/UploadToCloudinary';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import * as Yup from 'yup';
 import { getAllCategory } from '../../component/State/Categories/Action';
-import { fetchComponents } from '../../component/State/Gold Price/Action';
+import { getAllComponent } from '../../component/State/Components/Action';
 import { createMenuItem } from '../../component/State/Menu/Action';
+import { uploadImageToCloudinary } from '../util/UploadToCloudinary';
 
 const initialValues = {
     name: "",
     description: "",
     code: "",
     category: "",
-    selectedComponents: [], // Đổi tên thành selectedComponents
-    selectedComponents2: [], // Thêm selectedComponents2
+    selectedComponents: [],
+    selectedComponents2: [],
     goldWeight: "",
     diamondWeight: "",
     images: []
 };
 
+const validationSchema = Yup.object({
+    name: Yup.string()
+    .required('Name is required'),
+    description: Yup.string()
+    .required('Description is required'),
+    code: Yup.string()
+    .required('Jewelry Code is required'),
+    category: Yup.string()
+    .required('Category is required'),
+    goldWeight: Yup.number()
+    .positive('Gold Weight must be positive'),
+    diamondWeight: Yup.number()
+    .positive('Diamond Weight must be positive'),
+});
+
 const CreateMenuForm = () => {
     const [uploadImage, setUploadImage] = useState(false);
-    const { components, } = useSelector((state) => state.gold_price);
+    const { component } = useSelector(store => store);
     const { category } = useSelector(store => store);
     const dispatch = useDispatch();
-    const jwt = localStorage.getItem("jwt")
+    const navigate = useNavigate(); // Sử dụng useNavigate để chuyển hướng
+    const jwt = localStorage.getItem("jwt");
+    const [errorMessage, setErrorMessage] = useState('');
 
     const formik = useFormik({
         initialValues,
-        onSubmit: (values) => {
-            const selectedCategory = category.categories.find(cat => cat.id === formik.values.category);
-            const jewelryCategoryName = selectedCategory ? selectedCategory.name : '';
-            const data = {
+        validationSchema,
+        onSubmit: async (values) => {
+            const menu = {
                 name: values.name,
                 description: values.description,
                 code: values.code,
-                jewelryCategory: jewelryCategoryName,
+                jewelryCategory: values.category,
                 components: [values.selectedComponents, values.selectedComponents2],
                 goldWeight: values.goldWeight,
                 diamondWeight: values.diamondWeight,
                 images: values.images,
             };
-            console.log("jwt", jwt);
-            console.log("data ---", data);
-        
-            dispatch(createMenuItem({ data, jwt }));
+
+            console.log("data ---", menu);
+
+            dispatch(createMenuItem({ menu, jwt }));
+
+            // Chuyển hướng về trang danh sách sản phẩm
+            navigate('/admin/jewelry/menu');
         },
-        
     });
 
+    
     const handleImageChange = async (e) => {
         const file = e.target.files[0];
         setUploadImage(true);
@@ -77,9 +98,8 @@ const CreateMenuForm = () => {
     }, []);
 
     useEffect(() => {
-    const componentIds = "1, 4"; // Replace with the list of component IDs you want to fetch
-    dispatch(fetchComponents(componentIds));
-  }, [dispatch]);
+        dispatch(getAllComponent({ jwt }));
+    }, []);
 
     const handleChangeComponents = (event) => {
         const { value } = event.target;
@@ -98,6 +118,11 @@ const CreateMenuForm = () => {
                     Add New Jewelry
                 </h1>
                 <form onSubmit={formik.handleSubmit} className='space-y-4'>
+                {/* {errorMessage && (
+                        <div style={{ color: 'red', marginBottom: '10px' }}>
+                            {errorMessage}
+                        </div>
+                    )} */}
                     <Grid container spacing={2}>
                         <Grid className='flex flex-wrap gap-5' item xs={12}>
                             <input
@@ -147,8 +172,30 @@ const CreateMenuForm = () => {
                                 label="Name"
                                 variant="outlined"
                                 onChange={formik.handleChange}
-                                value={formik.values.name}>
-                            </TextField>
+                                value={formik.values.name}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.name && Boolean(formik.errors.name)}
+                                helperText={formik.touched.name && formik.errors.name}
+                                sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                    },
+                                    "& .MuiInputLabel-root": {
+                                        color: "gray",
+                                    },
+                                    "& .MuiInputLabel-root.Mui-focused": {
+                                        color: "gray",
+                                    },
+                                }}
+                            />
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -158,8 +205,30 @@ const CreateMenuForm = () => {
                                 label="Description"
                                 variant="outlined"
                                 onChange={formik.handleChange}
-                                value={formik.values.description}>
-                            </TextField>
+                                value={formik.values.description}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.description && Boolean(formik.errors.description)}
+                                helperText={formik.touched.description && formik.errors.description}
+                                sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                    },
+                                    "& .MuiInputLabel-root": {
+                                        color: "gray",
+                                    },
+                                    "& .MuiInputLabel-root.Mui-focused": {
+                                        color: "gray",
+                                    },
+                                }}
+                            />
                         </Grid>
                         <Grid item xs={12} lg={6}>
                             <TextField
@@ -169,79 +238,183 @@ const CreateMenuForm = () => {
                                 label="Jewelry Code"
                                 variant="outlined"
                                 onChange={formik.handleChange}
-                                value={formik.values.code}>
-                            </TextField>
+                                value={formik.values.code}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.code && Boolean(formik.errors.code)}
+                                helperText={formik.touched.code && formik.errors.code}
+                                sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                    },
+                                    "& .MuiInputLabel-root": {
+                                        color: "gray",
+                                    },
+                                    "& .MuiInputLabel-root.Mui-focused": {
+                                        color: "gray",
+                                    },
+                                }}
+                            />
                         </Grid>
                         <Grid item xs={12} lg={6}>
                             <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">Category</InputLabel>
                                 <Select
-                                labelId="demo-simple-select-label"
-                                id="category"
-                                value={formik.values.category} // Nên là id của category
-                                onChange={formik.handleChange}
-                                name="category"
-                            >
-                                {category.categories.map((category) => (
-                                    <MenuItem key={category.id} value={category.id}>
-                                        {category.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
+                                    labelId="demo-simple-select-label"
+                                    id="category"
+                                    value={formik.values.category} // Nên là id của category
+                                    onChange={formik.handleChange}
+                                    name="category"
+                                    onBlur={formik.handleBlur}
+                                    sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                            "& fieldset": {
+                                                borderColor: "gray",
+                                            },
+                                            "&:hover fieldset": {
+                                                borderColor: "gray",
+                                            },
+                                            "&.Mui-focused fieldset": {
+                                                borderColor: "gray",
+                                            },
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            color: "gray",
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            color: "gray",
+                                        },
+                                    }}
+                                >
+                                    {category.categories.map((category) => (
+                                        <MenuItem key={category.id} value={category.name}>
+                                            {category.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                                {formik.touched.category && formik.errors.category && (
+                                <FormHelperText>{formik.errors.category}</FormHelperText>
+                                )}
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} lg={6}>
                             <FormControl fullWidth>
                                 <InputLabel id="components-label">Components 1</InputLabel>
                                 <Select
-                                labelId="components-label"
-                                id="components"
-                                name="selectedComponents"
-                                value={formik.values.selectedComponents}
-                                onChange={handleChangeComponents}
-                                input={<OutlinedInput id="select-single-chip" label="Components 1" />}
-                                label="Components 1"
-                            >
-                                {components.map((component) => (
-                                    <MenuItem key={component.id} value={component.name}>
-                                        {component.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
+                                    labelId="components-label"
+                                    id="selectedComponents"
+                                    name="selectedComponents"
+                                    value={formik.values.selectedComponents}
+                                    onChange={handleChangeComponents}
+                                    input={<OutlinedInput id="select-single-chip" label="Components 1" />}
+                                    sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                            "& fieldset": {
+                                                borderColor: "gray",
+                                            },
+                                            "&:hover fieldset": {
+                                                borderColor: "gray",
+                                            },
+                                            "&.Mui-focused fieldset": {
+                                                borderColor: "gray",
+                                            },
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            color: "gray",
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            color: "gray",
+                                        },
+                                    }}
+                                >
+                                    {component.components.map((component) => (
+                                        <MenuItem key={component.id} value={component.name}>
+                                            {component.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} lg={6}>
-                        <FormControl fullWidth>
-                            <InputLabel id="components-label-2">Components 2</InputLabel>
-                            <Select
-                            labelId="components-label-2"
-                            id="components-2"
-                            name="selectedComponents2"
-                            value={formik.values.selectedComponents2}
-                            onChange={handleChangeComponents2}
-                            input={<OutlinedInput id="select-single-chip-2" label="Components 2" />}
-                            label="Components 2"
-                        >
-                            {["Natural Diamond", "Artificial Diamond"].map((name) => (
-                                <MenuItem key={name} value={name}>
-                                    {name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                        </FormControl>
+                            <FormControl fullWidth>
+                                <InputLabel id="components-label-2">Components 2</InputLabel>
+                                <Select
+                                    labelId="components-label-2"
+                                    id="selectedComponents2"
+                                    name="selectedComponents2"
+                                    value={formik.values.selectedComponents2}
+                                    onChange={handleChangeComponents2}
+                                    input={<OutlinedInput id="select-single-chip-2" label="Components 2" />}
+                                    sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                            "& fieldset": {
+                                                borderColor: "gray",
+                                            },
+                                            "&:hover fieldset": {
+                                                borderColor: "gray",
+                                            },
+                                            "&.Mui-focused fieldset": {
+                                                borderColor: "gray",
+                                            },
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            color: "gray",
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            color: "gray",
+                                        },
+                                    }}
+                                >
+                                    {component.components.map((component) => (
+                                        <MenuItem key={component.id} value={component.name}>
+                                            {component.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12} lg={6}>
+                            <TextField
+                                fullWidth
+                                id="goldWeight"
+                                name="goldWeight"
+                                label="Gold Weight"
+                                variant="outlined"
+                                onChange={formik.handleChange}
+                                value={formik.values.goldWeight}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.goldWeight && Boolean(formik.errors.goldWeight)}
+                                helperText={formik.touched.goldWeight && formik.errors.goldWeight}
+                                sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                    },
+                                    "& .MuiInputLabel-root": {
+                                        color: "gray",
+                                    },
+                                    "& .MuiInputLabel-root.Mui-focused": {
+                                        color: "gray",
+                                    },
+                                }}
+                            />
                         </Grid>
                         <Grid item xs={12} lg={6}>
-                        <TextField
-                            fullWidth
-                            id="goldWeight"
-                            name="goldWeight"
-                            label="Gold Weight"
-                            variant="outlined"
-                            onChange={formik.handleChange}
-                            value={formik.values.goldWeight}>
-                        </TextField>
-                    </Grid>                       
-                         <Grid item xs={12} lg={6}>
                             <TextField
                                 fullWidth
                                 id="diamondWeight"
@@ -249,11 +422,48 @@ const CreateMenuForm = () => {
                                 label="Diamond Weight"
                                 variant="outlined"
                                 onChange={formik.handleChange}
-                                value={formik.values.diamondWeight}>
-                            </TextField>
+                                value={formik.values.diamondWeight}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.diamondWeight && Boolean(formik.errors.diamondWeight)}
+                                helperText={formik.touched.diamondWeight && formik.errors.diamondWeight}
+                                sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "gray",
+                                        },
+                                    },
+                                    "& .MuiInputLabel-root": {
+                                        color: "gray",
+                                    },
+                                    "& .MuiInputLabel-root.Mui-focused": {
+                                        color: "gray",
+                                    },
+                                }}
+                            />
                         </Grid>
                     </Grid>
-                    <Button variant="contained" color="primary" type="submit">
+                    <Button variant="contained" color="primary" type="submit" 
+                     sx={{
+                        mt: 2,
+                        bgcolor: "#0B4CBB",
+                        color: 'white',
+                        fontWeight: 'bold',
+                        height: '40px', // Adjust height as needed
+                        padding: '8px',
+                        '&:hover': {
+                          bgcolor: 'darkorange',
+                        },
+                        '&:focus': {
+                          bgcolor: 'black',
+                        },
+                      }}
+                    >
                         Create
                     </Button>
                 </form>

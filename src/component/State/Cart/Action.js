@@ -47,7 +47,7 @@ export const addItemToCart = (reqData) => {
             dispatch({ type: ADD_ITEM_TO_CART_SUCCESS, payload: data });
         } catch (error) {
             console.log("catch error ", error);
-            dispatch({ type: ADD_ITEM_TO_CART_FAILURE, payload: error.message });
+            dispatch({ type: ADD_ITEM_TO_CART_FAILURE, payload: error });
         }
     };
 };
@@ -63,9 +63,11 @@ export const addItemToCartByCode = (reqData) => {
             });
             console.log("add item to cart ", data);
             dispatch({ type: ADD_ITEM_TO_CART_BY_CODE_SUCCESS, payload: data });
+            return data;
         } catch (error) {
             console.log("catch error ", error);
-            dispatch({ type: ADD_ITEM_TO_CART_BY_CODE_FAILURE, payload: error.message });
+            dispatch({ type: ADD_ITEM_TO_CART_BY_CODE_FAILURE, payload: error });
+            throw error;
         }
     };
 };
@@ -135,8 +137,11 @@ export const applyCoupon = (cartId, couponCode, jwt) => {
             });
             console.log('apply coupon data', data);
             dispatch({ type: APPLY_COUPON_SUCCESS, payload: data });
+            return data;
         } catch (error) {
+            console.log("coupon error",error)
             dispatch({ type: APPLY_COUPON_FAILURE, payload: error });
+            throw error;
         }
     };
 };

@@ -37,9 +37,12 @@ const JewelryDetails = () => {
 
   useEffect(() => {
     dispatch(getAreaById({ jwt, areaId: id }));
-    dispatch(getAllCategory({ jwt }));
   }, [dispatch, jwt, id]);
-
+  
+  useEffect(() => {
+    dispatch(getAllCategory({ jwt }));
+  }, [dispatch, jwt]);
+  
   useEffect(() => {
     dispatch(getMenuItemsByJewelryId({ jwt }));
   }, [dispatch, jwt]);
@@ -113,10 +116,10 @@ const JewelryDetails = () => {
               <img className="w-full h-[40vh] object-cover" src={area.area?.images[0]} alt="" />
             </Grid>
             <Grid item xs={12} lg={6}>
-              <img className="w-full h-[40vh] object-cover" src="https://cdn.pnj.io/images/promo/206/Banner_BST_Sakura-1200x450_CTA.png" alt="" />
+              <img className="w-full h-[40vh] object-cover" src="https://images.pexels.com/photos/9838851/pexels-photo-9838851.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="" />
             </Grid>
             <Grid item xs={12} lg={6}>
-              <img className="w-full h-[40vh] object-cover" src="https://cdn.pnj.io/images/promo/202/hello-apple-1200x450_CTA_.jpg" alt="" />
+              <img className="w-full h-[40vh] object-cover" src="https://images.pexels.com/photos/20796890/pexels-photo-20796890/free-photo-of-vang-nh-n-trang-s-c-kim-c-ng.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="" />
             </Grid>
           </Grid>
         </div>
@@ -199,11 +202,15 @@ const JewelryDetails = () => {
             </div>
           </div>
         </div>
-        <div className="space-y-5 lg:w[80%] lg:pl-10">
+        <Grid container spacing={4} className="lg:w-80 lg:pl-10">
           {filteredItems.map((item) => (
-            <MenuCard key={item.id} item={item} />
+            <Grid item key={item.id} xs={12} sm={6} md={4} lg={3}>
+              <div style={{ width: "100%", height: "450%" }}>
+                <MenuCard item={item} />
+              </div>
+            </Grid>
           ))}
-        </div>
+        </Grid>
       </section>
     </div>
   );

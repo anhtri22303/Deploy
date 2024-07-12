@@ -19,8 +19,8 @@ function App() {
 
   useEffect(()=> {
     dispatch(getAreaByUserId(auth.jwt || jwt));
-
   },[auth.user])
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
