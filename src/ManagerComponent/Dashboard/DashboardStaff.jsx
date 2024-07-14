@@ -65,7 +65,7 @@ const Dashboard = () => {
     return (
         <Box sx={{ px: 3, py: 4 }}>
             <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} md={4}>
+                <Grid item xs={3} md={4}>
                     <Paper elevation={3} sx={{ p: 3, textAlign: 'center' }}>
                         <Typography variant="h6" component="h2" gutterBottom>
                             <b>Total Orders</b>

@@ -42,13 +42,13 @@ export const AdminSidebar = ({ handleClose }) => {
             dispatch(logout());
             navigate("/");
         } else {
-            navigate(`/admin/jewelry${item.path}`);
+            navigate(`/manager/jewelry${item.path}`);
         }
         handleClose();
     };
 
     const handleLogoClick = () => {
-        navigate("/admin/jewelry");
+        navigate("/manager/jewelry");
         handleClose();
     };
 

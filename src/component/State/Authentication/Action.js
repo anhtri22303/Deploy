@@ -27,10 +27,13 @@ export const loginUser = (reqDate) => async (dispatch) => {
             const { data } = await axios.post(`${API_URL}/auth/signin`, reqDate.userData);
             if (data.jwt) localStorage.setItem("jwt", data.jwt);
             if (data.role === "ROLE_MANAGER") {
-                reqDate.navigate("/admin/jewelry");
-            } else {
+                reqDate.navigate("/manager/jewelry");
+            } else if(data.role === "ROLE_STAFF") {
                 reqDate.navigate("/area/:title/:id");
+            }else{
+                reqDate.navigate("/admin/jewelry");
             }
+
             dispatch({ type: LOGIN_SUCCESS, payload: data.jwt });
             console.log("login success")
         } catch (error) {

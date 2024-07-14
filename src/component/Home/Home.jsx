@@ -4,6 +4,7 @@ import MultiItemCarousel from "./MultiItemCarousel";
 import JewelryCard from '../Jewelry/JewelryCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllAreaAction } from "../State/Area/Action";
+import Footer from "../Footer/Footer";
 
 const Home = () => {
     const dispatch = useDispatch();
@@ -114,6 +115,7 @@ const Home = () => {
                     )}
                 </div>
             </section>
+            <Footer/>
         </div>
     );
 };

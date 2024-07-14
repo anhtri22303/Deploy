@@ -1,9 +1,10 @@
 import { Delete } from "@mui/icons-material";
 import React, { useEffect, useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Typography } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer,CardHeader, TableHead, TableRow, Paper, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Typography, TextField, InputAdornment, Box, Alert } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCoupons, deleteCoupon } from '../../component/State/Event/Action';
 import format from 'date-fns/format';
+import SearchIcon from '@mui/icons-material/Search';
 
 const EventTable = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,7 @@ const EventTable = () => {
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [couponToDelete, setCouponToDelete] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     dispatch(getCoupons(jwt));
@@ -32,11 +34,72 @@ const EventTable = () => {
     setCouponToDelete(null);
   };
 
+  const filteredEvents = coupon.coupons.filter(event => 
+    event.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 2 }}>
-     <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '2rem' }}>Events</div>
+       <CardHeader
+          title={"Events"}
+          sx={{
+            pt: 2,
+            pb: 1,
+            textAlign: "center",
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+            backgroundColor: "#0B4CBB",
+            color: "#fff",
+          }}
+        />
+      <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+        <TextField
+          label="Search by Event Name"
+          variant="outlined"
+          fullWidth
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton>
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            mb: 2,
+            mx: 5,
+            width: '100%',
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "gray",
+              },
+              "&:hover fieldset": {
+                borderColor: "gray",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "gray",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: "gray",
+            },
+            "& .MuiInputLabel-root.Mui-focused": {
+              color: "gray",
+            },
+          }}
+        />
+      </Box>
 
-     <Table>
+      {filteredEvents.length === 0 && (
+        <Alert severity="warning" sx={{ mb: 3, mx: 15, color: 'white', backgroundColor: '#FF5D5D', '& .MuiAlert-icon': { color: 'white' } }}>
+          No events found!
+        </Alert>
+      )}
+
+      <Table>
         <TableHead>
           <TableRow sx={{ backgroundColor: '#0B4CBB' }}>
             <TableCell>
@@ -77,8 +140,8 @@ const EventTable = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {coupon.coupons.length > 0 ? (
-            coupon.coupons.map((event, index) => (
+          {filteredEvents.length > 0 ? (
+            filteredEvents.map((event, index) => (
               <TableRow key={index} sx={{
                 "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
                 "&:hover": { backgroundColor: "#e0e0e0" },

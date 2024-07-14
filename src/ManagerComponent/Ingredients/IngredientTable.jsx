@@ -14,18 +14,26 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Alert,
+  TextField,         // Add this import for TextField
+  InputAdornment,    // Add this import for InputAdornment
 } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { getAllComponent } from "../../component/State/Components/Action";
 import UpdateForm from "./UpdateForm";
 import CreateIngredientsForm from "./CreateIngredientsForm";
+import SearchIcon from '@mui/icons-material/Search';  // Add this import for SearchIcon
 import UpgradeIcon from "@mui/icons-material/Upgrade";
+
+
 const IngredientTable = () => {
   const [open, setOpen] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const { components } = useSelector((state) => state.component);
   const dispatch = useDispatch();
   const jwt = localStorage.getItem("jwt");
+  const [showNoComponentAlert, setShowNoComponentAlert] = useState(false); // State for showing no component alert
 
   useEffect(() => {
     dispatch(getAllComponent({ jwt }));
@@ -42,6 +50,24 @@ const IngredientTable = () => {
     setOpen(true);
   };
 
+  const handleSearch = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    setSearchTerm(searchTerm);
+    if (searchTerm.trim() === "") {
+      setShowNoComponentAlert(false);
+    } else {
+      const found = components.some(
+        (component) => component.name.toLowerCase().includes(searchTerm)
+      );
+      setShowNoComponentAlert(!found);
+    }
+  };
+
+  // Filter components based on search term
+  const filteredComponents = components.filter((component) =>
+    component.name.toLowerCase().includes(searchTerm)
+  );
+
   return (
     <Box sx={{ padding: 2 }}>
       <Card sx={{ mt: 2, boxShadow: 3, borderRadius: 2 }}>
@@ -51,16 +77,65 @@ const IngredientTable = () => {
               <CreateIcon />
             </IconButton>
           }
-          title="Ingredients"
+          title={"Ingredients"}
           sx={{
             pt: 2,
             pb: 1,
             textAlign: "center",
-            backgroundColor: "#f5f5f5",
-            borderBottom: "1px solid #e0e0e0",
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+            backgroundColor: "#0B4CBB",
+            color: "#fff",
           }}
-          titleTypographyProps={{ variant: "h5", fontWeight: "bold" }}
         />
+        <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
+          <TextField
+            label="Search by Ingredient Name"
+            variant="outlined"
+            fullWidth
+            value={searchTerm}
+            onChange={handleSearch}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton>
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              mb: 2,
+              mx: 5,
+              width: "100%",
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "gray",
+                },
+                "&:hover fieldset": {
+                  borderColor: "gray",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "gray",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "gray",
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: "gray",
+              },
+            }}
+          />
+        </Box>
+
+        {/* Display Alert if no component found */}
+        {showNoComponentAlert && (
+          <Alert severity="warning" sx={{ mb: 3, mx: "auto", width: "fit-content" }}>
+            No ingredients found with the provided name.
+          </Alert>
+        )}
+
         <TableContainer component={Paper}>
           <Table aria-label="ingredient table" sx={{ minWidth: 650 }}>
             <TableHead>
@@ -108,7 +183,7 @@ const IngredientTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {components.map((item, index) => (
+              {filteredComponents.map((item, index) => (
                 <TableRow
                   key={item.id}
                   sx={{
@@ -127,12 +202,20 @@ const IngredientTable = () => {
                       onClick={() => handleUpdateClick(item)}
                       aria-label="update"
                       sx={{ color: "red", width: 60, height: 60 }} // Adjust the width and height to make the button larger
-                      >
-                        <UpgradeIcon sx={{ fontSize: 40 }} />
+                    >
+                      <UpgradeIcon sx={{ fontSize: 40 }} />
                     </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
+              {/* Show message if no ingredients found */}
+              {searchTerm !== "" && filteredComponents.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">
+                    No ingredients found with the provided name.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>

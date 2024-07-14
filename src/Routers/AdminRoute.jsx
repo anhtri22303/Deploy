@@ -1,11 +1,11 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { Manager } from '../ManagerComponent/Manager/Manager';
-export const ManagerRoute = () => {
+import { Admin } from '../Admin/Admin/Admin';
+export const AdminRoute = () => {
     return (
         <div>
             <Routes>
-                <Route path="/*" element={ <Manager/>}         
+                <Route path="/*" element={ <Admin/>}         
                 ></Route>
             </Routes>
         </div>

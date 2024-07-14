@@ -30,7 +30,6 @@ const Buy = () => {
       setProductDetail(menu.search);
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Incorect Product code!");
     }
   };
 

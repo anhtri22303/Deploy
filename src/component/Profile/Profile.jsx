@@ -6,8 +6,8 @@ import { Orders } from "./Orders";
 import { Address } from "./Address";
 import Favorites from "./Favorites";
 import {Events} from "./Events";
-import DashboardStaff  from '../../AdminComponent/Dashboard/DashboardStaff';
-import Buyback from '../../AdminComponent/Buyback/Buyback';
+import DashboardStaff  from '../../ManagerComponent/Dashboard/DashboardStaff';
+import Buyback from '../../ManagerComponent/Buyback/Buyback';
 const Profile = () => {
   const [openSideBar,setOpenSideBar] = useState(false);
   return (

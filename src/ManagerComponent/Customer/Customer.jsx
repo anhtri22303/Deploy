@@ -12,6 +12,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
+  Typography,
+  Alert,
 } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -35,6 +38,9 @@ const style = {
 const Customer = () => {
   const [open, setOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showNoItemAlert, setShowNoItemAlert] = useState(false); // State for showing no item alert
+
   const { customers } = useSelector((state) => state.customer);
   const dispatch = useDispatch();
   const jwt = localStorage.getItem("jwt");
@@ -54,14 +60,44 @@ const Customer = () => {
     setOpen(true);
   };
 
+  const handleSearch = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    setSearchTerm(searchTerm);
+    if (searchTerm.trim() === "") {
+      setShowNoItemAlert(false);
+    } else {
+      const found = customers.some(
+        (customer) => customer.fullname.toLowerCase().includes(searchTerm)
+      );
+      setShowNoItemAlert(!found);
+    }
+  };
+
   return (
     <Box>
       <Card className="mt-1" sx={{ padding: 2, margin: 2 }}>
+        <CardHeader
+          title={"Customer"}
+          sx={{
+            pt: 2,
+            pb: 1,
+            textAlign: "center",
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+            backgroundColor: "#0B4CBB",
+            color: "#fff",
+          }}
+        />
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
+          <TextField
+            label="Search by Name"
+            variant="outlined"
+            onChange={handleSearch}
+          />
+        </Box>
         <TableContainer component={Paper}>
-        <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '2rem' }}>Customer Management</div>
-
           <Table aria-label="customer table">
-            <TableHead sx={{ backgroundColor: "#0B4CBB"  }}>
+            <TableHead sx={{ backgroundColor: "#0B4CBB" }}>
               <TableRow>
                 <TableCell
                   align="left"
@@ -93,35 +129,38 @@ const Customer = () => {
                 >
                   Điểm Tích Luỹ
                 </TableCell>
-                {/* <TableCell
-                  align="right"
-                  sx={{ color: "white", fontWeight: "bold" }}
-                >
-                  Actions
-                </TableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>
-              {customers.map((item, index) => (
-                <TableRow key={item.id}>
-                  <TableCell component="th" scope="row">
-                    {index + 1}
-                  </TableCell>
-                  <TableCell align="right">{item.fullname}</TableCell>
-                  <TableCell align="right">{item.mobile}</TableCell>
-                  <TableCell align="right">{item.email}</TableCell>
-                  <TableCell align="right">{item.point}</TableCell>
-                  {/* <TableCell align="right">
-                    <IconButton
-                      onClick={() => handleUpdateClick(item)}
-                      aria-label="update"
-                      sx={{ color: "red" }}
-                    >
-                      Update
-                    </IconButton>
-                  </TableCell> */}
-                </TableRow>
-              ))}
+              {customers
+                .filter((customer) =>
+                  customer.fullname.toLowerCase().includes(searchTerm)
+                )
+                .map((customer, index) => (
+                  <TableRow key={customer.id}>
+                    <TableCell component="th" scope="row">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell align="right">{customer.fullname}</TableCell>
+                    <TableCell align="right">{customer.mobile}</TableCell>
+                    <TableCell align="right">{customer.email}</TableCell>
+                    <TableCell align="right">{customer.point}</TableCell>
+                  </TableRow>
+                ))}
+              {/* Show message if no items found */}
+              {searchTerm !== "" &&
+                customers
+                  .filter((customer) =>
+                    customer.fullname.toLowerCase().includes(searchTerm)
+                  ).length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={5} align="center">
+                        <Alert severity="warning">
+                          No customers found with the provided name.
+                        </Alert>
+                      </TableCell>
+                    </TableRow>
+                  )}
             </TableBody>
           </Table>
         </TableContainer>

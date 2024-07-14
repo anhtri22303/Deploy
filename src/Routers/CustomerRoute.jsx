@@ -78,7 +78,8 @@ import Buy from "../component/BuyBack/Buy";
 import Exchange from "../component/BuyBack/Exchange";
 import Invoice from "../component/BuyBack/Invoice";
 import { useSelector } from "react-redux";
-import CreateAreaForm from "../AdminComponent/CreateAreaForm/CreateAreaForm";
+import CreateAreaForm from "../ManagerComponent/CreateAreaForm/CreateAreaForm";
+import InvoiceOut from "../component/BuyBack/InvoiceOut";
 
 export const CustomerRoute = () => {
   const { area } = useSelector((store) => store);
@@ -100,6 +101,7 @@ export const CustomerRoute = () => {
         <Route path='/exchange' element={<Exchange />} />
         <Route path='/payment/success/:orderId' element={<PayMentSuccess />} />
         <Route path='/buyback-success' element={<Invoice />} />
+        <Route path='/buyback-out-success' element={<InvoiceOut/>} />
       </Routes>
       {/* <ul>
         <li>
@@ -109,7 +111,7 @@ export const CustomerRoute = () => {
           <Link to={"/register"}>Register</Link>
         </li>
       </ul> */}
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

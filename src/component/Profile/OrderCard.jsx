@@ -20,9 +20,6 @@ import {
   MenuItem,
   Menu,
   Button,
-  Select,
-  FormControl,
-  InputLabel,
   Radio,
   RadioGroup,
   FormControlLabel,
@@ -47,6 +44,7 @@ export default function OrderCard() {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [filterStatus, setFilterStatus] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const open = Boolean(anchorEl);
 
   const handleClick = (event, orderId) => {
@@ -70,11 +68,20 @@ export default function OrderCard() {
     handleClose();
   };
 
-  const filteredOrders = order.orders?.filter(
-    (order) =>
-      (filterStatus === "ALL" || order.orderStatus === filterStatus) &&
-      order.customer.fullname.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    if (order.orders) {
+      handleSearch();
+    }
+  }, [order.orders, filterStatus, searchTerm]);
+
+  const handleSearch = () => {
+    const filtered = order.orders?.filter(
+      (order) =>
+        (filterStatus === "ALL" || order.orderStatus === filterStatus) &&
+        order.customer.fullname.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredOrders(filtered);
+  };
 
   return (
     <Box sx={{ padding: 2 }}>
@@ -92,69 +99,57 @@ export default function OrderCard() {
           }}
         />
         <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
-          <FormControl component="fieldset" sx={{ minWidth: 200 }}>
-            <RadioGroup
-              row
-              aria-label="filter-status"
-              name="filter-status"
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              sx={{ display: "flex", justifyContent: "center" }}
-            >
-              <FormControlLabel value="ALL" control={<Radio />} label="All" />
-              <FormControlLabel
-                value="PENDING"
-                control={<Radio />}
-                label="Pending"
-              />
-              <FormControlLabel
-                value="COMPLETED"
-                control={<Radio />}
-                label="Completed"
-              />
-            </RadioGroup>
-          </FormControl>
+          <RadioGroup
+            row
+            aria-label="filter-status"
+            name="filter-status"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
+            <FormControlLabel value="ALL" control={<Radio />} label="All" />
+            <FormControlLabel value="PENDING" control={<Radio />} label="Pending" />
+            <FormControlLabel value="COMPLETED" control={<Radio />} label="Completed" />
+          </RadioGroup>
         </Box>
 
-        <TextField
-  label="Search by Customer Name"
-  variant="outlined"
-  fullWidth
-  value={searchTerm}
-  onChange={(e) => setSearchTerm(e.target.value)}
-  InputProps={{
-    endAdornment: (
-      <InputAdornment position="end">
-        <IconButton>
-          <SearchIcon />
-        </IconButton>
-      </InputAdornment>
-    ),
-  }}
-  sx={{
-    mb: 2,
-    mx: 4,
-    width: '88%',
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderColor: "gray",
-      },
-      "&:hover fieldset": {
-        borderColor: "gray",
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "gray",
-      },
-    },
-    "& .MuiInputLabel-root": {
-      color: "gray",
-    },
-    "& .MuiInputLabel-root.Mui-focused": {
-      color: "gray",
-    },
-  }}
-/>
-
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 2 }}>
+          <TextField
+            id="search-input"
+            label="Search by Name"
+            variant="outlined"
+            size="small"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch();
+              }
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "gray",
+                },
+                "&:hover fieldset": {
+                  borderColor: "gray",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "gray",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "gray",
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: "gray",
+              },
+            }}
+          />
+          <IconButton aria-label="search" onClick={handleSearch}>
+            <SearchIcon />
+          </IconButton>
+        </Box>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
@@ -210,71 +205,79 @@ export default function OrderCard() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredOrders?.map((order) => (
-                <TableRow
-                  key={order.id}
-                  sx={{
-                    "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
-                    "&:hover": { backgroundColor: "#e0e0e0" },
-                  }}
-                >
-                  <TableCell sx={{ fontWeight: "bold" }}>{order.id}</TableCell>
-                  <TableCell align="center">
-                    {order.customer.fullname}
-                  </TableCell>
-                  <TableCell align="center">{order.totalPrice}</TableCell>
-                  <TableCell align="center">{order.areaName}</TableCell>
-                  <TableCell align="center">
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: "bold",
-                        color:
-                          order.orderStatus === "COMPLETED" ? "green" : "red",
-                      }}
-                    >
-                      {order.orderStatus}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Button
-                      id="basic-button"
-                      aria-controls={open ? "basic-menu" : undefined}
-                      aria-haspopup="true"
-                      aria-expanded={open ? "true" : undefined}
-                      onClick={(event) => handleClick(event, order.id)}
-                      sx={{
-                        color: "#fff",
-                        fontWeight: "bold",
-                        backgroundColor: "#0B4CBB",
-                        "&:hover": {
-                          backgroundColor: "#1976d2",
-                        },
-                      }}
-                    >
-                      Update
-                    </Button>
-                    <Menu
-                      id="basic-menu"
-                      anchorEl={anchorEl}
-                      open={open && selectedOrderId === order.id}
-                      onClose={handleClose}
-                      MenuListProps={{
-                        "aria-labelledby": "basic-button",
-                      }}
-                    >
-                      {orderStatus.map((status) => (
-                        <MenuItem
-                          key={status.value}
-                          onClick={() => handleUpdateOrder(status.value)}
-                        >
-                          {status.label}
-                        </MenuItem>
-                      ))}
-                    </Menu>
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((order) => (
+                  <TableRow
+                    key={order.id}
+                    sx={{
+                      "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
+                      "&:hover": { backgroundColor: "#e0e0e0" },
+                    }}
+                  >
+                    <TableCell sx={{ fontWeight: "bold" }}>{order.id}</TableCell>
+                    <TableCell align="center">
+                      {order.customer.fullname}
+                    </TableCell>
+                    <TableCell align="center">{order.totalPrice}</TableCell>
+                    <TableCell align="center">{order.areaName}</TableCell>
+                    <TableCell align="center">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: "bold",
+                          color:
+                            order.orderStatus === "COMPLETED" ? "green" : "red",
+                        }}
+                      >
+                        {order.orderStatus}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Button
+                        id="basic-button"
+                        aria-controls={open ? "basic-menu" : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? "true" : undefined}
+                        onClick={(event) => handleClick(event, order.id)}
+                        sx={{
+                          color: "#fff",
+                          fontWeight: "bold",
+                          backgroundColor: "#0B4CBB",
+                          "&:hover": {
+                            backgroundColor: "#1976d2",
+                          },
+                        }}
+                      >
+                        Update
+                      </Button>
+                      <Menu
+                        id="basic-menu"
+                        anchorEl={anchorEl}
+                        open={open && selectedOrderId === order.id}
+                        onClose={handleClose}
+                        MenuListProps={{
+                          "aria-labelledby": "basic-button",
+                        }}
+                      >
+                        {orderStatus.map((status) => (
+                          <MenuItem
+                            key={status.value}
+                            onClick={() => handleUpdateOrder(status.value)}
+                          >
+                            {status.label}
+                          </MenuItem>
+                        ))}
+                      </Menu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">
+                    No orders found with the given search criteria.
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </TableContainer>

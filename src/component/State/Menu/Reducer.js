@@ -4,7 +4,7 @@ const initialState = {
     menuItems: [],
     loading: false,
     error: null,
-    search: [],
+    search: null,
     message: null
 };
 

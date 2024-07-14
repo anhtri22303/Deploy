@@ -15,8 +15,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { calculateBuybackPriceOut } from "../State/Valuation/Action";
 import { Formik, Form, Field } from "formik";
 import { createBuybackOut } from "../State/Buyback/Action";
+import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid"; // Ensure you have the correct import path
-import { uploadImageToCloudinary } from "../../AdminComponent/util/UploadToCloudinary"; // Import your image upload utility function
+import { uploadImageToCloudinary } from "../../ManagerComponent/util/UploadToCloudinary"; // Import your image upload utility function
 
 const Buy = () => {
   const dispatch = useDispatch();
@@ -29,6 +30,7 @@ const Buy = () => {
   const [images, setImages] = useState([]);
   const [buybackPrice, setBuybackPrice] = useState(null);
   const jwt = localStorage.getItem("jwt");
+  const navigate = useNavigate();
 
   const [isCustomerInfoModalOpen, setIsCustomerInfoModalOpen] = useState(false); // State for managing customer info modal open state
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false); // State for managing code modal open state
@@ -397,13 +399,50 @@ const Buy = () => {
             Customer Information
           </Typography>
           <Formik
-            initialValues={initialValues}
-            onSubmit={(values, { setSubmitting }) => {
-              setTimeout(() => {
-                console.log(JSON.stringify(values, null, 2));
-                setSubmitting(false);
-              }, 400);
-            }}
+          initialValues={initialValues}
+          onSubmit={(values, actions) => {
+            dispatch(
+              createBuybackOut(
+                {
+                  fullname: values.fullname,
+                  mobile: values.mobile,
+                  email: values.email,
+                },
+                {
+                  name : Name,
+                  description : "",
+                  goldWeight : goldWeight,
+                  diamondWeight: diamondWeight,
+                  jewelryCategory : type,
+                  code : code,
+                  images: images.map(image => image.url), 
+                  "components" : components.filter(Boolean)
+                },      
+                jwt
+              )
+            );
+            const customer =   {
+              fullname: values.fullname,
+              mobile: values.mobile,
+              email: values.email,
+            }
+            const product =  {
+              name : Name,
+              description : "",
+              goldWeight : goldWeight,
+              diamondWeight: diamondWeight,
+              jewelryCategory : type,
+              code : code,
+              images: images.map(image => image.url), 
+              "components" : components.filter(Boolean)
+            }
+            navigate("/buyback-out-success", {
+              state: { buyback: customer, product: product , valuation },
+            });
+
+            handleCloseCustomerInfoModal();
+            actions.setSubmitting(false);
+          }}
           >
             {({ isSubmitting }) => (
               <Form style={{ width: "100%" }}>

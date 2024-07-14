@@ -1,6 +1,6 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { JewelryDetails } from '../Admin/JewelryDetails'
+import { JewelryDetails } from './JewelryDetails'
 import { Category } from '../Category/Category'
 import Dashboard from '../Dashboard/Dashboard'
 
@@ -17,7 +17,7 @@ import Teams from '../Staff/Teams'
 import Customer from '../Customer/Customer'
 import Buyback from '../Buyback/Buyback'
 
-export const Admin = () => {
+export const Manager = () => {
     const dispatch = useDispatch();
     const jwt = localStorage.getItem('jwt');
     const { jewelry } = useSelector(store => store);

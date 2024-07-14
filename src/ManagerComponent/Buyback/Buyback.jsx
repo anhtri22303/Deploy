@@ -2,7 +2,7 @@ import React from 'react'
 import BuybackTable from './BuybackTable'
 const Buyback = () => {
   return (
-    <div>
+    <div >
       <BuybackTable/>
     </div>
   )

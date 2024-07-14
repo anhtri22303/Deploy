@@ -5,16 +5,26 @@ import SearchIcon from '@mui/icons-material/Search';
 import { getALLsOrders } from '../../component/State/Order/Action';
 
 export default function OrdersTable({ filter }) {
-    const { orders } = useSelector((state) => state.order); // Assuming state has 'order' slice with 'orders' array
+    const { orders } = useSelector((state) => state.order);
     const dispatch = useDispatch();
     const jwt = localStorage.getItem("jwt");
 
     const [filterStatus, setFilterStatus] = useState("ALL");
     const [searchTerm, setSearchTerm] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
 
     useEffect(() => {
         dispatch(getALLsOrders(jwt));
     }, [dispatch, jwt]);
+
+    useEffect(() => {
+        const filteredOrders = orders.filter((order) =>
+            (filterStatus === "ALL" || order.orderStatus.toUpperCase() === filterStatus) &&
+            (order.customer.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                order.id.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+        setSearchResults(filteredOrders);
+    }, [orders, filterStatus, searchTerm]);
 
     const handleFilterChange = (event) => {
         setFilterStatus(event.target.value);
@@ -24,29 +34,24 @@ export default function OrdersTable({ filter }) {
         setSearchTerm(event.target.value);
     };
 
-    const filteredOrders = orders.filter((order) =>
-        (filterStatus === "ALL" || order.orderStatus.toUpperCase() === filterStatus) &&
-        (order.customer.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.id.toString().toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-
     return (
         <Box sx={{ padding: 2 }}>
             <Card sx={{ mt: 2, boxShadow: 3, borderRadius: 2 }}>
-                <CardHeader
-                    title="All Orders"
-                    sx={{
-                        pt: 2,
-                        pb: 1,
-                        textAlign: 'center',
-                        backgroundColor: '#f5f5f5',
-                        borderBottom: '1px solid #e0e0e0'
-                    }}
-                    titleTypographyProps={{ variant: 'h5', fontWeight: 'bold' }}
-                />
+            <CardHeader
+          title={"All Orders"}
+          sx={{
+            pt: 2,
+            pb: 1,
+            textAlign: "center",
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+            backgroundColor: "#0B4CBB",
+            color: "#fff",
+          }}
+        />
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <FormControl component="fieldset" sx={{ minWidth: 200 }}>
+                        <FormControl component="fieldset" sx={{ minWidth: 350 }}>
                             <RadioGroup
                                 row
                                 aria-label="filter-status"
@@ -129,27 +134,37 @@ export default function OrdersTable({ filter }) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredOrders.map((order) => (
-                                <TableRow
-                                    key={order.id}
-                                    sx={{
-                                        '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' },
-                                        '&:hover': { backgroundColor: '#e0e0e0' }
-                                    }}
-                                >
-                                    <TableCell component="th" scope="row" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>
-                                        {order.id}
-                                    </TableCell>
-                                    <TableCell align="center">{order.customer.fullname}</TableCell>
-                                    <TableCell align="center">{order.totalPrice}</TableCell>
-                                    <TableCell align="center">{order.areaName}</TableCell>
-                                    <TableCell align="center">
-                                        <Typography variant="body2" sx={{ fontWeight: 'bold', color: order.orderStatus === 'COMPLETED' ? 'green' : 'red' }}>
-                                            {order.orderStatus}
+                            {searchResults.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} align="center">
+                                        <Typography variant="body1" sx={{ fontStyle: 'italic' }}>
+                                            No orders found.
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            ) : (
+                                searchResults.map((order) => (
+                                    <TableRow
+                                        key={order.id}
+                                        sx={{
+                                            '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' },
+                                            '&:hover': { backgroundColor: '#e0e0e0' }
+                                        }}
+                                    >
+                                        <TableCell component="th" scope="row" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>
+                                            {order.id}
+                                        </TableCell>
+                                        <TableCell align="center">{order.customer.fullname}</TableCell>
+                                        <TableCell align="center">{order.totalPrice}</TableCell>
+                                        <TableCell align="center">{order.areaName}</TableCell>
+                                        <TableCell align="center">
+                                            <Typography variant="body2" sx={{ fontWeight: 'bold', color: order.orderStatus === 'COMPLETED' ? 'green' : 'red' }}>
+                                                {order.orderStatus}
+                                            </Typography>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
