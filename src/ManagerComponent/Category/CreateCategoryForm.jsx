@@ -1,6 +1,7 @@
 import { Button, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
 import { createCategoryAction } from "../../component/State/Categories/Action";
 const CreateCategoryForm = () => {
   // const {jewelry}=useSelector(store=>store);
@@ -12,21 +13,47 @@ const CreateCategoryForm = () => {
 
   const validateForm = () => {
     let tempErrors = {};
-    tempErrors.categoryName = formData.categoryName ? "" : "This field is required.";
+    if (!formData.categoryName) {
+      tempErrors.categoryName = "This field is required.";
+    } else {
+      if (formData.categoryName.length < 3) {
+        tempErrors.categoryName = "Category name must be at least 3 characters.";
+      } else if (formData.categoryName.startsWith(' ')) {
+        tempErrors.categoryName = "Category name cannot start with a space.";
+      } else {
+        tempErrors.categoryName = "";
+      }
+    }
+  
     setErrors(tempErrors);
     return Object.values(tempErrors).every(x => x === "");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       const data = {
         name: formData.categoryName,
       };
-      dispatch(createCategoryAction({ reqData: data, jwt: localStorage.getItem("jwt") }));
-      console.log(data);
+      try {
+
+        await dispatch(createCategoryAction({ reqData: data, jwt: localStorage.getItem("jwt") }));
+        console.log("Category created:", data);
+
+        setFormData({ categoryName: "" });
+        toast.success("Category created successfully!");
+
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          toast.error(`${error.response.data.message}`);
+        } else {
+          toast.error("Wrong code. Please try again.");
+        }
+        console.error("error:", error);
+      }
     }
   };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -37,6 +64,7 @@ const CreateCategoryForm = () => {
   };
 
   return (
+    <>
     <div className="">
       <div className="p-5 ">
         <h1 className="text-black-400 text-center text-xl pb-10" style={{}}>
@@ -98,6 +126,10 @@ const CreateCategoryForm = () => {
         </form>
       </div>
     </div>
+    <ToastContainer />
+    </>
+    
+    
   );
 };
 

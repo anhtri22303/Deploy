@@ -1,11 +1,16 @@
-import {
-    GET_COUPONS_REQUEST, GET_COUPONS_SUCCESS, GET_COUPONS_FAILURE,
-    GET_COUPON_REQUEST, GET_COUPON_SUCCESS, GET_COUPON_FAILURE,
-    CREATE_COUPON_REQUEST, CREATE_COUPON_SUCCESS, CREATE_COUPON_FAILURE,
-    UPDATE_COUPON_REQUEST, UPDATE_COUPON_SUCCESS, UPDATE_COUPON_FAILURE,
-    DELETE_COUPON_REQUEST, DELETE_COUPON_SUCCESS, DELETE_COUPON_FAILURE
-} from './ActionType';
 import { api } from '../../config/api';
+import {
+    CREATE_COUPON_FAILURE,
+    CREATE_COUPON_REQUEST, CREATE_COUPON_SUCCESS,
+    DELETE_COUPON_FAILURE,
+    DELETE_COUPON_REQUEST, DELETE_COUPON_SUCCESS,
+    GET_COUPONS_FAILURE,
+    GET_COUPONS_REQUEST, GET_COUPONS_SUCCESS,
+    GET_COUPON_FAILURE,
+    GET_COUPON_REQUEST, GET_COUPON_SUCCESS,
+    UPDATE_COUPON_FAILURE,
+    UPDATE_COUPON_REQUEST, UPDATE_COUPON_SUCCESS
+} from './ActionType';
 
 // GET all coupons
 export const getCoupons = (jwt) => async dispatch => {
@@ -53,6 +58,7 @@ export const createCoupon = (couponData,jwt) => async dispatch => {
     } catch (error) {
         console.log("error", error)
         dispatch({ type: CREATE_COUPON_FAILURE, payload: error.message });
+        throw error;
     }
 };
 

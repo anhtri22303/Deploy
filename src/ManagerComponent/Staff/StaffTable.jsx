@@ -1,9 +1,10 @@
+import { Delete } from "@mui/icons-material";
+import SearchIcon from '@mui/icons-material/Search';
+import { Box, Card, CardHeader, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Card, CardHeader, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, TextField } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import { getAllStaffUser, deleteStaffUser } from '../../component/State/Authentication/Action';
-import { Delete } from "@mui/icons-material";
+import { deleteStaffUser, getAllStaffUser } from '../../component/State/Authentication/Action';
+
 export default function StaffTable() {
     const dispatch = useDispatch();
     const { auth } = useSelector((store) => store);

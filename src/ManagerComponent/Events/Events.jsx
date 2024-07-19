@@ -3,6 +3,7 @@ import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
 import { createCoupon } from "../../component/State/Event/Action";
 import EventTable from "./EventTable";
 
@@ -39,8 +40,10 @@ export const Events = () => {
   const validateForm = () => {
     let tempErrors = {};
     tempErrors.images = formValue.images ? "" : "Image URL is required.";
-    tempErrors.name = formValue.name ? "" : "Name is required.";
-    tempErrors.code = formValue.code ? "" : "Code is required.";
+
+    tempErrors.name = formValue.name && formValue.name.trimStart() === formValue.name ? "" : "Name is required and should not start with a space.";
+
+    tempErrors.code = formValue.code && formValue.code.trimStart() === formValue.code ? "" : "Code is required and should not start with a space.";
     tempErrors.discountPercentage = formValue.discountPercentage
       ? ""
       : "Discount Percentage is required.";
@@ -54,17 +57,27 @@ export const Events = () => {
 
     setErrors(tempErrors);
     return Object.values(tempErrors).every((x) => x === "");
-  };
+};
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (validateForm()) {
+    try {
       console.log("submit ", formValue);
-      dispatch(createCoupon(formValue, jwt));
+      await dispatch(createCoupon(formValue, jwt));
       setFormValue(initialValue);
+      toast.success("Coupon created successfully!");
       handleClose();
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(`${error.response.data.message}`);
+      } else {
+        toast.error("Wrong code. Please try again.");
+      }
+      console.error("error:", error);
     }
-  };
+  }
+};
 
   const handleFormChange = (event) => {
     const { name, value } = event.target;
@@ -95,6 +108,7 @@ export const Events = () => {
   };
 
   return (
+    <>
     <div>
       <div className="p-5">
         <Button
@@ -374,5 +388,8 @@ export const Events = () => {
       </div>
       <EventTable />
     </div>
+    <ToastContainer/>
+    </>
+    
   );
 };

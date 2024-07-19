@@ -17,7 +17,8 @@ export const registerUser=(reqDate) =>async(dispatch)=>{
     
     } catch(error){
         dispatch({type:REGISTER_FAILURE,payload:error})
-        console.log(error,error)
+        console.log(error,error);
+        throw error;
     }
     }
 

@@ -169,6 +169,7 @@ export const createComponent = ({ data, jwt }) => {
 
         } catch (error) {
             console.log("error", error);
+            throw error;
         }
     };
 };

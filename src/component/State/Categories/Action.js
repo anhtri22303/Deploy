@@ -1,12 +1,12 @@
-import {
-    GET_CATEGORY_FAILURE,
-    GET_CATEGORY_REQUEST,
-    GET_CATEGORY_SUCCESS,
-    CREATE_CATEGORY_FAILURE,
-    CREATE_CATEGORY_REQUEST,
-    CREATE_CATEGORY_SUCCESS,
-  } from "./ActionType";
 import { api } from "../../config/api";
+import {
+  CREATE_CATEGORY_FAILURE,
+  CREATE_CATEGORY_REQUEST,
+  CREATE_CATEGORY_SUCCESS,
+  GET_CATEGORY_FAILURE,
+  GET_CATEGORY_REQUEST,
+  GET_CATEGORY_SUCCESS,
+} from "./ActionType";
 // chua lam
 
 export const createCategoryAction=({reqData,jwt})=>{
@@ -25,6 +25,7 @@ export const createCategoryAction=({reqData,jwt})=>{
         }catch(error){
             console.log("catch - ", error);
             dispatch({type:CREATE_CATEGORY_FAILURE,payload:error});
+            throw error;
         }
     };
 };

@@ -1,8 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { Create as CreateIcon, Delete, Refresh as RefreshIcon } from "@mui/icons-material";
 import {
+  Alert,
   Box,
+  Button,
   Card,
   CardHeader,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
   Paper,
   Table,
@@ -11,20 +18,13 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
-  Alert,
   TextField,
+  Typography,
 } from "@mui/material";
-import { Delete, Refresh as RefreshIcon, Create as CreateIcon } from "@mui/icons-material";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAllMenuItem, updateJewelryPrice, deleteFoodAction } from "../../component/State/Menu/Action";
+import { deleteFoodAction, getAllMenuItem, updateJewelryPrice } from "../../component/State/Menu/Action";
 
 const MenuTable = () => {
   const { menu } = useSelector((store) => store);
@@ -89,8 +89,8 @@ const MenuTable = () => {
               >
                 <RefreshIcon />
               </IconButton>
-              <IconButton
-                onClick={() => navigate("/admin/jewelry/add-menu")}
+              <IconButton 
+                onClick={() => navigate("/manager/jewelry/add-menu")}
                 aria-label="settings"
               >
                 <CreateIcon />

@@ -11,6 +11,7 @@ import { useFormik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { toast, ToastContainer } from "react-toastify";
 import * as Yup from 'yup';
 import { getAllCategory } from '../../component/State/Categories/Action';
 import { getAllComponent } from '../../component/State/Components/Action';
@@ -31,6 +32,7 @@ const initialValues = {
 
 const validationSchema = Yup.object({
     name: Yup.string()
+    .matches(/^[^\s].*[^\s]$/, 'The name cannot have leading or trailing spaces')
     .required('Name is required'),
     description: Yup.string()
     .required('Description is required'),
@@ -67,13 +69,23 @@ const CreateMenuForm = () => {
                 diamondWeight: values.diamondWeight,
                 images: values.images,
             };
+            try {
 
             console.log("data ---", menu);
+            await dispatch(createMenuItem({ menu, jwt }));
 
-            dispatch(createMenuItem({ menu, jwt }));
-
+            toast.success("Category created successfully!");
             // Chuyển hướng về trang danh sách sản phẩm
-            navigate('/admin/jewelry/menu');
+            navigate('/manager/jewelry/add-menu');
+            
+            } catch (error) {
+                if (error.response && error.response.data && error.response.data.message) {
+                  toast.error(`${error.response.data.message}`);
+                } else {
+                  toast.error("Wrong code. Please try again.");
+                }
+                console.error("error:", error);
+              }
         },
     });
 
@@ -112,6 +124,7 @@ const CreateMenuForm = () => {
     };
 
     return (
+        <>
         <div className='py-10 lg:flex px-5 items-center justify-center min-h-screen'>
             <div className="lg:max-w-4xl">
                 <h1 className='font-bold text-2xl text-center py-2'>
@@ -469,6 +482,9 @@ const CreateMenuForm = () => {
                 </form>
             </div>
         </div>
+        <ToastContainer/>
+        </>
+        
     );
 };
 

@@ -5,10 +5,11 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
 import { createComponent } from "../../component/State/Components/Action";
 
 const CreateIngredientsForm = () => {
-  const dispath = useDispatch();
+  const dispatch = useDispatch();
   const [formData, setFormData, ] = useState({
     name: "",
     price: "",
@@ -20,6 +21,10 @@ const CreateIngredientsForm = () => {
   const validateForm = () => {
     if (!formData.name || !formData.price || !formData.pricebuyback) {
       setError('All fields are required.');
+      return false;
+    }
+    if (formData.name.startsWith(' ')) {
+      setError('Name cannot start with a space.');
       return false;
     }
     if (isNaN(formData.price) || isNaN(formData.pricebuyback)) {
@@ -34,7 +39,7 @@ const CreateIngredientsForm = () => {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
@@ -44,9 +49,19 @@ const CreateIngredientsForm = () => {
       pricebuyback: formData.pricebuyback,
     };
 
-    dispath(createComponent({ data, jwt }));
-    console.log(data);
-  };
+    try {
+      await dispatch(createComponent({ data, jwt }));
+      console.log("Ingredient created:", data);
+      toast.success("Category created successfully!");
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(`${error.response.data.message}`);
+      } else {
+        toast.error("Wrong name. Please try again.");
+      }
+      console.error("error:", error);
+    }
+};
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -57,6 +72,7 @@ const CreateIngredientsForm = () => {
   };
 
   return (
+    <>
     <div className="">
       <div className="p-5">
         <h1
@@ -176,6 +192,9 @@ const CreateIngredientsForm = () => {
         </form>
       </div>
     </div>
+    <ToastContainer/>
+    </>
+    
   );
 };
 

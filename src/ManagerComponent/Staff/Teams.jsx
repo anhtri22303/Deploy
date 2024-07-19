@@ -1,8 +1,10 @@
 import { Box, Button, Grid, Modal, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { toast, ToastContainer } from "react-toastify";
 import { createUser } from '../../component/State/Authentication/Action';
 import StaffTable from './StaffTable';
+
 const style = {
   position: 'absolute',
   top: '50%',
@@ -35,45 +37,61 @@ const Teams = () => {
 
   const validate = () => {
     let tempErrors = {};
-    tempErrors.fullname = formValue.fullname ? "" : "Full Name is required.";
-    tempErrors.username = formValue.username ? "" : "Username is required.";
+
+    // Hàm kiểm tra chuỗi bắt đầu bằng ký tự 'space'
+    const startsWithSpace = (str) => str.startsWith(' ');
+
+    tempErrors.fullname = formValue.fullname ? (startsWithSpace(formValue.fullname) ? "Full Name cannot start with a space." : "") : "Full Name is required.";
+    tempErrors.username = formValue.username ? (startsWithSpace(formValue.username) ? "Username cannot start with a space." : "") : "Username is required.";
 
     // Password validation
     if (formValue.password.length < 6) {
-      tempErrors.password = "Password must be at least 6 characters long";
-  } else if (formValue.password.length > 15) {
-      tempErrors.password = "Password must not exceed 15 characters";
-  } else if (!/[A-Z]/.test(formValue.password)) {
-      tempErrors.password = "Password must contain at least one uppercase letter";
-  } else if (!/\d/.test(formValue.password)) { // Check for at least one digit
-      tempErrors.password = "Password must contain at least one number";
-  } else {
-      tempErrors.password = "";
-  }
+        tempErrors.password = "Password must be at least 6 characters long";
+    } else if (formValue.password.length > 15) {
+        tempErrors.password = "Password must not exceed 15 characters";
+    } else if (!/[A-Z]/.test(formValue.password)) {
+        tempErrors.password = "Password must contain at least one uppercase letter";
+    } else if (!/\d/.test(formValue.password)) {
+        tempErrors.password = "Password must contain at least one number";
+    } else if (startsWithSpace(formValue.password)) {
+        tempErrors.password = "Password cannot start with a space.";
+    } else {
+        tempErrors.password = "";
+    }
 
-    tempErrors.email = /$^|.+@.+..+/.test(formValue.email) ? "" : "Email is not valid.";
-    tempErrors.gender = formValue.gender ? "" : "Gender is required.";
-    tempErrors.role = formValue.role ? "" : "Role is required.";
+    tempErrors.email = formValue.email ? (startsWithSpace(formValue.email) ? "Email cannot start with a space." : (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formValue.email) ? "" : "Email is not valid.")) : "Email is required.";
+    tempErrors.gender = formValue.gender ? (startsWithSpace(formValue.gender) ? "Gender cannot start with a space." : "") : "Gender is required.";
+    tempErrors.role = formValue.role ? (startsWithSpace(formValue.role) ? "Role cannot start with a space." : "") : "Role is required.";
     
     setErrors({ ...tempErrors });
     return Object.values(tempErrors).every(x => x === "");
 };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-    console.log('submit ', formValue);
-    setFormValue(initialValue);
-    const reqdata = formValue
-    dispatch(createUser(reqdata ,jwt))
-    handleClose(); // Close modal after submit
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!validate()) return;
+  try {
+      console.log('submit ', formValue);
+      setFormValue(initialValue);
+      const reqdata = formValue;
+      await dispatch(createUser(reqdata, jwt));
+      // handleClose(); // Close modal after submit
+  } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+          toast.error(`${error.response.data.message}`);
+      } else {
+          toast.error("Wrong code. Please try again.");
+      }
+      console.error("error:", error);
+  }
+};
 
   const handleFormChange = (e) => {
     setFormValue({ ...formValue, [e.target.name]: e.target.value });
   };
 
   return (
+    <>
     <div>
       <Button onClick={handleOpen} variant='contained' sx={{
                         mt: 2,
@@ -319,6 +337,9 @@ const Teams = () => {
       <StaffTable/>
       </div>
     </div>
+    <ToastContainer/>
+    </>
+    
   );
 };
 
