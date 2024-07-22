@@ -54,7 +54,6 @@ const CreateCategoryForm = () => {
     }
   };
 
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -128,7 +127,6 @@ const CreateCategoryForm = () => {
     </div>
     <ToastContainer />
     </>
-    
     
   );
 };

@@ -20,18 +20,57 @@ const UserProfile = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    navigate('/');
   };
 
   return (
-    <Box sx={{ minHeight: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Paper elevation={3} sx={{ padding: '2rem', textAlign: 'center', maxWidth: '400px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <AccountBoxIcon sx={{ fontSize: '9rem', color: '#1976d2' }} />
-          <Typography variant="h4" component="h1" sx={{ paddingY: '1rem', fontWeight: 'bold', fontFamily: 'Roboto, sans-serif' }}>
+    <Box
+      sx={{
+        minHeight: '80vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#ffffff',
+        padding: '2rem',
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          padding: '2rem',
+          textAlign: 'center',
+          maxWidth: '400px',
+          width: '100%',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          borderRadius: '10px',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <AccountBoxIcon
+            sx={{ fontSize: '8rem', color: '#1976d2', marginBottom: '1rem' }}
+          />
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{
+              paddingY: '1rem',
+              fontWeight: 'bold',
+              fontFamily: 'Roboto, sans-serif',
+            }}
+          >
             {auth.user ? auth.user.fullname : ''}
           </Typography>
-          <Typography variant="h6" component="h2" sx={{ color: 'gray', fontFamily: 'Roboto, sans-serif' }}>
+          <Typography
+            variant="h6"
+            component="h2"
+            sx={{ color: 'gray', fontFamily: 'Roboto, sans-serif' }}
+          >
             {auth.user ? auth.user.areaName : ''}
           </Typography>
           <Button

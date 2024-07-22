@@ -15,6 +15,7 @@ import { CALCULATE_BUYBACK_PRICE_FAILURE, CALCULATE_BUYBACK_PRICE_OUT_FAILURE, C
       } catch (error) {
         console.log("error",error)
         dispatch({ type: CALCULATE_BUYBACK_PRICE_FAILURE, payload: error.message });
+        throw error;
       }
     };
   };
@@ -36,6 +37,7 @@ import { CALCULATE_BUYBACK_PRICE_FAILURE, CALCULATE_BUYBACK_PRICE_OUT_FAILURE, C
         console.log("componentsName",componentsName)
         console.log("error",error)
         dispatch({ type: CALCULATE_BUYBACK_PRICE_OUT_FAILURE, payload: error.message });
+        throw error;
       }
     };
   };

@@ -26,9 +26,15 @@
 }
 
 .footer-logo {
-    max-height: 50px;
-    vertical-align: middle;
-}
+    height: 80px; /* Increase height to enlarge the image */
+    width: 110px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: #003366;
+    border-radius: 100%;
+    border: 3px solid #EEBF0D; 
+  }
 
 .contact-info, .footer-left .footer-text {
     margin-top: 10px; /* Add margin for spacing */

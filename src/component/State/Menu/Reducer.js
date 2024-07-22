@@ -2,6 +2,7 @@ import * as actionTypes from './ActionType';
 
 const initialState = {
     menuItems: [],
+    outOfStock: [],
     loading: false,
     error: null,
     search: null,
@@ -85,6 +86,53 @@ const menuItemReducer = (state = initialState, action) => {
                 error: action.payload,
                 message: null
             };
+            case actionTypes.INSTOCK_ITEM_REQUEST:
+            return {
+                ...state,
+                loading: true,
+                error: null,
+                message: null
+            };
+        case actionTypes.INSTOCK_ITEM_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                menuItems: state.menuItems.map(
+                    menuItem => menuItem.id === action.payload.id ? action.payload : menuItem
+                ),
+                message: "Item moved to instock successfully"
+            };
+        case actionTypes.INSTOCK_ITEM_FAILURE:
+            return {
+                ...state,
+                loading: false,
+                error: action.payload,
+                message: null
+            };
+
+            case actionTypes.GET_OUT_OF_STOCk_ITEM_REQUEST:
+            return {
+                ...state,
+                loading: true,
+                error: null,
+                message: null
+            };
+        case actionTypes.GET_OUT_OF_STOCk_ITEM_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                outOfStock: action.payload, // Update out of stock items in state
+                message: "Out of stock items fetched successfully"
+            };
+        case actionTypes.GET_OUT_OF_STOCk_ITEM_FAILURE:
+            return {
+                ...state,
+                loading: false,
+                error: action.payload,
+                message: null
+            };
+
+
         default:
             return state;
     }

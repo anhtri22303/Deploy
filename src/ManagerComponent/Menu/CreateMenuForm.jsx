@@ -11,7 +11,7 @@ import { useFormik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { toast, ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from 'react-toastify';
 import * as Yup from 'yup';
 import { getAllCategory } from '../../component/State/Categories/Action';
 import { getAllComponent } from '../../component/State/Components/Action';
@@ -32,18 +32,47 @@ const initialValues = {
 
 const validationSchema = Yup.object({
     name: Yup.string()
-    .matches(/^[^\s].*[^\s]$/, 'The name cannot have leading or trailing spaces')
-    .required('Name is required'),
+        .matches(/^[^\s].*$/, 'The name cannot start with a space')
+        .matches(/^[^\s].*[^\s]$/, 'The name cannot have leading or trailing spaces')
+        .required('Name is required'),
     description: Yup.string()
-    .required('Description is required'),
+        .matches(/^[^\s].*$/, 'The description cannot start with a space')
+        .required('Description is required'),
     code: Yup.string()
-    .required('Jewelry Code is required'),
+        .matches(/^[^\s].*$/, 'The jewelry code cannot start with a space')
+        .required('Jewelry Code is required'),
     category: Yup.string()
-    .required('Category is required'),
+        .matches(/^[^\s].*$/, 'The category cannot start with a space')
+        .required('Category is required'),
+
     goldWeight: Yup.number()
-    .positive('Gold Weight must be positive'),
+    .required('Gold Weight is required')
+    .test(
+        'is-not-space',
+        'Gold Weight cannot contain spaces',
+        value => String(value).trim() === String(value)
+    )
+        .typeError('Gold Weight must be a number')
+        .positive('Gold Weight must be positive')
+        
+        ,
     diamondWeight: Yup.number()
-    .positive('Diamond Weight must be positive'),
+    .required('Diamond Weight is required')
+    .test(
+        'is-not-space',
+        'Diamond Weight cannot contain spaces',
+        value => String(value).trim() === String(value)
+    )
+        .typeError('Diamond Weight must be a number')
+        .positive('Diamond Weight must be positive'),
+
+    // selectedComponents: Yup.array()
+    //     .of(Yup.string().required('A component selection is required'))
+    //     .min(1, 'At least one component must be selected'),
+    
+    // selectedComponents2: Yup.array()
+    //     .of(Yup.string().required('A component selection is required'))
+    //     .min(1, 'At least one component must be selected'),
 });
 
 const CreateMenuForm = () => {
@@ -51,7 +80,7 @@ const CreateMenuForm = () => {
     const { component } = useSelector(store => store);
     const { category } = useSelector(store => store);
     const dispatch = useDispatch();
-    const navigate = useNavigate(); // Sử dụng useNavigate để chuyển hướng
+    const navigate = useNavigate();
     const jwt = localStorage.getItem("jwt");
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -71,23 +100,23 @@ const CreateMenuForm = () => {
             };
             try {
 
-            console.log("data ---", menu);
-            await dispatch(createMenuItem({ menu, jwt }));
+                console.log("data ---", menu);
+                await dispatch(createMenuItem({ menu, jwt }));
+    
+                toast.success("Category created successfully!");
 
-            toast.success("Category created successfully!");
-            // Chuyển hướng về trang danh sách sản phẩm
-            navigate('/manager/jewelry/add-menu');
-            
-            } catch (error) {
-                if (error.response && error.response.data && error.response.data.message) {
-                  toast.error(`${error.response.data.message}`);
-                } else {
-                  toast.error("Wrong code. Please try again.");
+                navigate('/manager/jewelry/menu');
+                
+                } catch (error) {
+                    if (error.response && error.response.data && error.response.data.message) {
+                        toast.error(`${error.response.data.message}`);
+                    } else {
+                        toast.error("Wrong code. Please try again.");
+                    }
+                    console.error("error:", error);
                 }
-                console.error("error:", error);
-              }
-        },
-    });
+            },
+        });
 
     
     const handleImageChange = async (e) => {
@@ -131,11 +160,11 @@ const CreateMenuForm = () => {
                     Add New Jewelry
                 </h1>
                 <form onSubmit={formik.handleSubmit} className='space-y-4'>
-                {/* {errorMessage && (
+                {errorMessage && (
                         <div style={{ color: 'red', marginBottom: '10px' }}>
                             {errorMessage}
                         </div>
-                    )} */}
+                    )}
                     <Grid container spacing={2}>
                         <Grid className='flex flex-wrap gap-5' item xs={12}>
                             <input
@@ -277,7 +306,7 @@ const CreateMenuForm = () => {
                             />
                         </Grid>
                         <Grid item xs={12} lg={6}>
-                            <FormControl fullWidth>
+                            <FormControl error={formik.touched.category && Boolean(formik.errors.category)}fullWidth>
                                 <InputLabel id="demo-simple-select-label">Category</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-label"
@@ -313,12 +342,12 @@ const CreateMenuForm = () => {
                                     ))}
                                 </Select>
                                 {formik.touched.category && formik.errors.category && (
-                                <FormHelperText>{formik.errors.category}</FormHelperText>
+                                <FormHelperText sx={{ color: 'red' }}>{formik.errors.category}</FormHelperText>
                                 )}
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} lg={6}>
-                            <FormControl fullWidth>
+                            <FormControl error={formik.touched.selectedComponents && Boolean(formik.errors.selectedComponents)} fullWidth>
                                 <InputLabel id="components-label">Components 1</InputLabel>
                                 <Select
                                     labelId="components-label"
@@ -326,6 +355,7 @@ const CreateMenuForm = () => {
                                     name="selectedComponents"
                                     value={formik.values.selectedComponents}
                                     onChange={handleChangeComponents}
+                                    onBlur={formik.handleBlur}
                                     input={<OutlinedInput id="select-single-chip" label="Components 1" />}
                                     sx={{
                                         "& .MuiOutlinedInput-root": {
@@ -353,10 +383,13 @@ const CreateMenuForm = () => {
                                         </MenuItem>
                                     ))}
                                 </Select>
+                                {formik.touched.selectedComponents && formik.errors.selectedComponents && (
+                                <FormHelperText sx={{ color: 'red' }}>{formik.errors.selectedComponents}</FormHelperText>
+                                )}
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} lg={6}>
-                            <FormControl fullWidth>
+                            <FormControl error={formik.touched.selectedComponents2 && Boolean(formik.errors.selectedComponents2)} fullWidth>
                                 <InputLabel id="components-label-2">Components 2</InputLabel>
                                 <Select
                                     labelId="components-label-2"
@@ -364,6 +397,7 @@ const CreateMenuForm = () => {
                                     name="selectedComponents2"
                                     value={formik.values.selectedComponents2}
                                     onChange={handleChangeComponents2}
+                                    onBlur={formik.handleBlur}
                                     input={<OutlinedInput id="select-single-chip-2" label="Components 2" />}
                                     sx={{
                                         "& .MuiOutlinedInput-root": {
@@ -391,6 +425,9 @@ const CreateMenuForm = () => {
                                         </MenuItem>
                                     ))}
                                 </Select>
+                                {formik.touched.selectedComponents2 && formik.errors.selectedComponents2 && (
+                                <FormHelperText sx={{ color: 'red' }}>{formik.errors.selectedComponents2}</FormHelperText>
+                                )}
                             </FormControl>
                         </Grid>
 
@@ -484,7 +521,6 @@ const CreateMenuForm = () => {
         </div>
         <ToastContainer/>
         </>
-        
     );
 };
 

@@ -22,21 +22,20 @@ import {
   TextField,
 } from "@mui/material";
 import {
+  Delete,
   Refresh as RefreshIcon,
   Create as CreateIcon,
   Search as SearchIcon,
 } from "@mui/icons-material";
-import DoDisturbOnIcon from '@mui/icons-material/DoDisturbOn';
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   getAllMenuItem,
   updateJewelryPrice,
   deleteFoodAction,
-  instockItem,
 } from "../../component/State/Menu/Action";
 
-const MenuTable = () => {
+const InstockTable = () => {
   const { menu } = useSelector((store) => store);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -77,7 +76,7 @@ const MenuTable = () => {
 
   const handleDelete = () => {
     if (selectedItem) {
-      dispatch(instockItem({ jewelryId: selectedItem.id, jwt }));
+      dispatch(deleteFoodAction({ jewelryId: selectedItem.id, jwt }));
       handleClose();
     }
   };
@@ -99,7 +98,7 @@ const MenuTable = () => {
     <Box sx={{ padding: 3, minHeight: "100vh" }}>
             <Card sx={{ mt: 2, boxShadow: 3, borderRadius: 2 }}>
         <CardHeader
-          title={"Menu"}
+          title={"OutStock"}
           action={
             <>
               <IconButton
@@ -108,12 +107,6 @@ const MenuTable = () => {
                 sx={{ marginRight: 2 }}
               >
                 <RefreshIcon />
-              </IconButton>
-              <IconButton
-                onClick={() => navigate("/manager/jewelry/add-menu")}
-                aria-label="create"
-              >
-                <CreateIcon />
               </IconButton>
             </>
           }
@@ -236,7 +229,7 @@ const MenuTable = () => {
                     variant="subtitle1"
                     sx={{ fontWeight: "bold", color: "white" }}
                   >
-                    Out Of Stock
+                    Delete
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -271,7 +264,7 @@ const MenuTable = () => {
                     <TableCell align="right">{row.price}</TableCell>
                     <TableCell align="right">
                       <IconButton onClick={() => handleClickOpen(row)}>
-                        <DoDisturbOnIcon />
+                        <Delete />
                       </IconButton>
                     </TableCell>
                   </TableRow>
@@ -292,10 +285,10 @@ const MenuTable = () => {
         </TableContainer>
       </Card>
       <Dialog open={open} onClose={handleClose} sx={{ borderRadius: 2 }}>
-        <DialogTitle>{"Confirm Out Of Stock"}</DialogTitle>
+        <DialogTitle>{"Confirm Delete"}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to Out Of Stock this item?
+            Are you sure you want to delete this item?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -303,7 +296,7 @@ const MenuTable = () => {
             Cancel
           </Button>
           <Button onClick={handleDelete} color="error" autoFocus>
-          Out Of Stock
+            Delete
           </Button>
         </DialogActions>
       </Dialog>
@@ -311,4 +304,4 @@ const MenuTable = () => {
   );
 };
 
-export default MenuTable;
+export default InstockTable;

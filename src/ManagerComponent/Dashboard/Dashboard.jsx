@@ -1,122 +1,308 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Paper, Typography, Grid } from '@mui/material';
-import { getTotalOrdersByStatus, getTotalAmountByStatus, getTotalSoldItemsByStatus, getTotalOrdersByAreaAndStatus, getTotalAmountByAreaAndStatus, getTotalItemsByAreaAndStatus } from '../../component/State/DashBoard/Action'; // Adjust the import path as needed
-import { getAllAreaAction } from '../../component/State/Area/Action';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { 
+  Paper, Typography, Grid, TextField, Button, 
+  Table, TableBody, TableCell, TableContainer, 
+  TableHead, TableRow 
+} from "@mui/material";
+import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import { 
+  getDashboardBuybackStats, 
+  getDashboardBuybackStatsByAreas, 
+  getDashboardStats, 
+  getDashboardStatsByAreas 
+} from "../../component/State/DashBoard/Action";
+import { getAllAreaAction } from "../../component/State/Area/Action";
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, 
+  Tooltip, Legend as RechartsLegend, ResponsiveContainer 
+} from 'recharts';
+import { Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, Title, Tooltip as ChartTooltip, Legend as ChartLegend, ArcElement } from 'chart.js';
+
+ChartJS.register(Title, ChartTooltip, ChartLegend, ArcElement);
 
 const Dashboard = () => {
-    const dispatch = useDispatch();
-    const jwt =  localStorage.getItem("jwt")
-    
+  const dispatch = useDispatch();
+  const jwt = localStorage.getItem("jwt");
 
-    const totalOrders = useSelector((state) => state.dashboard.totalOrders);
-    const totalAmount = useSelector((state) => state.dashboard.totalAmount);
-    const totalSoldItems = useSelector((state) => state.dashboard.totalSoldItems);
-    const totalOrdersArea = useSelector((state) => state.dashboard.totalOrdersArea);
-    const totalAmountArea = useSelector((state) => state.dashboard.totalAmountArea);
-    const totalSoldItemsArea = useSelector((state) => state.dashboard.totalSoldItemsArea);
-    const loading = useSelector((state) => state.dashboard.loading);
-    const error = useSelector((state) => state.dashboard.error);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [SDate] = useState(dayjs());
+  const [EDate] = useState(dayjs().add(1, "day"));
+  const [errors, setErrors] = useState({});
 
-    useEffect(() => {
-        if (jwt) {
-            dispatch(getTotalOrdersByStatus('COMPLETED', jwt));
-            dispatch(getTotalAmountByStatus('COMPLETED', jwt));
-            dispatch(getTotalSoldItemsByStatus('COMPLETED', jwt));
-        }
-    }, [dispatch, jwt]);
+  const { dashboard, area } = useSelector((store) => store);
+  const loading = useSelector((state) => state.dashboard.loading);
+  const error = useSelector((state) => state.dashboard.error);
 
-    useEffect(() => {
-        if (jwt) {
-            dispatch(getTotalOrdersByAreaAndStatus(1,'COMPLETED', jwt));
-            dispatch(getTotalAmountByAreaAndStatus(1,'COMPLETED', jwt));
-            dispatch(getTotalItemsByAreaAndStatus(1,'COMPLETED', jwt));
-        }
-    }, [dispatch, jwt]);
+  useEffect(() => {
+    dispatch(getAllAreaAction(jwt));
+  }, [dispatch, jwt]);
 
-
-    if (loading) {
-        return <Typography>Loading...</Typography>;
-    }
-
-    if (error) {
-        return <Typography>Error: {error}</Typography>;
-    }
-
-    return (
-        <div>
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={4}>
-                    <Paper elevation={3} sx={{ p: 2 }}>
-                        <Typography variant="h5" component="h2" gutterBottom>
-                            Total Orders
-                        </Typography>
-                        <Typography variant="h3" component="div">
-                            {totalOrders}
-                        </Typography>
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <Paper elevation={3} sx={{ p: 2 }}>
-                        <Typography variant="h5" component="h2" gutterBottom>
-                            Total Amount
-                        </Typography>
-                        <Typography variant="h3" component="div">
-                            ${totalAmount}
-                        </Typography>
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <Paper elevation={3} sx={{ p: 2 }}>
-                        <Typography variant="h5" component="h2" gutterBottom>
-                            Total Sold Items
-                        </Typography>
-                        <Typography variant="h3" component="div">
-                            {totalSoldItems}
-                        </Typography>
-                    </Paper>
-                </Grid>  
-            </Grid>
-            <div>
-            <h1>QUẦY SỐ 1</h1>
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={4}>
-                    <Paper elevation={3} sx={{ p: 2 }}>
-                        <Typography variant="h5" component="h2" gutterBottom>
-                            Total Orders
-                        </Typography>
-                        <Typography variant="h3" component="div">
-                            {totalOrdersArea}
-                        </Typography>
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <Paper elevation={3} sx={{ p: 2 }}>
-                        <Typography variant="h5" component="h2" gutterBottom>
-                            Total Amount
-                        </Typography>
-                        <Typography variant="h3" component="div">
-                            ${totalAmountArea}
-                        </Typography>
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <Paper elevation={3} sx={{ p: 2 }}>
-                        <Typography variant="h5" component="h2" gutterBottom>
-                            Total Sold Items
-                        </Typography>
-                        <Typography variant="h3" component="div">
-                            {totalSoldItemsArea}
-                        </Typography>
-                    </Paper>
-                </Grid>  
-            </Grid>
-            
-        </div>
-        </div>  
+  useEffect(() => {
+    const formattedStartDate = dayjs(SDate).format("YYYY-MM-DD");
+    const formattedEndDate = dayjs(EDate).format("YYYY-MM-DD");
+    const areaIds = area.areas?.map((area) => area.id) || [];
+    dispatch(getDashboardStats(formattedStartDate, formattedEndDate, jwt));
+    dispatch(
+      getDashboardStatsByAreas(
+        formattedStartDate,
+        formattedEndDate,
+        areaIds,
+        jwt
+      )
     );
+    dispatch(
+      getDashboardBuybackStats(formattedStartDate, formattedEndDate, jwt)
+    );
+    dispatch(
+      getDashboardBuybackStatsByAreas(
+        formattedStartDate,
+        formattedEndDate,
+        areaIds,
+        jwt
+      )
+    );
+  }, [dispatch, jwt, SDate, EDate, area.areas]);
+
+  const validateDates = (newValue, field) => {
+    if (field === "startDate" && newValue && endDate && newValue > endDate) {
+      setErrors((prev) => ({
+        ...prev,
+        startDate: "Ngày bắt đầu phải trước ngày kết thúc.",
+      }));
+    } else if (
+      field === "endDate" &&
+      newValue &&
+      startDate &&
+      newValue < startDate
+    ) {
+      setErrors((prev) => ({
+        ...prev,
+        endDate: "Ngày kết thúc phải sau ngày bắt đầu.",
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
+    validateDates(date, "startDate");
+  };
+
+  const handleEndDateChange = (date) => {
+    setEndDate(date);
+    validateDates(date, "endDate");
+  };
+
+  const handleSearch = () => {
+    if (!errors.startDate && !errors.endDate && startDate && endDate) {
+      const formattedStartDate = dayjs(startDate).format("YYYY-MM-DD");
+      const formattedEndDate = dayjs(endDate).format("YYYY-MM-DD");
+      const areaIds = area.areas?.map((area) => area.id) || [];
+      dispatch(getDashboardStats(formattedStartDate, formattedEndDate, jwt));
+      dispatch(
+        getDashboardStatsByAreas(
+          formattedStartDate,
+          formattedEndDate,
+          areaIds,
+          jwt
+        )
+      );
+      dispatch(
+        getDashboardBuybackStats(formattedStartDate, formattedEndDate, jwt)
+      );
+      dispatch(
+        getDashboardBuybackStatsByAreas(
+          formattedStartDate,
+          formattedEndDate,
+          areaIds,
+          jwt
+        )
+      );
+    }
+  };
+
+  // Combine the data for the bar chart
+  const combinedData = [
+    {
+      name: 'Total Orders',
+      Orders: dashboard.all?.totalOrders ?? 0,
+      Buybacks: dashboard.buybackAll?.totalBuybacks ?? 0,
+    },
+    {
+      name: 'Total Amount',
+      Orders: dashboard.all?.totalAmount ?? 0,
+      Buybacks: dashboard.buybackAll?.totalAmount ?? 0,
+    },
+    {
+      name: 'Total Sold Items',
+      Orders: dashboard.all?.totalItems ?? 0,
+      Buybacks: dashboard.buybackAll?.totalItems ?? 0,
+    }
+  ];
+
+  // Prepare data for the Doughnut chart
+  const doughnutData = {
+    labels: area.areas?.map((a) => a.name) || [], // Area names
+    datasets: [
+      {
+        label: 'Total Orders by Area',
+        backgroundColor: [
+          '#FF6384',
+          '#36A2EB',
+          '#FFCE56',
+          '#4BC0C0',
+          '#9966FF'
+        ],
+        data: area.areas?.map((a) => dashboard.areas?.[a.id]?.totalOrders || 0) || []
+      }
+    ]
+  };
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <Paper elevation={3} sx={{ p: 2, backgroundColor: '#f4f4f4' }}>
+            <Typography variant="h5" component="h2" gutterBottom>
+              Ngày bắt đầu
+            </Typography>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateTimePicker
+                label="Chọn ngày bắt đầu"
+                value={startDate}
+                onChange={handleStartDateChange}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    error={!!errors.startDate}
+                    helperText={errors.startDate}
+                    fullWidth
+                  />
+                )}
+                inputFormat="YYYY-MM-DD"
+              />
+            </LocalizationProvider>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Paper elevation={3} sx={{ p: 2, backgroundColor: '#f4f4f4' }}>
+            <Typography variant="h5" component="h2" gutterBottom>
+              Ngày kết thúc
+            </Typography>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateTimePicker
+                label="Chọn ngày kết thúc"
+                value={endDate}
+                onChange={handleEndDateChange}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    error={!!errors.endDate}
+                    helperText={errors.endDate}
+                    fullWidth
+                  />
+                )}
+                inputFormat="YYYY-MM-DD"
+              />
+            </LocalizationProvider>
+          </Paper>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sx={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
+          }}
+        >
+          <Button
+            variant="contained"
+            onClick={handleSearch}
+            disabled={
+              !!errors.startDate || !!errors.endDate || !startDate || !endDate
+            }
+            sx={{ backgroundColor: '#4CAF50', color: '#fff' }}
+          >
+            Tìm kiếm
+          </Button>
+        </Grid>
+      </Grid>
+
+      <Typography variant="h4" sx={{ mt: 4, color: '#3f51b5' }}>Order & Buyback Summary</Typography>
+      <div style={{ marginTop: '20px' }}>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={combinedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <RechartsLegend />
+            <Bar dataKey="Orders" fill="#FF0000" />
+            <Bar dataKey="Buybacks" fill="#008000" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <Typography variant="h4" sx={{ mt: 4, color: '#3f51b5' }}>Statistics by Area</Typography>
+      <div style={{ marginTop: '20px' }}>
+        <ResponsiveContainer width="100%" height={400}>
+          <Doughnut
+            data={doughnutData}
+            options={{
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Total Orders by Area',
+                  font: {
+                    size: 20
+                  },
+                  color: '#3f51b5'
+                },
+                legend: {
+                  display: true,
+                  position: 'right',
+                  labels: {
+                    color: '#333'
+                  }
+                },
+              },
+            }}
+          />
+        </ResponsiveContainer>
+      </div>
+
+      <Typography variant="h4" sx={{ mt: 4, color: '#3f51b5' }}>Area Breakdown</Typography>
+      <TableContainer component={Paper} sx={{ marginTop: '20px' }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Area</TableCell>
+              <TableCell align="right">Total Orders</TableCell>
+              <TableCell align="right">Total Amount</TableCell>
+              <TableCell align="right">Total Items</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {area.areas?.map((a) => (
+              <TableRow key={a.id}>
+                <TableCell>{a.name}</TableCell>
+                <TableCell align="right">{dashboard.areas?.[a.id]?.totalOrders || 0}</TableCell>
+                <TableCell align="right">{dashboard.areas?.[a.id]?.totalAmount || 0}</TableCell>
+                <TableCell align="right">{dashboard.areas?.[a.id]?.totalItems || 0}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
+  );
 };
 
-
 export default Dashboard;
-

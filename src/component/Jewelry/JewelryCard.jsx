@@ -1,48 +1,41 @@
 import React from "react";
-import { Card, Chip, IconButton } from "@mui/material";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import {useNavigate} from "react-router-dom"
+import { Card, CardActionArea, CardContent, CardMedia, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { store } from "../State/store";
-const JewelryCard = ({item}) => {
-  const navigate = useNavigate()
+
+const JewelryCard = ({ item }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const jwt = localStorage.getItem("jwt")
-  const {auth} = useSelector(store=>store)
+  const jwt = localStorage.getItem("jwt");
+  const { auth } = useSelector((store) => store);
 
-  const handleNavigateToArea=()=>{
-      navigate(`/area/${item.name}/${item.id}`)
-    
-  }
+  const handleNavigate = () => {
+    navigate(`/item/${item.id}`);
+  };
 
+  const handleFavoriteToggle = () => {
+    // Implement favorite toggle logic
+  };
 
   return (
-    <Card className="m-5 w-[18rem]">
-      <div className={`${true ? "cursor-pointer" : "cursor-not-allowed"}
-       relative`}>
-        <img
-          className="w-full h-[10rem] rounded-t-md object-cover "
-          src=  {item.images[0]}
-          alt=""
+    <Card sx={{ maxWidth: 345, m: 2, borderRadius: 2, boxShadow: 3 }}>
+      <CardActionArea onClick={handleNavigate}>
+        <CardMedia
+          component="img"
+          height="200"
+          image={item.images[0]}
+          alt={item.name}
+          sx={{ borderRadius: "8px 8px 0 0" }}
         />
-        <Chip
-         size="small"
-         className="absolute top-2 left-2"
-         color={item.open?"success":"error"}
-         label={item.open?"open":"closed"}
-         />
-      </div>
-      <div className="p-4 textPart lg:flex w-full justify-between">
-        <div className="space-y-1">
-            <p onClick={handleNavigateToArea}className="font-semibold text-lg
-            cursor-pointer">{item.name}</p>
-            <p className="text-gray-500 text-sm">{item.desciption}</p>
-        </div>
-        <div>
-            <IconButton>{false?<FavoriteIcon/>:<FavoriteBorderIcon/>}</IconButton>
-        </div>
-      </div>
+        <CardContent>
+          <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+            {item.name}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {item.description}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
     </Card>
   );
 };

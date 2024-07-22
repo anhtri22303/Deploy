@@ -4,11 +4,11 @@ import { Category } from '../../ManagerComponent/Category/Category'
 import Dashboard from '../../ManagerComponent/Dashboard/Dashboard'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { Events } from '../../ManagerComponent/Events/Events'
-import Ingredients from '../../ManagerComponent/Ingredients/Ingredients'
 import Home from '../../ManagerComponent/HomeA/Home'
-import { AdminSidebar } from './AdminSideBar'
-
+import  AdminSidebar from './AdminSideBar'
+import User from '../../ManagerComponent/Staff/User'
+import Customer from '../../ManagerComponent/Customer/Customer'
+import ListBan from '../../ManagerComponent/Staff/ListBan'
 export const Admin = () => {
     const dispatch = useDispatch();
     const jwt = localStorage.getItem('jwt');
@@ -22,20 +22,12 @@ export const Admin = () => {
                 <div>
                     <AdminSidebar handleClose={handleClose} />
                 </div>
-                <div className='lg:w-[80%]'>
+                <div className='lg:w-[85%]'>
                     <Routes>
                         <Route path='/' element={<Home />} />
-                        {/* <Route path='/dashboard' element={<Dashboard />} />
-                        <Route path='/orders' element={<Orders />} />
-                        <Route path='/menu' element={<Menu />} />
-                        <Route path='/category' element={<Category />} />
-                        <Route path='/ingredients' element={<Ingredients />} />
-                        <Route path='/event' element={<Events />} />
-                        <Route path='/details' element={<JewelryDetails />} />
-                        <Route path='/add-menu' element={<CreateMenuForm />} />
-                        <Route path='/buyback' element={<Buyback/>} />
-                        <Route path='/teams' element={<Teams/>} />
-                        <Route path='/customer' element={<Customer/>} /> */}
+                        <Route path='/dashboard' element={<Dashboard />}/>
+                        <Route path='/user' element={<User/>} />
+                        <Route path='/ban' element={<ListBan/>} />
                     </Routes>
                 </div>
             </div>

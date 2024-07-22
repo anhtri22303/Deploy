@@ -51,9 +51,6 @@ export const CartItem = ({ item }) => {
                 <IconButton onClick={() => handleUpdateCartItem(1)}>
                   <AddCircleOutlineIcon />
                 </IconButton>
-                <IconButton onClick={handleRemoveCartItem}>
-                  <DeleteIcon /> {/* Delete Icon */}
-                </IconButton>
               </div>
             </div>
           </div>

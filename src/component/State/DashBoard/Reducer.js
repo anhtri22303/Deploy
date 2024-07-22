@@ -1,99 +1,179 @@
 import {
-    GET_TOTAL_ORDER_REQUEST,
-    GET_TOTAL_ORDER_SUCCESS,
-    GET_TOTAL_ORDER_FAILURE,
-    GET_TOTAL_AMOUNT_REQUEST,
-    GET_TOTAL_AMOUNT_SUCCESS,
-    GET_TOTAL_AMOUNT_FAILURE,
-    GET_TOTAL_SOLD_ITEMS_REQUEST,
-    GET_TOTAL_SOLD_ITEMS_SUCCESS,
-    GET_TOTAL_SOLD_ITEMS_FAILURE,
-    GET_TOTAL_ORDER_AREA_REQUEST,
-    GET_TOTAL_AMOUNT_AREA_REQUEST,
-    GET_TOTAL_SOLD_AREA_ITEMS_REQUEST,
-    GET_TOTAL_ORDER_AREA_FAILURE,
-    GET_TOTAL_AMOUNT_AREA_FAILURE,
-    GET_TOTAL_SOLD_AREA_ITEMS_FAILURE,
-    GET_TOTAL_ORDER_AREA_SUCCESS,
-    GET_TOTAL_AMOUNT_AREA_SUCCESS,
-    GET_TOTAL_SOLD_AREA_ITEMS_SUCCESS
-  } from './ActionType';
-  
-  const initialState = {
-    loading: false,
+  GET_DASHBOARD_REQUEST,
+  GET_DASHBOARD_SUCCESS,
+  GET_DASHBOARD_FAILURE,
+  GET_DASHBOARD_AREA_REQUEST,
+  GET_DASHBOARD_AREA_SUCCESS,
+  GET_DASHBOARD_AREA_FAILURE,
+  GET_DASHBOARD_AREAS_REQUEST,
+  GET_DASHBOARD_AREAS_SUCCESS,
+  GET_DASHBOARD_AREAS_FAILURE,
+  GET_DASHBOARD_BUYBACK_REQUEST,
+  GET_DASHBOARD_BUYBACK_SUCCESS,
+  GET_DASHBOARD_BUYBACK_FAILURE,
+  GET_DASHBOARD_BUYBACK_AREA_REQUEST,
+  GET_DASHBOARD_BUYBACK_AREA_SUCCESS,
+  GET_DASHBOARD_BUYBACK_AREA_FAILURE,
+  GET_DASHBOARD_BUYBACK_AREAS_REQUEST,
+  GET_DASHBOARD_BUYBACK_AREAS_SUCCESS,
+  GET_DASHBOARD_BUYBACK_AREAS_FAILURE,
+} from './ActionType';
+
+const initialState = {
+  all : {
     totalOrders: 0,
-    totalAmount: 0.0,
-    totalSoldItems: 0,
-    totalOrdersArea: 0,
-    totalAmountArea: 0.0,
-    totalSoldItemsArea: 0,
-    error: null
-  };
-  
-  const dashboardReducer = (state = initialState, action) => {
-    switch (action.type) {
-      case GET_TOTAL_ORDER_REQUEST:
-      case GET_TOTAL_AMOUNT_REQUEST:
-      case GET_TOTAL_SOLD_ITEMS_REQUEST:
-      case GET_TOTAL_ORDER_AREA_REQUEST:
-      case GET_TOTAL_AMOUNT_AREA_REQUEST:
-      case GET_TOTAL_SOLD_AREA_ITEMS_REQUEST:
-      
-        return {
-          ...state,
-          loading: true
-        };
-      case GET_TOTAL_ORDER_SUCCESS:
-        return {
-          ...state,
-          loading: false,
-          totalOrders: action.payload
-        };
-      case GET_TOTAL_AMOUNT_SUCCESS:
-        return {
-          ...state,
-          loading: false,
-          totalAmount: action.payload
-        };
-      case GET_TOTAL_SOLD_ITEMS_SUCCESS:
-        return {
-          ...state,
-          loading: false,
-          totalSoldItems: action.payload
-        };
-        case GET_TOTAL_ORDER_AREA_SUCCESS:
-        return {
-          ...state,
-          loading: false,
-          totalOrdersArea: action.payload
-        };
-      case GET_TOTAL_AMOUNT_AREA_SUCCESS:
-        return {
-          ...state,
-          loading: false,
-          totalAmountArea: action.payload
-        };
-      case GET_TOTAL_SOLD_AREA_ITEMS_SUCCESS:
-        return {
-          ...state,
-          loading: false,
-          totalSoldItemsArea: action.payload
-        };
-      case GET_TOTAL_ORDER_FAILURE:
-      case GET_TOTAL_AMOUNT_FAILURE:
-      case GET_TOTAL_SOLD_ITEMS_FAILURE:
-      case GET_TOTAL_ORDER_AREA_FAILURE:
-      case GET_TOTAL_AMOUNT_AREA_FAILURE:
-      case GET_TOTAL_SOLD_AREA_ITEMS_FAILURE:
-        return {
-          ...state,
-          loading: false,
-          error: action.error
-        };
-      default:
-        return state;
-    }
-  };
-  
-  export default dashboardReducer;
-  
+    totalAmount: 0,
+    totalItems: 0,
+  },
+  area : null,
+  areas : null,
+  buybackAll : {
+    totalBuybacks: 0,
+    totalAmount: 0,
+    totalItems: 0,
+  },
+  buybackArea : null,
+  buybackAreas : null,
+  loading: false,
+  error: null,
+};
+
+
+const dashboardReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case GET_DASHBOARD_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+
+    case GET_DASHBOARD_SUCCESS:
+      return {
+        ...state,
+        all : action.payload,
+        loading: false,
+        error: null,
+      };
+
+    case GET_DASHBOARD_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
+      };
+
+    case GET_DASHBOARD_AREA_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+
+    case GET_DASHBOARD_AREA_SUCCESS:
+      return {
+        ...state,
+        area : action.payload,
+        loading: false,
+        error: null,
+      };
+
+    case GET_DASHBOARD_AREA_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
+      };
+
+    case GET_DASHBOARD_AREAS_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+
+    case GET_DASHBOARD_AREAS_SUCCESS:
+      return {
+        ...state,
+        areas : action.payload,
+        loading: false,
+        error: null,
+      };
+
+    case GET_DASHBOARD_AREAS_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
+      };
+      case GET_DASHBOARD_BUYBACK_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+
+    case GET_DASHBOARD_BUYBACK_SUCCESS:
+      return {
+        ...state,
+        buybackAll : action.payload,
+        loading: false,
+        error: null,
+      };
+
+    case GET_DASHBOARD_BUYBACK_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
+      };
+
+    case GET_DASHBOARD_BUYBACK_AREA_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+
+    case GET_DASHBOARD_BUYBACK_AREA_SUCCESS:
+      return {
+        ...state,
+        buybackArea : action.payload,
+        loading: false,
+        error: null,
+      };
+
+    case GET_DASHBOARD_BUYBACK_AREA_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
+      };
+
+    case GET_DASHBOARD_BUYBACK_AREAS_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+
+    case GET_DASHBOARD_BUYBACK_AREAS_SUCCESS:
+      return {
+        ...state,
+        buybackAreas : action.payload,
+        loading: false,
+        error: null,
+      };
+
+    case GET_DASHBOARD_BUYBACK_AREAS_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
+      };
+
+    default:
+      return state;
+  }
+};
+export default dashboardReducer

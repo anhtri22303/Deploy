@@ -1,115 +1,149 @@
-import axios from 'axios';
-import {
-  GET_TOTAL_ORDER_REQUEST,
-  GET_TOTAL_ORDER_SUCCESS,
-  GET_TOTAL_ORDER_FAILURE,
-  GET_TOTAL_AMOUNT_REQUEST,
-  GET_TOTAL_AMOUNT_SUCCESS,
-  GET_TOTAL_AMOUNT_FAILURE,
-  GET_TOTAL_SOLD_ITEMS_REQUEST,
-  GET_TOTAL_SOLD_ITEMS_SUCCESS,
-  GET_TOTAL_SOLD_ITEMS_FAILURE,
-  GET_TOTAL_ORDER_AREA_REQUEST,
-  GET_TOTAL_ORDER_AREA_SUCCESS,
-  GET_TOTAL_ORDER_AREA_FAILURE,
-  GET_TOTAL_AMOUNT_AREA_REQUEST,
-  GET_TOTAL_AMOUNT_AREA_SUCCESS,
-  GET_TOTAL_AMOUNT_AREA_FAILURE,
-  GET_TOTAL_SOLD_AREA_ITEMS_REQUEST,
-  GET_TOTAL_SOLD_AREA_ITEMS_SUCCESS,
-  GET_TOTAL_SOLD_AREA_ITEMS_FAILURE
-} from './ActionType';
 
-const API_URL = '/api/dashboard';
+import { api } from '../../config/api';
 
-export const getTotalOrdersByStatus = (status, jwt) => async (dispatch) => {
-  dispatch({ type: GET_TOTAL_ORDER_REQUEST });
+import {GET_DASHBOARD_AREA_FAILURE, GET_DASHBOARD_AREA_REQUEST, GET_DASHBOARD_AREA_SUCCESS, GET_DASHBOARD_AREAS_FAILURE, GET_DASHBOARD_AREAS_REQUEST, GET_DASHBOARD_AREAS_SUCCESS, GET_DASHBOARD_BUYBACK_AREA_FAILURE, GET_DASHBOARD_BUYBACK_AREA_REQUEST, GET_DASHBOARD_BUYBACK_AREA_SUCCESS, GET_DASHBOARD_BUYBACK_AREAS_FAILURE, GET_DASHBOARD_BUYBACK_AREAS_REQUEST, GET_DASHBOARD_BUYBACK_AREAS_SUCCESS, GET_DASHBOARD_BUYBACK_FAILURE, GET_DASHBOARD_BUYBACK_REQUEST, GET_DASHBOARD_BUYBACK_SUCCESS, GET_DASHBOARD_FAILURE, GET_DASHBOARD_REQUEST, GET_DASHBOARD_SUCCESS} from './ActionType';
+
+
+export const getDashboardStats = (start, end, jwt) => async (dispatch) => {
+  dispatch({ type: GET_DASHBOARD_REQUEST });
+
   try {
-    const response = await axios.get(`${API_URL}/total-orders/${status}`, {
-        headers: {
-            Authorization: `Bearer ${jwt}`,
-        },
+    const response = await api.get(`/api/dashboard/store`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+      params: { start, end },
     });
-    dispatch({ type: GET_TOTAL_ORDER_SUCCESS, payload: response.data });
-  } catch (error) {
-    dispatch({ type: GET_TOTAL_ORDER_FAILURE, error: error.message });
-  }
-};
-
-export const getTotalAmountByStatus = (status, jwt) => async (dispatch) => {
-  dispatch({ type: GET_TOTAL_AMOUNT_REQUEST });
-  try {
-    const response = await axios.get(`${API_URL}/total-amount/${status}`,{
-        headers: {
-            Authorization: `Bearer ${jwt}`,
-        },
+    dispatch({
+      type: GET_DASHBOARD_SUCCESS,
+      payload: response.data,
     });
-    dispatch({ type: GET_TOTAL_AMOUNT_SUCCESS, payload: response.data });
+    console.log("data",response.data)
   } catch (error) {
-    dispatch({ type: GET_TOTAL_AMOUNT_FAILURE, error: error.message });
-  }
-};
-
-export const getTotalSoldItemsByStatus = (status, jwt) => async (dispatch) => {
-  dispatch({ type: GET_TOTAL_SOLD_ITEMS_REQUEST  });
-  try {
-    const response = await axios.get(`${API_URL}/total-sold-items/${status}`, {
-        headers: {
-            Authorization: `Bearer ${jwt}`,
-        },
+    dispatch({
+      type: GET_DASHBOARD_FAILURE,
+      error: error.message,
     });
-    dispatch({ type: GET_TOTAL_SOLD_ITEMS_SUCCESS, payload: response.data });
-  } catch (error) {
-    dispatch({ type: GET_TOTAL_SOLD_ITEMS_FAILURE, error: error.message });
-  }
-};
-
-
-
-
-
-
-
-
-export const getTotalOrdersByAreaAndStatus = (areaId,status, jwt) => async (dispatch) => {
-  dispatch({ type: GET_TOTAL_ORDER_AREA_REQUEST });
-  try {
-    const response = await axios.get(`/api/dashboard/total-orders/area?areaId=${areaId}&orderStatus=${status}`, {
-        headers: {
-            Authorization: `Bearer ${jwt}`,
-        },
-    });
-    dispatch({ type: GET_TOTAL_ORDER_AREA_SUCCESS, payload: response.data });
-  } catch (error) {
-    dispatch({ type: GET_TOTAL_ORDER_AREA_FAILURE, error: error.message });
-  }
-};
-
-export const getTotalAmountByAreaAndStatus = (areaId,status, jwt) => async (dispatch) => {
-  dispatch({ type: GET_TOTAL_AMOUNT_AREA_REQUEST });
-  try {
-    const response = await axios.get(`/api/dashboard/total-amount/area?areaId=${areaId}&orderStatus=${status}`,{
-        headers: {
-            Authorization: `Bearer ${jwt}`,
-        },
-    });
-    dispatch({ type: GET_TOTAL_AMOUNT_AREA_SUCCESS, payload: response.data });
-  } catch (error) {
     console.log("error",error)
-    dispatch({ type: GET_TOTAL_AMOUNT_AREA_FAILURE, error: error.message });
   }
 };
 
-export const getTotalItemsByAreaAndStatus = (areaId,status, jwt) => async (dispatch) => {
-  dispatch({ type: GET_TOTAL_SOLD_AREA_ITEMS_REQUEST });
+export const getDashboardStatsByArea = (start, end, areaId, jwt) => async (dispatch) => {
+  dispatch({ type: GET_DASHBOARD_AREA_REQUEST });
+
   try {
-    const response = await axios.get(`/api/dashboard/total-items/area?areaId=${areaId}&orderStatus=${status}`, {
-        headers: {
-            Authorization: `Bearer ${jwt}`,
-        },
+    const response = await api.get(`/api/dashboard/area`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+      params: { start, end, areaId },
     });
-    dispatch({ type: GET_TOTAL_SOLD_AREA_ITEMS_SUCCESS, payload: response.data });
+    dispatch({
+      type: GET_DASHBOARD_AREA_SUCCESS,
+      payload: response.data,
+    });
+    console.log("area",response.data)
   } catch (error) {
-    dispatch({ type: GET_TOTAL_SOLD_AREA_ITEMS_FAILURE, error: error.message });
+    dispatch({
+      type: GET_DASHBOARD_AREA_FAILURE,
+      error: error.message,
+    });
+    console.log("error",error)
+  }
+};
+
+export const getDashboardStatsByAreas = (start, end, areaIds, jwt) => async (dispatch) => {
+  dispatch({ type: GET_DASHBOARD_AREAS_REQUEST});
+
+  try {
+    const areaParams = areaIds.map(id => `areaIds=${id}`).join('&');
+    const response = await api.get(`/api/dashboard/areas?start=${start}&end=${end}&${areaParams}`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    dispatch({
+      type: GET_DASHBOARD_AREAS_SUCCESS,
+      payload: response.data,
+    });
+    console.log("total area",response.data)
+  } catch (error) {
+    dispatch({
+      type: GET_DASHBOARD_AREAS_FAILURE,
+      error: error.message,
+    });
+    console.log("error",error);
+  }
+};
+
+export const getDashboardBuybackStats = (start, end, jwt) => async (dispatch) => {
+  dispatch({ type: GET_DASHBOARD_BUYBACK_REQUEST });
+
+  try {
+    const response = await api.get(`/api/dashboard/buybacks/store`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+      params: { start, end },
+    });
+    dispatch({
+      type: GET_DASHBOARD_BUYBACK_SUCCESS,
+      payload: response.data,
+    });
+    console.log("data",response.data)
+  } catch (error) {
+    dispatch({
+      type: GET_DASHBOARD_BUYBACK_FAILURE,
+      error: error.message,
+    });
+    console.log("error",error)
+  }
+};
+
+export const getDashboardBuybackStatsByArea = (start, end, areaId, jwt) => async (dispatch) => {
+  dispatch({ type: GET_DASHBOARD_BUYBACK_AREA_REQUEST });
+
+  try {
+    const response = await api.get(`/api/dashboard/buybacks/area`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+      params: { start, end, areaId },
+    });
+    dispatch({
+      type: GET_DASHBOARD_BUYBACK_AREA_SUCCESS,
+      payload: response.data,
+    });
+    console.log("area",response.data)
+  } catch (error) {
+    dispatch({
+      type: GET_DASHBOARD_BUYBACK_AREA_FAILURE,
+      error: error.message,
+    });
+    console.log("error",error)
+  }
+};
+
+export const getDashboardBuybackStatsByAreas = (start, end, areaIds, jwt) => async (dispatch) => {
+  dispatch({ type: GET_DASHBOARD_BUYBACK_AREAS_REQUEST});
+
+  try {
+    const areaParams = areaIds.map(id => `areaIds=${id}`).join('&');
+    const response = await api.get(`/api/dashboard/buybacks/areas?start=${start}&end=${end}&${areaParams}`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    dispatch({
+      type: GET_DASHBOARD_BUYBACK_AREAS_SUCCESS,
+      payload: response.data,
+    });
+    console.log("total area",response.data)
+  } catch (error) {
+    dispatch({
+      type: GET_DASHBOARD_BUYBACK_AREAS_FAILURE,
+      error: error.message,
+    });
+    console.log("error",error);
   }
 };

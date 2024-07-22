@@ -3,7 +3,7 @@ import CallIcon from '@mui/icons-material/Call';
 import EmailIcon from '@mui/icons-material/Email';
 import HomeIcon from '@mui/icons-material/Home';
 import './Footer.css';
-
+import logo from '../../assets/logo.png';
 const Footer = () => {
     return (
         <footer className="footer">
@@ -11,7 +11,7 @@ const Footer = () => {
                 <div className="footer-left">
                     <a href="https://www.google.com/maps/dir//PNJ+Center+229+X%C3%B4+Vi%E1%BA%BFt+Ngh%E1%BB%87+T%C4%A9nh,+229+X%C3%B4+Vi%E1%BA%BFt+Ngh%E1%BB%87+T%C4%A9nh,+Ph%C6%B0%E1%BB%9Dng+17,+B%C3%ACnh+Th%E1%BA%A1nh,+H%E1%BB%93+Ch%C3%AD+Minh+700000/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x317528b19a816f15:0x20442b010c7631aa?sa=X&ved=1t:57443&ictx=111" target="_blank" rel="noopener noreferrer">
                         <img 
-                            src="https://cdn.pnj.io/images/logo/pnj.com.vn.png" 
+                            src={logo}
                             alt="Company Logo"
                             className="footer-logo"
                         />

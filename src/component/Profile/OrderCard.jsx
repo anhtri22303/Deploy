@@ -25,6 +25,7 @@ import {
   FormControlLabel,
   TextField,
   IconButton,
+  Pagination,
 } from "@mui/material";
 
 export default function OrderCard() {
@@ -45,7 +46,10 @@ export default function OrderCard() {
   const [filterStatus, setFilterStatus] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10;
   const open = Boolean(anchorEl);
+  //window.scrollTo(9,9);
 
   const handleClick = (event, orderId) => {
     setAnchorEl(event.currentTarget);
@@ -72,7 +76,7 @@ export default function OrderCard() {
     if (order.orders) {
       handleSearch();
     }
-  }, [order.orders, filterStatus, searchTerm]);
+  }, [order.orders, filterStatus, searchTerm, currentPage]);
 
   const handleSearch = () => {
     const filtered = order.orders?.filter(
@@ -83,22 +87,32 @@ export default function OrderCard() {
     setFilteredOrders(filtered);
   };
 
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const startIndex = (currentPage - 1) * ordersPerPage;
+  const currentOrders = filteredOrders.slice(startIndex, startIndex + ordersPerPage);
+
+
   return (
-    <Box sx={{ padding: 2 }}>
-      <Card sx={{ mt: 2, boxShadow: 3 }}>
+    <Box sx={{ padding: 3, minHeight: "100vh" }}>
+      <Card sx={{ mt: 2, boxShadow: 3, borderRadius: 2 }}>
         <CardHeader
           title={"All Orders"}
           sx={{
             pt: 2,
-            pb: 1,
+            pb: 2,
             textAlign: "center",
-            fontSize: "1.5rem",
+            fontSize: "1.75rem",
             fontWeight: "bold",
             backgroundColor: "#0B4CBB",
             color: "#fff",
+            borderTopLeftRadius: 3,
+            borderTopRightRadius: 3,
           }}
         />
-        <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
           <RadioGroup
             row
             aria-label="filter-status"
@@ -113,7 +127,7 @@ export default function OrderCard() {
           </RadioGroup>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 3, marginRight: 2 }}>
           <TextField
             id="search-input"
             label="Search by Name"
@@ -129,35 +143,35 @@ export default function OrderCard() {
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "gray",
+                  borderColor: "#0B4CBB",
                 },
                 "&:hover fieldset": {
-                  borderColor: "gray",
+                  borderColor: "#0B4CBB",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "gray",
+                  borderColor: "#0B4CBB",
                 },
               },
               "& .MuiInputLabel-root": {
-                color: "gray",
+                color: "#0B4CBB",
               },
               "& .MuiInputLabel-root.Mui-focused": {
-                color: "gray",
+                color: "#0B4CBB",
               },
             }}
           />
-          <IconButton aria-label="search" onClick={handleSearch}>
+          <IconButton aria-label="search" onClick={handleSearch} sx={{ color: "#0B4CBB" }}>
             <SearchIcon />
           </IconButton>
         </Box>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow sx={{ backgroundColor: "#0B4CBB" }}>
                 <TableCell>
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontWeight: "bold", color: "White" }}
+                    sx={{ fontWeight: "bold", color: "white" }}
                   >
                     ID
                   </Typography>
@@ -165,7 +179,7 @@ export default function OrderCard() {
                 <TableCell align="center">
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontWeight: "bold", color: "White" }}
+                    sx={{ fontWeight: "bold", color: "white" }}
                   >
                     Customer
                   </Typography>
@@ -173,7 +187,7 @@ export default function OrderCard() {
                 <TableCell align="center">
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontWeight: "bold", color: "White" }}
+                    sx={{ fontWeight: "bold", color: "white" }}
                   >
                     Price
                   </Typography>
@@ -181,7 +195,7 @@ export default function OrderCard() {
                 <TableCell align="center">
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontWeight: "bold", color: "White" }}
+                    sx={{ fontWeight: "bold", color: "white" }}
                   >
                     Stall
                   </Typography>
@@ -189,7 +203,7 @@ export default function OrderCard() {
                 <TableCell align="center">
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontWeight: "bold", color: "White" }}
+                    sx={{ fontWeight: "bold", color: "white" }}
                   >
                     Status
                   </Typography>
@@ -197,7 +211,7 @@ export default function OrderCard() {
                 <TableCell align="center">
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontWeight: "bold", color: "White" }}
+                    sx={{ fontWeight: "bold", color: "white" }}
                   >
                     Update
                   </Typography>
@@ -205,8 +219,8 @@ export default function OrderCard() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredOrders.length > 0 ? (
-                filteredOrders.map((order) => (
+              {currentOrders.length > 0 ? (
+                currentOrders.map((order) => (
                   <TableRow
                     key={order.id}
                     sx={{
@@ -215,9 +229,7 @@ export default function OrderCard() {
                     }}
                   >
                     <TableCell sx={{ fontWeight: "bold" }}>{order.id}</TableCell>
-                    <TableCell align="center">
-                      {order.customer.fullname}
-                    </TableCell>
+                    <TableCell align="center">{order.customer.fullname}</TableCell>
                     <TableCell align="center">{order.totalPrice}</TableCell>
                     <TableCell align="center">{order.areaName}</TableCell>
                     <TableCell align="center">
@@ -225,8 +237,7 @@ export default function OrderCard() {
                         variant="body2"
                         sx={{
                           fontWeight: "bold",
-                          color:
-                            order.orderStatus === "COMPLETED" ? "green" : "red",
+                          color: order.orderStatus === "COMPLETED" ? "green" : "red",
                         }}
                       >
                         {order.orderStatus}
@@ -274,13 +285,21 @@ export default function OrderCard() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} align="center">
-                    No orders found with the given search criteria.
+                    No found orders
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
         </TableContainer>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 3, mb: 2 }}>
+          <Pagination
+            count={Math.ceil(filteredOrders.length / ordersPerPage)}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+          />
+        </Box>
       </Card>
     </Box>
   );

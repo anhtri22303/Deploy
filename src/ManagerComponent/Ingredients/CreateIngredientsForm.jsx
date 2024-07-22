@@ -23,8 +23,8 @@ const CreateIngredientsForm = () => {
       setError('All fields are required.');
       return false;
     }
-    if (formData.name.startsWith(' ')) {
-      setError('Name cannot start with a space.');
+    if (formData.name.startsWith(' ') || formData.price.toString().startsWith(' ') || formData.pricebuyback.toString().startsWith(' ')) {
+      setError('Fields cannot start with a space.');
       return false;
     }
     if (isNaN(formData.price) || isNaN(formData.pricebuyback)) {
@@ -37,7 +37,7 @@ const CreateIngredientsForm = () => {
     }
     setError('');
     return true;
-  };
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,6 +62,7 @@ const CreateIngredientsForm = () => {
       console.error("error:", error);
     }
 };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

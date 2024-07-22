@@ -1,5 +1,5 @@
 import { api } from "../../config/api";
-import { CREATE_MENU_ITEM_REQUEST, CREATE_MENU_ITEM_SUCCESS, DELETE_MENU_ITEM_FAILURE, DELETE_MENU_ITEM_REQUEST, DELETE_MENU_ITEM_SUCCESS, GET_MENU_ITEMS_BY_JEWELRY_ID_FAILURE, GET_MENU_ITEMS_BY_JEWELRY_ID_REQUEST, GET_MENU_ITEMS_BY_JEWELRY_ID_SUCCESS, GET_MENU_ITEM_BY_CODE_FAILURE, GET_MENU_ITEM_BY_CODE_REQUEST, GET_MENU_ITEM_BY_CODE_SUCCESS, SEARCH_MENU_ITEM_FAILURE, SEARCH_MENU_ITEM_REQUEST, SEARCH_MENU_ITEM_SUCCESS, UPDATE_JEWELRY_PRICES_FAILURE, UPDATE_JEWELRY_PRICES_REQUEST, UPDATE_JEWELRY_PRICES_SUCCESS, UPDATE_MENU_ITEMS_AVAILABILITY_FAILURE, UPDATE_MENU_ITEMS_AVAILABILITY_REQUEST, UPDATE_MENU_ITEMS_AVAILABILITY_SUCCESS } from "./ActionType";
+import { CREATE_MENU_ITEM_FAILURE, CREATE_MENU_ITEM_REQUEST, CREATE_MENU_ITEM_SUCCESS, DELETE_MENU_ITEM_FAILURE, DELETE_MENU_ITEM_REQUEST, DELETE_MENU_ITEM_SUCCESS, GET_MENU_ITEMS_BY_JEWELRY_ID_FAILURE, GET_MENU_ITEMS_BY_JEWELRY_ID_REQUEST, GET_MENU_ITEMS_BY_JEWELRY_ID_SUCCESS, GET_MENU_ITEM_BY_CODE_FAILURE, GET_MENU_ITEM_BY_CODE_REQUEST, GET_MENU_ITEM_BY_CODE_SUCCESS, GET_OUT_OF_STOCk_ITEM_FAILURE, GET_OUT_OF_STOCk_ITEM_REQUEST, GET_OUT_OF_STOCk_ITEM_SUCCESS, INSTOCK_ITEM_FAILURE, INSTOCK_ITEM_REQUEST, INSTOCK_ITEM_SUCCESS, SEARCH_MENU_ITEM_FAILURE, SEARCH_MENU_ITEM_REQUEST, SEARCH_MENU_ITEM_SUCCESS, UPDATE_JEWELRY_PRICES_FAILURE, UPDATE_JEWELRY_PRICES_REQUEST, UPDATE_JEWELRY_PRICES_SUCCESS, UPDATE_MENU_ITEMS_AVAILABILITY_FAILURE, UPDATE_MENU_ITEMS_AVAILABILITY_REQUEST, UPDATE_MENU_ITEMS_AVAILABILITY_SUCCESS } from "./ActionType";
 
 export const createMenuItem = ({menu,jwt}) => {
     return async (dispatch) => {
@@ -15,9 +15,9 @@ export const createMenuItem = ({menu,jwt}) => {
             dispatch({type:CREATE_MENU_ITEM_SUCCESS,payload:data});
         } catch (error) {
             console.log("created error", error);
-            dispatch({ type: 'CREATE_MENU_ITEM_FAILURE', payload: error });
+            dispatch({type:CREATE_MENU_ITEM_FAILURE,payload:error});
             throw error;
-          }
+        }
     };
 };
 
@@ -176,3 +176,44 @@ export const deleteFoodAction = ({ jewelryId, jwt }) =>
           }
         };
       };
+
+      export const instockItem = ({ jewelryId, jwt }) => {
+        return async (dispatch) => {
+            dispatch({ type: INSTOCK_ITEM_REQUEST });
+            try {
+                const { data } = await api.put(
+                    `/api/admin/jewelry/instock/${jewelryId}`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${jwt}`,
+                        },
+                    }
+                );
+                console.log("instocked item ", data);
+                dispatch({ type: INSTOCK_ITEM_SUCCESS, payload: data });
+            } catch (error) {
+                console.log("instock error", error);
+                dispatch({ type: INSTOCK_ITEM_FAILURE, payload: error });
+            }
+        };
+    };
+
+
+    export const getOutOfStockItems = (jwt) => {
+        return async (dispatch) => {
+            dispatch({ type: GET_OUT_OF_STOCk_ITEM_REQUEST });
+            try {
+                const { data } = await api.get('/api/jewelry/getAll/OutOfStock', {
+                    headers: {
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                });
+                console.log("Out of stock items: ", data);
+                dispatch({ type: GET_OUT_OF_STOCk_ITEM_SUCCESS, payload: data });
+            } catch (error) {
+                console.log("Error fetching out of stock items", error);
+                dispatch({ type: GET_OUT_OF_STOCk_ITEM_FAILURE, payload: error });
+            }
+        };
+    };

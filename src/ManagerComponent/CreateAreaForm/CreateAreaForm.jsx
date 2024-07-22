@@ -6,8 +6,10 @@ import Grid from '@mui/material/Grid';
 import { useFormik } from 'formik';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { uploadImageToCloudinary } from '../util/UploadToCloudinary';
+import { toast, ToastContainer } from "react-toastify";
+import * as yup from 'yup';
 import { createArea } from '../../component/State/Area/Action';
+import { uploadImageToCloudinary } from '../util/UploadToCloudinary';
 
 const initialValues = {
     name: "",
@@ -17,27 +19,53 @@ const initialValues = {
     openingHours: "Mon-Sun : 9:00 AM - 12:00 PM",
     images: []
 }
+const noLeadingSpace = (message) => yup.string().test('no-leading-space', message, value => !value || !value.startsWith(' '));
+
+const validationSchema = yup.object({
+  name: noLeadingSpace('Name cannot start with a space').required('Name is required'),
+  description: noLeadingSpace('Description cannot start with a space').required('Description is required'),
+  email: noLeadingSpace('Email cannot start with a space').email('Invalid email format').required('Email is required'),
+  mobile: noLeadingSpace('Mobile cannot start with a space')
+    .matches(/^[0-9]+$/, "Must be only digits")
+    .min(10, 'Must be exactly 10 digits')
+    .max(10, 'Must be exactly 10 digits')
+    .required('Mobile is required'),
+  openingHours: noLeadingSpace('Opening hours cannot start with a space').required('Opening hours are required'),
+  images: yup.array().min(1, 'At least one image is required'),
+});
 
 const CreateAreaForm = () => {
     const [uploadImage, setUploadImage] = useState(false);
     const dispatch=useDispatch()
     const jwt=localStorage.getItem("jwt");
+    
     const formik = useFormik({
         initialValues,
-        onSubmit: (values) => {
-            const Data={
-                name: values.name,
-                description: values.description,
-                contactInformation:{
-                    email: values.email,
-                    mobile: values.mobile,
-                },
-                OpeningHours: values.openingHours,
-                images: values.images,
-            };
-            console.log("data ---",Data)
-            
-            dispatch(createArea(Data,jwt))
+        validationSchema,
+        onSubmit: async (values) => {
+            try {
+                const Data = {
+                    name: values.name,
+                    description: values.description,
+                    contactInformation: {
+                        email: values.email,
+                        mobile: values.mobile,
+                    },
+                    OpeningHours: values.openingHours,
+                    images: values.images,
+                };
+                console.log("data ---", Data);
+
+                await dispatch(createArea(Data, jwt));
+                toast.success("Area created successfully!");
+            } catch (error) {
+                if (error.response && error.response.data && error.response.data.message) {
+                  toast.error(`${error.response.data.message}`);
+                } else {
+                  toast.error("Failed to Buyback. Please try again.");
+                }
+                console.error("error:", error);
+              }
         },
     });
 
@@ -57,6 +85,7 @@ const CreateAreaForm = () => {
     };
 
     return (
+        <>
         <div className='py-10 px-5 items-center justify-center min-h-screen'>
             <div className="lg:max-w-4xl mx-auto">
                 <h1 className='font-bold text-2xl text-center py-2'>
@@ -101,58 +130,76 @@ const CreateAreaForm = () => {
                                         </IconButton>
                                     </div>
                                 ))}
+                                {formik.touched.images && formik.errors.images ? (
+                                    <div className="error">{formik.errors.images}</div>
+                                ) : null}
                             </div>
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField fullWidth
-                                id="name"
-                                name="name"
-                                label="Name"
-                                variant="outlined"
-                                onChange={formik.handleChange}
-                                value={formik.values.name}>
-                            </TextField>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField fullWidth
-                                id="description"
-                                name="description"
-                                label="Description"
-                                variant="outlined"
-                                onChange={formik.handleChange}
-                                value={formik.values.description}>
-                            </TextField>
-                        </Grid>
-                        <Grid item xs={12} lg={6}>
-                            <TextField fullWidth
-                                id="openingHours"
-                                name="openingHours"
-                                label="OpeningHours"
-                                variant="outlined"
-                                onChange={formik.handleChange}
-                                value={formik.values.openingHours}>
-                            </TextField>
-                        </Grid>
-                        <Grid item xs={12} lg={6}>
-                            <TextField fullWidth
-                                id="email"
-                                name="email"
-                                label="Email"
-                                variant="outlined"
-                                onChange={formik.handleChange}
-                                value={formik.values.email}>
-                            </TextField>
-                        </Grid>
-                        <Grid item xs={12} lg={6}>
-                            <TextField fullWidth
-                                id="mobile"
-                                name="mobile"
-                                label="Mobile"
-                                variant="outlined"
-                                onChange={formik.handleChange}
-                                value={formik.values.mobile}>
-                            </TextField>
-                        </Grid>
+    <TextField fullWidth
+        id="name"
+        name="name"
+        label="Name"
+        variant="outlined"
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        value={formik.values.name}
+        error={formik.touched.name && Boolean(formik.errors.name)}
+        helperText={formik.touched.name && formik.errors.name}
+    />
+</Grid>
+<Grid item xs={12}>
+    <TextField fullWidth
+        id="description"
+        name="description"
+        label="Description"
+        variant="outlined"
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        value={formik.values.description}
+        error={formik.touched.description && Boolean(formik.errors.description)}
+        helperText={formik.touched.description && formik.errors.description}
+    />
+</Grid>
+<Grid item xs={12} lg={6}>
+    <TextField fullWidth
+        id="openingHours"
+        name="openingHours"
+        label="OpeningHours"
+        variant="outlined"
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        value={formik.values.openingHours}
+        error={formik.touched.openingHours && Boolean(formik.errors.openingHours)}
+        helperText={formik.touched.openingHours && formik.errors.openingHours}
+    />
+</Grid>
+<Grid item xs={12} lg={6}>
+    <TextField fullWidth
+        id="email"
+        name="email"
+        label="Email"
+        variant="outlined"
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        value={formik.values.email}
+        error={formik.touched.email && Boolean(formik.errors.email)}
+        helperText={formik.touched.email && formik.errors.email}
+    />
+</Grid>
+<Grid item xs={12} lg={6}>
+    <TextField fullWidth
+        id="mobile"
+        name="mobile"
+        label="Mobile"
+        variant="outlined"
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        value={formik.values.mobile}
+        error={formik.touched.mobile && Boolean(formik.errors.mobile)}
+        helperText={formik.touched.mobile && formik.errors.mobile}
+    />
+</Grid>
                     </Grid>
                     <Button variant="contained" color="primary" type="submit">
                         Create Area
@@ -160,6 +207,8 @@ const CreateAreaForm = () => {
                 </form>
             </div>
         </div>
+        <ToastContainer/>
+        </>
     )
 }
 

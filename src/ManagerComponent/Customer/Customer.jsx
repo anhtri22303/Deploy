@@ -15,6 +15,7 @@ import {
   TextField,
   Typography,
   Alert,
+  Pagination,
 } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -22,6 +23,7 @@ import {
   getAllCustomers,
 } from "../../component/State/Customer/Action";
 import UpdateCustomerForm from "./UpdateCustomerForm";
+import SearchIcon from "@mui/icons-material/Search";
 
 const style = {
   position: "absolute",
@@ -39,7 +41,9 @@ const Customer = () => {
   const [open, setOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showNoItemAlert, setShowNoItemAlert] = useState(false); // State for showing no item alert
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showNoResults, setShowNoResults] = useState(false);
+  const ordersPerPage = 12;
 
   const { customers } = useSelector((state) => state.customer);
   const dispatch = useDispatch();
@@ -49,12 +53,19 @@ const Customer = () => {
     dispatch(getAllCustomers(jwt));
   }, [dispatch, jwt]);
 
+  const handleSearchClick = () => {
+    handleSearch();
+  };
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
     setSelectedCustomer(null);
   };
-
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setShowNoResults(false);
+  };
   const handleUpdateClick = (customer) => {
     setSelectedCustomer(customer);
     setOpen(true);
@@ -63,19 +74,26 @@ const Customer = () => {
   const handleSearch = (e) => {
     const searchTerm = e.target.value.toLowerCase();
     setSearchTerm(searchTerm);
-    if (searchTerm.trim() === "") {
-      setShowNoItemAlert(false);
-    } else {
-      const found = customers.some(
-        (customer) => customer.fullname.toLowerCase().includes(searchTerm)
-      );
-      setShowNoItemAlert(!found);
-    }
+    setCurrentPage(1); // Reset to the first page on search
   };
 
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const filteredCustomers = customers.filter((customer) =>
+    customer.fullname.toLowerCase().includes(searchTerm)
+  );
+
+  const startIndex = (currentPage - 1) * ordersPerPage;
+  const currentCustomers = filteredCustomers.slice(
+    startIndex,
+    startIndex + ordersPerPage
+  );
+
   return (
-    <Box>
-      <Card className="mt-1" sx={{ padding: 2, margin: 2 }}>
+    <Box sx={{ padding: 3, minHeight: "100vh" }}>
+      <Card sx={{ mt: 2, boxShadow: 3, borderRadius: 2 }}>
         <CardHeader
           title={"Customer"}
           sx={{
@@ -88,12 +106,50 @@ const Customer = () => {
             color: "#fff",
           }}
         />
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            padding: 2,
+            gap: 1,
+          }}
+        >
           <TextField
-            label="Search by Name"
+            id="search-input"
+            label="Search by Customer Name"
             variant="outlined"
-            onChange={handleSearch}
+            size="small"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "gray",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#0B4CBB",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#0B4CBB",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "gray",
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: "gray",
+              },
+            }}
           />
+          <IconButton aria-label="search" onClick={handleSearchClick}>
+            <SearchIcon />
+          </IconButton>
         </Box>
         <TableContainer component={Paper}>
           <Table aria-label="customer table">
@@ -132,37 +188,35 @@ const Customer = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {customers
-                .filter((customer) =>
-                  customer.fullname.toLowerCase().includes(searchTerm)
-                )
-                .map((customer, index) => (
+              {currentCustomers.length > 0 ? (
+                currentCustomers.map((customer, index) => (
                   <TableRow key={customer.id}>
                     <TableCell component="th" scope="row">
-                      {index + 1}
+                      {startIndex + index + 1}
                     </TableCell>
                     <TableCell align="right">{customer.fullname}</TableCell>
                     <TableCell align="right">{customer.mobile}</TableCell>
                     <TableCell align="right">{customer.email}</TableCell>
                     <TableCell align="right">{customer.point}</TableCell>
                   </TableRow>
-                ))}
-              {/* Show message if no items found */}
-              {searchTerm !== "" &&
-                customers
-                  .filter((customer) =>
-                    customer.fullname.toLowerCase().includes(searchTerm)
-                  ).length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5} align="center">
-                        <Alert severity="warning">
-                          No customers found with the provided name.
-                        </Alert>
-                      </TableCell>
-                    </TableRow>
-                  )}
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">
+                    No Customer available
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2, pb: 2 }}>
+            <Pagination
+              count={Math.ceil(filteredCustomers.length / ordersPerPage)}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+            />
+          </Box>
         </TableContainer>
       </Card>
       <Modal

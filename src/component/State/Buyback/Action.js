@@ -23,6 +23,7 @@ export const createBuyback = (buybackRequest, jewelryCode, jwt) => {
         console.log("data",buybackRequest)
         console.log("error", error)
         dispatch({ type: CREATE_BUYBACK_FAILURE, error: error.message });
+        throw error;
         // Handle error scenario
       }
     };
@@ -57,6 +58,7 @@ export const createBuyback = (buybackRequest, jewelryCode, jwt) => {
             console.log("buybackRequest", createJewelryRequest);
 
             dispatch({ type: CREATE_BUYBACK_OUT_FAILURE, error: error.message });
+            throw error;
         }
     };
 };
@@ -80,6 +82,7 @@ export const createBuyback = (buybackRequest, jewelryCode, jwt) => {
         } catch (error) {
             dispatch({ type: GET_ALL_BUYBACK_FAILURE })
             console.log("error", error);
+            throw error;
         }
     };
 };

@@ -3,7 +3,6 @@ import { Field, Form, Formik } from "formik";
 import React from 'react';
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { registerUser } from '../State/Authentication/Action';
 
 const initialValues = {
@@ -19,20 +18,16 @@ export default function RegisterForm() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleSubmit = async (values) => {
-    try {
-      await dispatch(registerUser({ userData: values, navigate }));
-      toast.success("Category created successfully!");
-      // On successful registration, navigate to the login page or a success page
-      navigate("/area/:title/:id");
-    } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
-        toast.error(`${error.response.data.message}`);
-      } else {
-        toast.error("Wrong code. Please try again.");
-      }
-      console.error("error:", error);
-    }
+  const handleSubmit = (values) => {
+    dispatch(registerUser({ userData: values, navigate }))
+      .then(() => {
+        // On successful registration, navigate to the login page or a success page
+        navigate("/area/:title/:id"); // or navigate("/registration-success");
+      })
+      .catch((error) => {
+        console.error("Registration failed", error);
+        // Handle registration error here
+      });
   };
   const validate = (values) => {
     const errors = {};

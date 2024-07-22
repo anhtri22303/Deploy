@@ -14,31 +14,68 @@ import {
   TableRow,
   Typography,
   TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import CheckIcon from "@mui/icons-material/Check";
 import {
-  getAllStaffUser,
-  deleteStaffUser,
+  banUser,
+  getAllBanUsers,
 } from "../../component/State/Authentication/Action";
-import { Delete } from "@mui/icons-material";
-export default function StaffTable() {
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+export default function StaffTableA() {
   const dispatch = useDispatch();
   const { auth } = useSelector((store) => store);
   const jwt = localStorage.getItem("jwt");
 
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [open, setOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   useEffect(() => {
-    dispatch(getAllStaffUser(jwt));
+    dispatch(getAllBanUsers(jwt));
   }, [dispatch, jwt]);
 
-  const handleDelete = (username) => {
-    if (window.confirm("Are you sure you want to delete this account?")) {
-      dispatch(deleteStaffUser(jwt, username));
-    }
+  const handleOpenDialog = (id) => {
+    setSelectedUserId(id);
+    setOpen(true);
   };
 
-  // Filtered staff based on search term
+  const handleCloseDialog = () => {
+    setOpen(false);
+    setSelectedUserId(null);
+  };
+
+  const handleDelete = () => {
+    if (selectedUserId) {
+      dispatch(banUser(jwt, selectedUserId))
+        .then(() => {
+          toast.success("User banned successfully!", {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          setTimeout(() => {
+            window.location.reload(); // Reload the page after 2 seconds
+          }, 1000);
+        })
+        .catch((error) => {
+          console.error("Error banning user", error);
+        });
+    }
+    handleCloseDialog();
+  };
+
   const filteredStaff = auth.users.filter((user) =>
     user.fullname.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -110,7 +147,15 @@ export default function StaffTable() {
                     Full Name
                   </Typography>
                 </TableCell>
-                <TableCell align="right">
+                <TableCell align="left">
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: "bold", color: "white" }}
+                  >
+                    userName
+                  </Typography>
+                </TableCell>
+                <TableCell align="center">
                   <Typography
                     variant="subtitle1"
                     sx={{ fontWeight: "bold", color: "white" }}
@@ -118,7 +163,7 @@ export default function StaffTable() {
                     Gender
                   </Typography>
                 </TableCell>
-                <TableCell align="right">
+                <TableCell align="center">
                   <Typography
                     variant="subtitle1"
                     sx={{ fontWeight: "bold", color: "white" }}
@@ -126,15 +171,7 @@ export default function StaffTable() {
                     Role
                   </Typography>
                 </TableCell>
-                <TableCell align="right">
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: "bold", color: "white" }}
-                  >
-                    Area
-                  </Typography>
-                </TableCell>
-                <TableCell align="right">
+                <TableCell align="center">
                   <Typography
                     variant="subtitle1"
                     sx={{ fontWeight: "bold", color: "white" }}
@@ -142,14 +179,14 @@ export default function StaffTable() {
                     Email
                   </Typography>
                 </TableCell>
-                {/* <TableCell align="right">
-                                    <Typography
-                                        variant="subtitle1"
-                                        sx={{ fontWeight: "bold", color: "white" }}
-                                    >
-                                        Delete
-                                    </Typography>
-                                </TableCell> */}
+                <TableCell align="right">
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: "bold", color: "white" }}
+                  >
+                    UnBan
+                  </Typography>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -168,21 +205,22 @@ export default function StaffTable() {
                     <TableCell component="th" scope="row">
                       {row.fullname}
                     </TableCell>
-                    <TableCell align="right">{row.gender}</TableCell>
-                    <TableCell align="right">{row.role}</TableCell>
-                    <TableCell align="right">{row.areaName}</TableCell>
+                    <TableCell align="center">{row.username}</TableCell>
+                    <TableCell align="center">{row.gender}</TableCell>
+                    <TableCell align="center">{row.role}</TableCell>
+
                     <TableCell align="right">{row.email}</TableCell>
-                    {/*<TableCell align="right">
-                                            <IconButton onClick={() => handleDelete(row.username)}>
-                                                <Delete />
-                                            </IconButton>
-                                        </TableCell>*/}
+                    <TableCell align="right">
+                      <IconButton onClick={() => handleOpenDialog(row.id)}>
+                        <CheckIcon />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} align="center">
-                    No staff found.
+                    No staff found with the given search criteria.
                   </TableCell>
                 </TableRow>
               )}
@@ -190,6 +228,23 @@ export default function StaffTable() {
           </Table>
         </TableContainer>
       </Card>
+      <Dialog open={open} onClose={handleCloseDialog} sx={{ borderRadius: 2 }}>
+        <DialogTitle>{"Confirm UnBan"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to UnBan this Account?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="error" autoFocus>
+            UnBan
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <ToastContainer />
     </Box>
   );
 }

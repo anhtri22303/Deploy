@@ -82,6 +82,7 @@ import { CREATE_AREA_FAILURE, CREATE_AREA_REQUEST,CREATE_AREA_SUCCESS,CREATE_EVE
         } catch (error) {
             console.log("catch error",error);
             dispatch({type:CREATE_AREA_FAILURE, payload:error})
+            throw error;
         }
     }
  };

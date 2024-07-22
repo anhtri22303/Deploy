@@ -1,41 +1,49 @@
-import { Dashboard, ShoppingBag } from '@mui/icons-material';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import CategoryIcon from '@mui/icons-material/Category';
-import DiamondIcon from '@mui/icons-material/Diamond';
-import EventIcon from '@mui/icons-material/Event';
-import LogoutIcon from '@mui/icons-material/Logout';
-import ShopTwoIcon from '@mui/icons-material/ShopTwo';
-import HomeIcon from '@mui/icons-material/Home';
-import GroupIcon from '@mui/icons-material/Group';
-import ChecklistIcon from '@mui/icons-material/Checklist';
-import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
-import { Divider, Drawer, Typography, useMediaQuery } from '@mui/material';
 import React, { useState } from 'react';
+import {
+    Dashboard, ShoppingBag, Home, Group, Checklist, Logout,
+    Category, Diamond, Event, ShopTwo, ShoppingCartCheckout, Menu as MenuIcon
+} from '@mui/icons-material';
+import {
+    Divider, Drawer, Typography, useMediaQuery, IconButton, Box,
+    List, ListItem, ListItemIcon, ListItemText, useTheme, Collapse
+} from '@mui/material';
+import PermMediaIcon from '@mui/icons-material/PermMedia';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../component/State/Authentication/Action';
-
+import { styled } from '@mui/system';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import logo from '../../assets/logo.png';
 const menu = [
-    { title: "Home", icon: <HomeIcon fontSize="large" sx={{ color: 'White' }} />, path: "/" },
-    { title: "Dashboard", icon: <Dashboard fontSize="large" sx={{ color: 'White' }} />, path: "/dashboard" },
-    { title: "Orders", icon: <ShoppingBag fontSize="large" sx={{ color: 'White' }} />, path: "/orders" },
-    { title: "Menu", icon: <ShopTwoIcon fontSize="large" sx={{ color: 'White' }} />, path: "/menu" },
-    { title: "Category", icon: <CategoryIcon fontSize="large" sx={{ color: 'White' }} />, path: "/category" },
-    { title: "Ingredients", icon: <DiamondIcon fontSize="large" sx={{ color: 'White'  }} />, path: "/ingredients" },
-    { title: "Staff", icon: <GroupIcon fontSize="large" sx={{ color: 'White'  }} />, path: "/teams" },
-    { title: "Customer", icon: <ChecklistIcon fontSize="large" sx={{ color: 'White' }} />, path: "/customer" },
-    { title: "Buyback", icon: <ShoppingCartCheckoutIcon fontSize="large" sx={{ color: 'White' }} />, path: "/buyback" },
-    // { title: "Details", icon: <AdminPanelSettingsIcon fontSize="large" sx={{ color: 'White'  }} />, path: "/details" },
-    { title: "Events", icon: <EventIcon fontSize="large" sx={{ color: 'White' }} />, path: "/event" },
-
-    { title: "Logout", icon: <LogoutIcon fontSize="large" sx={{ color: 'Red'  }} />, path: "/logout" },
+    { title: "Home", icon: <Home />, path: "/" },
+    { title: "Dashboard", icon: <Dashboard />, path: "/dashboard" },
+    { title: "Orders", icon: <ShoppingBag />, path: "/orders" },
+    { title: "Buyback", icon: <ShoppingCartCheckout />, path: "/buyback" },
+    { title: "Customer", icon: <Checklist />, path: "/customer" },
+    { title: "Menu", icon: <ShopTwo />, path: "/menu" },
+    { title: "OutStock", icon: <InventoryIcon />, path: "/instock" },
+    { title: "Category", icon: <Category />, path: "/category" },
+    { title: "Ingredients", icon: <Diamond />, path: "/ingredients" },
+    { title: "Staff", icon: <Group />, path: "/teams" },
+    { title: "Events", icon: <Event />, path: "/event" },
+    { title: "Area", icon: <PermMediaIcon />, path: "/area" },
+    { title: "Logout", icon: <Logout sx={{ color: 'red' }} />, path: "/logout" },
 ];
 
-export const AdminSidebar = ({ handleClose }) => {
+const Logo = styled("img")({
+    height: 300, // Tăng giá trị height để phóng to ảnh
+    width: 300, // Thêm width để giữ tỷ lệ
+    backgroundColor: "#003366",
+    borderRadius: "100%",
+    border: "5px solid #EEBF0D", 
+  });
+const AdminSidebar = () => {
     const isSmallScreen = useMediaQuery("(max-width:1080px)");
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [showIcons, setShowIcons] = useState(false);
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [showAdditionalIcons, setShowAdditionalIcons] = useState(false);
+    const theme = useTheme();
 
     const handleNavigate = (item) => {
         if (item.title === "Logout") {
@@ -44,54 +52,150 @@ export const AdminSidebar = ({ handleClose }) => {
         } else {
             navigate(`/manager/jewelry${item.path}`);
         }
-        handleClose();
+        if (isSmallScreen) setDrawerOpen(false);
     };
 
     const handleLogoClick = () => {
         navigate("/manager/jewelry");
-        handleClose();
+        if (isSmallScreen) setDrawerOpen(false);
     };
 
-    const handleMouseEnter = () => {
-        setShowIcons(true);
-    };
-
-    const handleMouseLeave = () => {
-        setShowIcons(false);
+    const handleHomeClick = () => {
+        setShowAdditionalIcons(!showAdditionalIcons);
     };
 
     return (
-        <div className="sidebar-container" style={{ backgroundImage: `url('https://images.pexels.com/photos/11903459/pexels-photo-11903459.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')` }}>
+        <Box sx={{ display: 'flex' }}>
+            {isSmallScreen && (
+                <IconButton
+                    onClick={() => setDrawerOpen(true)}
+                    sx={{ position: 'fixed', top: 16, left: 16, zIndex: 1300 }}
+                >
+                    <MenuIcon fontSize="large" />
+                </IconButton>
+            )}
             <Drawer
                 variant={isSmallScreen ? "temporary" : "permanent"}
-                onClose={handleClose}
-                open={true}
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
                 anchor='left'
-                sx={{ zIndex: 1 }}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
+                sx={{ zIndex: 1200 }}
             >
-                <div className='w-[70vw] lg:w-[20vw] h-screen flex flex-col items-center text-xl space-y-4 p-4'>
-                    <div className='w-full flex justify-center items-center py-4 cursor-pointer' onClick={handleLogoClick}>
-                        <img src="https://cdn.pnj.io/images/logo/pnj.com.vn.png" alt="Logo" className='h-20' style={{ backgroundColor: '#00ABE1', padding: '8px', borderRadius: '50%' }} />
-                    </div>
-                    <Divider className='w-full' />
-                    <div className='w-full'>
-                        {menu.map((item, i) => (
-                            <div
+                <Box
+                    sx={{
+                        width: isSmallScreen ? '70vw' : '15vw',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        backgroundColor: "#F1EEEB",
+                        color: 'white',
+                        p: 2,
+                    }}
+                >
+                    <Box
+                        onClick={handleLogoClick}
+                        sx={{
+                            width: '100%',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            py: 2,
+                            cursor: 'pointer',
+                        }}
+                    >
+                        <Logo src={logo} alt="Logo"  style={{ width: '60%', height: '80%' }} />
+                    </Box>
+                    <Divider sx={{ width: '100%', mb: 2, backgroundColor: 'white' }} />
+                    <List sx={{ width: '100%' }}>
+                        <ListItem
+                            button
+                            onClick={handleHomeClick}
+                            sx={{
+                                '&:hover': {
+                                    backgroundColor: "White",
+                                },
+                                transition: 'all 0.3s',
+                                mb: 1,
+                            }}
+                        >
+                            <ListItemIcon sx={{ color: "#003366" }}>
+                                <Home />
+                            </ListItemIcon>
+                            <ListItemText
+                                primary={
+                                    <Typography
+                                        variant="subtitle1"
+                                        sx={{color: "Black", fontWeight: 'bold' }}
+                                    >
+                                        Home
+                                    </Typography>
+                                }
+                            />
+                        </ListItem>
+                        <Collapse in={showAdditionalIcons} timeout="auto" unmountOnExit>
+                            {menu.slice(1, 5).map((item, i) => (
+                                <ListItem
+                                    button
+                                    key={i}
+                                    onClick={() => handleNavigate(item)}
+                                    sx={{
+                                        '&:hover': {
+                                            backgroundColor: "White",
+                                        },
+                                        transition: 'all 0.3s',
+                                        mb: 1,
+                                    }}
+                                >
+                                    <ListItemIcon sx={{ color: 'red' }}>
+                                        {item.icon}
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primary={
+                                            <Typography
+                                                variant="subtitle1"
+                                                sx={{color: "Black", fontWeight: 'bold' }}
+                                            >
+                                                {item.title}
+                                            </Typography>
+                                        }
+                                    />
+                                </ListItem>
+                            ))}
+                        </Collapse>
+                        {menu.slice(5).map((item, i) => (
+                            <ListItem
+                                button
                                 key={i}
                                 onClick={() => handleNavigate(item)}
-                                className={`w-full flex items-center gap-5 p-3 cursor-pointer hover:bg-gray-200 rounded transition-opacity duration-500 ${showIcons ? 'opacity-100' : 'opacity-0'}`}
+                                sx={{
+                                    '&:hover': {
+                                        backgroundColor: "White",
+                                    },
+                                    transition: 'all 0.3s',
+                                    mb: 1,
+                                }}
                             >
-                                <div className="icon-container" style={{ backgroundColor: '#0B4CBB', padding: '10px', borderRadius: '10px', width: '200px' }}>
+                                <ListItemIcon sx={{ color: "#003366"}}>
                                     {item.icon}
-                                </div>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#000000' }}>{item.title}</Typography>
-                            </div>
+                                </ListItemIcon>
+                                <ListItemText
+                                    primary={
+                                        <Typography
+                                            variant="subtitle1"
+                                            sx={{color: "Black",  fontWeight: 'bold' }}
+                                        >
+                                            {item.title}
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
                         ))}
-                    </div>
-                </div>
+                    </List>
+                </Box>
             </Drawer>
-        </div>
+        </Box>
     );
 };
+
+export default AdminSidebar;

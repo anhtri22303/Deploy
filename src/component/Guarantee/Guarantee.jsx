@@ -1,12 +1,15 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
-import about_1 from '../../assets/about_1.png'
+import about_1 from '../../assets/about_1.png';
 import about_2 from "../../assets/about_2.png";
 import about_3 from "../../assets/about_3.png";
 import about_4 from "../../assets/about_4.png";
+import { Navbar } from "../Navbar/Navbar";
 
 const About = () => {
   return (
+    <div>
+      <Navbar/>
     <Box sx={{ width: "100%", maxWidth: "1252px", margin: "50px 250px 200px" }}>
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
@@ -193,6 +196,7 @@ const About = () => {
         </Grid>
       </Grid>
     </Box>
+    </div>
   );
 };
 

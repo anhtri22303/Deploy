@@ -1,4 +1,4 @@
-import {CREATE_ORDER_FAILURE, CREATE_ORDER_REQUEST, CREATE_ORDER_SUCCESS, GET_ALL_ORDER_FAILURE, GET_ALL_ORDER_REQUEST, GET_ALL_ORDER_SUCCESS, GET_ORDER_BY_ID_FAILURE, GET_ORDER_BY_ID_REQUEST, GET_ORDER_BY_ID_SUCCESS, GET_USERS_ORDERS_FAILURE, GET_USERS_ORDERS_REQUEST, GET_USERS_ORDERS_SUCCESS } from "./ActionType";
+import { CREATE_ORDER_FAILURE, CREATE_ORDER_REQUEST, CREATE_ORDER_SUCCESS, GET_ALL_ORDER_FAILURE, GET_ALL_ORDER_REQUEST, GET_ALL_ORDER_SUCCESS, GET_ORDER_BY_ID_FAILURE, GET_ORDER_BY_ID_REQUEST, GET_ORDER_BY_ID_SUCCESS, GET_USERS_ORDERS_FAILURE, GET_USERS_ORDERS_REQUEST, GET_USERS_ORDERS_SUCCESS } from "./ActionType";
 
 import { api } from "../../config/api";
 
@@ -14,7 +14,7 @@ export const createOrder = (reqData) => {
 
             const orderId = data.id;
 
-            const callbackUrl = `${window.location.origin}/payment/success/${orderId}`;
+            const callbackUrl = `${window.location.origin}/staff/jewelry/payment/success/${orderId}`;
 
             if (data.payment_url) {
                 window.location.href = data.payment_url;
@@ -26,6 +26,7 @@ export const createOrder = (reqData) => {
         } catch (error) {
             console.log("error",error)
             dispatch({ type: CREATE_ORDER_FAILURE, payload:error});
+            throw error;
         }
     };
 };
@@ -43,6 +44,7 @@ export const getUsersOrders = (jwt) => {
             dispatch({ type: GET_USERS_ORDERS_SUCCESS, payload:data });
         } catch (error) {
             dispatch({ type: GET_USERS_ORDERS_FAILURE, payload:error});
+            throw error;
         }
     };
 };
@@ -59,6 +61,7 @@ export const getALLsOrders = (jwt) => {
             dispatch({ type: GET_ALL_ORDER_SUCCESS, payload:data });
         } catch (error) {
             dispatch({ type: GET_ALL_ORDER_FAILURE, payload:error});
+            throw error;
         }
     };
 };
@@ -76,6 +79,7 @@ export const getOrderDetails = (orderId) => {
         dispatch({ type: GET_ORDER_BY_ID_SUCCESS, payload: data });
       } catch (error) {
         dispatch({ type: GET_ORDER_BY_ID_FAILURE, payload: error });
+        throw error;
       }
     };
   };

@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux'
 import Home from '../component/Home/Home'
 import { ManagerRoute } from './ManagerRoute'
 import { AdminRoute } from './AdminRoute'
+import { StaffRoute } from './StaffRoute'
 
 
 
@@ -14,7 +15,8 @@ const Routers = () => {
     const { auth } = useSelector((store) => store);
     return (
         <Routes>
-            <Route path="/*" element={ auth.user ? <CustomerRoute /> :<LoginForm/>} />
+            <Route path="/" element={<LoginForm/>} />
+            <Route path="/staff/jewelry/*" element={<StaffRoute/>} />
             <Route path="/manager/jewelry/*" element={<ManagerRoute />} />
             <Route path="/admin/jewelry/*" element={<AdminRoute/>} />
 

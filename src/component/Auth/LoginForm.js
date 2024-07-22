@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate hook
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { loginUser } from "../State/Authentication/Action";
-
+import logo from '../../assets/logo.png';
 const initialValues = {
     username: "",
     password: ""
@@ -25,11 +25,18 @@ const LoginForm = () => {
                 // navigate("/some-page");
             })
             .catch((error) => {
-                let errorMessage = "Incorrect username or password";
-                // Display error message to the user
-                toast.error(`LOGIN FAIL: ${errorMessage}`);
-            });
-    };
+                if (
+                  error.response &&
+                  error.response.data &&
+                  error.response.data.message
+                ) {
+                  toast.error(`${error.response.data.message}`); // Show specific error message
+                } else {
+                  toast.error("Login Fail. Please try again."); // Fallback error message
+                }
+                console.error("error:", error);
+              }
+            )};
     return (
         <div
             style={{
@@ -42,9 +49,9 @@ const LoginForm = () => {
                 alignItems: 'center'
             }}
         >
-            <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', maxWidth: '400px', width: '100%' }}>
-                <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                    <img src="https://cdn.pnj.io/images/logo/pnj.com.vn.png" alt="Logo" style={{ width: '100px' }} />
+            <div style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', maxWidth: '400px', width: '100%' }}>
+                <div style={{ textAlign: 'center'}}>
+                    <img src={logo} alt="Logo" style={{ width: '100px' }} />
                 </div>
                 <Typography variant="h5" className="text-center" style={{ color: 'black' }}>
                     Login

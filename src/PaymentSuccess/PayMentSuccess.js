@@ -23,7 +23,7 @@ export const PayMentSuccess = () => {
     }, [orderId, dispatch, jwt]);
 
     const handleNavigateHome = () => {
-        navigate("/cart");
+        navigate("/staff/jewelry/cart");
     };
 
     return (
@@ -43,6 +43,7 @@ export const PayMentSuccess = () => {
                                     <p>Customer Name: {orderDetails.customer.fullname}</p>
                                     <p>Mobile: {orderDetails.customer.mobile}</p>
                                     <p>Email: {orderDetails.customer.email}</p>
+                                    <p> {orderDetails.description}</p>
                                 </div>
                             ) : (
                                 <p>Loading...</p>
@@ -73,6 +74,7 @@ export const PayMentSuccess = () => {
                                 <div>
                                     <p>Total Amount: {orderDetails.totalAmount}</p>
                                     <p>Discount: {orderDetails.items[0].discountPercentage}% on entire bill</p>
+                                    <p>Promotions exclusively for loyal customers: {orderDetails.detail}</p>
                                     <p>Total Pay: {orderDetails.totalPrice}</p>
                                 </div>
                             ) : (
@@ -84,6 +86,7 @@ export const PayMentSuccess = () => {
                             <div className="bg-green-100 border border-gray-300 p-4 rounded-md">
                                 <h2 className="text-xl mb-2">Warranty</h2>
                                 <div>
+                                    <p>Warranty ID: {warrantyDetails.id}</p>
                                     <p>Warranty Terms: {warrantyDetails.terms}</p>
                                     <p>Start Date: {warrantyDetails.startDate}</p>
                                     <p>End Date: {warrantyDetails.endDate}</p>

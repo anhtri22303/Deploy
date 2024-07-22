@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAreaById } from "../State/Area/Action";
 import { getMenuItemsByJewelryId } from "../State/Menu/Action";
 import { getAllCategory } from "../State/Categories/Action";
-
+import { Navbar } from "../Navbar/Navbar";
 const jewelryTypes = [
   { label: "ALL", value: "all" },
   { label: "Gold", value: "Gold" },
@@ -34,6 +34,7 @@ const JewelryDetails = () => {
   const jwt = localStorage.getItem("jwt");
   const { area, menu } = useSelector((store) => store);
   const { id } = useParams();
+  //window.scrollTo(0,0); // cuộn lên trang 
 
   useEffect(() => {
     dispatch(getAreaById({ jwt, areaId: id }));
@@ -107,9 +108,11 @@ const JewelryDetails = () => {
   };
 
   return (
+    <div>
+       <Navbar/>
     <div className="px-5 lg:px-20">
       <section>
-        <h3 className="text-gray-500 py-2 mt-10">Home/jewelry/jewelry product</h3>
+        <h3 className="text-gray-500 py-2 mt-10">Area</h3>
         <div>
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -130,11 +133,11 @@ const JewelryDetails = () => {
           <div className="space-y-3 mt-3">
             <p className="text-gray-500 flex items-center gap-3">
               <LocationOnIcon />
-              <span>ThaoDien, District 2, HCM city</span>
+              <span>ThaoDien, District 2, HCM City</span>
             </p>
             <p className="text-gray-500 flex items-center gap-3">
               <CalendarTodayIcon />
-              <span>9:00AM to 8:30PM</span>
+              <span>9:00 AM to 8:30 PM</span>
             </p>
           </div>
         </div>
@@ -205,13 +208,14 @@ const JewelryDetails = () => {
         <Grid container spacing={4} className="lg:w-80 lg:pl-10">
           {filteredItems.map((item) => (
             <Grid item key={item.id} xs={12} sm={6} md={4} lg={3}>
-              <div style={{ width: "100%", height: "450%" }}>
+              <div style={{ width: "100%", height: "150%" }}>
                 <MenuCard item={item} />
               </div>
             </Grid>
           ))}
         </Grid>
       </section>
+    </div>
     </div>
   );
 };

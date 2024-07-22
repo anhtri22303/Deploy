@@ -39,28 +39,23 @@ export const Events = () => {
 
   const validateForm = () => {
     let tempErrors = {};
-    tempErrors.images = formValue.images ? "" : "Image URL is required.";
-
+    tempErrors.images = formValue.images && formValue.images.trimStart() === formValue.images ? "" : "Image URL is required and should not start with a space.";
+  
     tempErrors.name = formValue.name && formValue.name.trimStart() === formValue.name ? "" : "Name is required and should not start with a space.";
-
+  
     tempErrors.code = formValue.code && formValue.code.trimStart() === formValue.code ? "" : "Code is required and should not start with a space.";
-    tempErrors.discountPercentage = formValue.discountPercentage
-      ? ""
-      : "Discount Percentage is required.";
-
-    tempErrors.validFrom = formValue.validFrom
-      ? ""
-      : "Valid From date is required.";
-    tempErrors.validUntil = formValue.validUntil
-      ? ""
-      : "Valid Until date is required.";
-
+  
+    tempErrors.discountPercentage = formValue.discountPercentage && formValue.discountPercentage.toString().trimStart() === formValue.discountPercentage.toString() ? "" : "Discount Percentage is required and should not start with a space.";
+  
+    tempErrors.validFrom = formValue.validFrom ? "" : "Valid From date is required.";
+    tempErrors.validUntil = formValue.validUntil ? "" : "Valid Until date is required.";
+  
     setErrors(tempErrors);
     return Object.values(tempErrors).every((x) => x === "");
-};
+  };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
   if (validateForm()) {
     try {
       console.log("submit ", formValue);
@@ -72,7 +67,7 @@ const handleSubmit = async (e) => {
       if (error.response && error.response.data && error.response.data.message) {
         toast.error(`${error.response.data.message}`);
       } else {
-        toast.error("Wrong code. Please try again.");
+        toast.error("Duplicate name. Please try again.");
       }
       console.error("error:", error);
     }
@@ -109,7 +104,7 @@ const handleSubmit = async (e) => {
 
   return (
     <>
-    <div>
+    <div className="px-4">
       <div className="p-5">
         <Button
           onClick={handleOpen}
@@ -388,7 +383,7 @@ const handleSubmit = async (e) => {
       </div>
       <EventTable />
     </div>
-    <ToastContainer/>
+    <ToastContainer />
     </>
     
   );

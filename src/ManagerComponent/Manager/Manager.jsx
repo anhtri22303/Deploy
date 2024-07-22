@@ -3,20 +3,19 @@ import { Route, Routes } from 'react-router-dom'
 import { JewelryDetails } from './JewelryDetails'
 import { Category } from '../Category/Category'
 import Dashboard from '../Dashboard/Dashboard'
-
 import { useDispatch, useSelector } from 'react-redux'
 import { Events } from '../Events/Events'
 import Ingredients from '../Ingredients/Ingredients'
 import CreateMenuForm from '../Menu/CreateMenuForm'
 import { Menu } from '../Menu/Menu'
 import { Orders } from '../Orders/Orders'
-import { AdminSidebar } from './AdminSidebar'
-import Footer from '../Footer/Footer'
+import  AdminSidebar  from './AdminSidebar';
 import Home from '../HomeA/Home'
 import Teams from '../Staff/Teams'
 import Customer from '../Customer/Customer'
 import Buyback from '../Buyback/Buyback'
-
+import Area from '../Area/Area';
+import { Instock } from '../Menu/Instock';
 export const Manager = () => {
     const dispatch = useDispatch();
     const jwt = localStorage.getItem('jwt');
@@ -30,12 +29,13 @@ export const Manager = () => {
                 <div>
                     <AdminSidebar handleClose={handleClose} />
                 </div>
-                <div className='lg:w-[80%]'>
+                <div className='lg:w-[85%]'>
                     <Routes>
                         <Route path='/' element={<Home />} />
                         <Route path='/dashboard' element={<Dashboard />} />
                         <Route path='/orders' element={<Orders />} />
                         <Route path='/menu' element={<Menu />} />
+                        <Route path='/instock' element={<Instock />} />
                         <Route path='/category' element={<Category />} />
                         <Route path='/ingredients' element={<Ingredients />} />
                         <Route path='/event' element={<Events />} />
@@ -44,6 +44,7 @@ export const Manager = () => {
                         <Route path='/buyback' element={<Buyback/>} />
                         <Route path='/teams' element={<Teams/>} />
                         <Route path='/customer' element={<Customer/>} />
+                        <Route path='/area' element={<Area/>} />
                     </Routes>
                 </div>
             </div>

@@ -7,19 +7,24 @@ import { darkTheme } from "./Theme/DarkTheme";
 import { getUser } from "./component/State/Authentication/Action";
 import { findCart } from "./component/State/Cart/Action";
 import { getAreaByUserId } from "./component/State/Area/Action";
+
 function App() {
-  const dispatch= useDispatch()
-  const jwt = localStorage.getItem("jwt")
-  const {auth} = useSelector (store=>store)
+  const dispatch = useDispatch();
+  const jwt = localStorage.getItem("jwt");
+  const { auth } = useSelector(store => store);
 
-  useEffect(()=> {
-    dispatch(getUser(auth.jwt || jwt))
-    dispatch(findCart(jwt))
-  },[auth.jwt])
+  useEffect(() => {
+    if (auth.jwt || jwt) {
+      dispatch(getUser(auth.jwt || jwt));
+      dispatch(findCart(jwt));
+    }
+  }, [auth.jwt]);
 
-  useEffect(()=> {
-    dispatch(getAreaByUserId(auth.jwt || jwt));
-  },[auth.user])
+  useEffect(() => {
+    if (auth.user) {
+      dispatch(getAreaByUserId(auth.jwt || jwt));
+    }
+  }, [auth.user]);
 
   return (
     <ThemeProvider theme={darkTheme}>

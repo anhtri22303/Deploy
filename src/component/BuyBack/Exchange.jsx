@@ -8,6 +8,7 @@ import { Formik, Form, Field } from "formik";
 import { createBuyback } from "../State/Buyback/Action"; // Adjust path as necessary
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { Navbar } from "../Navbar/Navbar";
 
 
 const Buy = () => {
@@ -19,6 +20,8 @@ const Buy = () => {
   const { menu, valuation } = useSelector((store) => store);
   const jwt = localStorage.getItem("jwt");
   const [jewelryImage, setJewelryImage] = useState("");
+
+  
 
   const handlePriceCalculation = async () => {
     try {
@@ -57,12 +60,14 @@ const Buy = () => {
     await dispatch(createBuyback(buybackRequest, productCode, jwt));
     actions.setSubmitting(false);
     handleCloseModal();
-    navigate("/buyback-success", {
+    navigate("/staff/jewelry/buyback-success", {
       state: { buyback: buybackRequest, product: productDetail, valuation },
     });
   };
 
   return (
+    <div>
+      <Navbar/>
     <Box
     display="flex"
     flexDirection="column"
@@ -72,12 +77,12 @@ const Buy = () => {
     mb={8}
     maxWidth="1000px"
     mx="auto"
-    sx={{ padding: 3,marginTop: "120px", marginBottom: "400px", backgroundColor: '#f0f0f0' }} // Replace with your desired shade of gray
+    sx={{ backgroundColor: '#f0f0f0', borderRadius: 8, boxShadow: 3, padding: 3 }}
   >
     <ToastContainer />
-      <Typography variant="h4" gutterBottom fontWeight="bold">
-        Buyback in Store
-      </Typography>
+    <Typography variant="h4" gutterBottom fontWeight="bold" textAlign="center">
+      Buyback in Store
+    </Typography>
       <Formik initialValues={initialValues} onSubmit={handleSubmit}>
         {({ isSubmitting }) => (
           <Form style={{ width: "100%" }}>
@@ -118,19 +123,19 @@ const Buy = () => {
                 disabled={isSubmitting}
                 sx={{
                   mt: 2,
-                  bgcolor: 'orange',
-                  color: 'white',
-                  fontWeight: 'bold',
-                  height: '40px', // Adjust height as needed
-                  padding: '8px',
-                  '&:hover': {
-                    bgcolor: 'darkorange',
+                  bgcolor: "#388E3C",
+                  color: "white",
+                  fontWeight: "bold",
+                  height: "40px", // Adjust height as needed
+                  padding: "8px",
+                  "&:hover": {
+                    bgcolor: "#D32F2F",
                   },
-                  '&:focus': {
-                    bgcolor: 'black',
+                  "&:focus": {
+                    bgcolor: "black",
                   },
                 }}
-              > 
+              >
                 Pricing
               </Button>
             </Box>
@@ -144,26 +149,26 @@ const Buy = () => {
               />
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Thông tin chi tiết sản phẩm
+                  Details Product
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
-                    <Typography variant="body1"><strong>Tên sản phẩm:</strong></Typography>
+                    <Typography variant="body1"><strong>Product code:</strong></Typography>
                   </Grid>
                   <Grid item xs={6}>
                     <Typography variant="body1">{productDetail.name}</Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography variant="body1"><strong>Loại:</strong></Typography>
+                    <Typography variant="body1"><strong>Type:</strong></Typography>
                   </Grid>
                   <Grid item xs={6}>
                     <Typography variant="body1">{productDetail.jewelryCategory.name}</Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography variant="body1"><strong>Giá mua lại:</strong></Typography>
+                    <Typography variant="body1"><strong>Price buybacks:</strong></Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography variant="body1">{valuation.totalPrice} đồng</Typography>
+                    <Typography variant="body1">{valuation.totalPrice} usd</Typography>
                   </Grid>
                 </Grid>
               </CardContent>
@@ -178,16 +183,16 @@ const Buy = () => {
                 disabled={!productDetail || isSubmitting}
                 sx={{
                   mt: 2,
-                  bgcolor: 'orange',
-                  color: 'white',
-                  fontWeight: 'bold',
-                  height: '40px', // Adjust height as needed
-                  padding: '8px',
-                  '&:hover': {
-                    bgcolor: 'darkorange',
+                  bgcolor: "#388E3C",
+                  color: "white",
+                  fontWeight: "bold",
+                  height: "40px", // Adjust height as needed
+                  padding: "8px",
+                  "&:hover": {
+                    bgcolor: "#D32F2F",
                   },
-                  '&:focus': {
-                    bgcolor: 'black',
+                  "&:focus": {
+                    bgcolor: "black",
                   },
                 }}
               >
@@ -216,7 +221,7 @@ const Buy = () => {
           }}
         >
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            thông tin khách hàng
+            Enter Information
           </Typography>
           <Formik initialValues={initialValues} onSubmit={handleFinalSubmit}>
             {({ isSubmitting }) => (
@@ -317,16 +322,16 @@ const Buy = () => {
                       disabled={isSubmitting}
                       sx={{
                         mt: 2,
-                        bgcolor: 'orange',
-                        color: 'white',
-                        fontWeight: 'bold',
-                        height: '40px', // Adjust height as needed
-                        padding: '8px',
-                        '&:hover': {
-                          bgcolor: 'darkorange',
+                        bgcolor: "#388E3C",
+                        color: "white",
+                        fontWeight: "bold",
+                        height: "40px", // Adjust height as needed
+                        padding: "8px",
+                        "&:hover": {
+                          bgcolor: "#D32F2F",
                         },
-                        '&:focus': {
-                          bgcolor: 'black',
+                        "&:focus": {
+                          bgcolor: "black",
                         },
                       }}
                     >
@@ -340,6 +345,7 @@ const Buy = () => {
         </Box>
       </Modal>
     </Box>
+    </div>
   );
 };
 

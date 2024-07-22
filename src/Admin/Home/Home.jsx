@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Container, Typography, Box } from '@mui/material';
+import { Container, Typography, Box, Button } from '@mui/material';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 
 const Home = () => {
@@ -15,11 +15,8 @@ const Home = () => {
     "Necklace",
     "Pendant",
     "Earring",
-    "Shake",
-    "Ring",
+    "Bracelet",
     "Charm",
-    "Necklace",
-    "Bracket"
   ];
 
   return (
@@ -36,7 +33,7 @@ const Home = () => {
         m: 0,
       }}
     >
-      <div id="carouselExampleIndicators" className="carousel slide" data-bs-ride="carousel" data-bs-interval="3000" style={{ width: '103.8%' }}>
+      <div id="carouselExampleIndicators" className="carousel slide" data-bs-ride="carousel" data-bs-interval="3000" style={{ width: '100%' }}>
         <div className="carousel-inner">
           {images.map((image, index) => (
             <div className={`carousel-item ${index === 0 ? 'active' : ''}`} key={index}>
@@ -47,52 +44,29 @@ const Home = () => {
                 style={{
                   border: '3px solid green',
                   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                  transition: 'transform 0.3s ease-in-out'
                 }}
               />
-              <Typography
-                variant="h2"
-                gutterBottom
-                fontWeight="bold"
-                sx={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  color: 'White', // #0040AEChanged text color to green
-                  zIndex: 1,
-                  opacity: 0.8,
-                  padding: '10px',
-                  borderRadius: '5px',
-                  transition: 'opacity 18s ease-in-out',
-                  '&:hover': {
-                    opacity: 1,
-                  },
-                  animation: 'typing 18s steps(10, end) infinite' // Added animation directly to Typography
-                }}
-              >
-                <strong>Welcome to Our Jewelry Store</strong>
-              </Typography>
-              <Box sx={{ mt: 2 }}>
-                {jewelryItems.map((item, idx) => (
-                  <Button
-                    key={idx}
-                    variant="contained"
-                    color="primary"
-                    className="circular-button"
-                    sx={{
-                      m: 1,
-                      fontWeight: 'bold',
-                      animation: 'moveInOut 6s infinite', // Changed animation to moveInOut
-                      '&:hover': {
-                        backgroundColor: '#4CAF50',
-                      }
-                    }}
-                  >
-                    {item}
-                  </Button>
-                ))}
-              </Box>
+              {index === 0 && (
+                <Typography
+                  variant="h2"
+                  gutterBottom
+                  fontWeight="bold"
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    color: 'white',
+                    zIndex: 1,
+                    opacity: 0.8,
+                    padding: '10px',
+                    borderRadius: '5px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  }}
+                >
+                  <strong>Welcome to Our Jewelry Store</strong>
+                </Typography>
+              )}
             </div>
           ))}
         </div>
@@ -106,30 +80,24 @@ const Home = () => {
         </button>
       </div>
 
-      <style>
-        {`
-        @keyframes typing {
-          0% {
-            width: 0;
-          }
-          50% {
-            width: 100%;
-          }
-          100% {
-            width: 0;
-          }
-        }
-
-        @keyframes moveInOut {
-          0%, 100% {
-            transform: translateX(-100%);
-          }
-          50% {
-            transform: translateX(100%);
-          }
-        }
-        `}
-      </style>
+      <Box sx={{ mt: 4 }}>
+        {jewelryItems.map((item, idx) => (
+          <Button
+            key={idx}
+            variant="contained"
+            color="primary"
+            sx={{
+              m: 1,
+              fontWeight: 'bold',
+              '&:hover': {
+                backgroundColor: '#4CAF50',
+              }
+            }}
+          >
+            {item}
+          </Button>
+        ))}
+      </Box>
     </Container>
   );
 };

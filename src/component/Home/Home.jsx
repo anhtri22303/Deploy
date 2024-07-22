@@ -5,7 +5,7 @@ import JewelryCard from '../Jewelry/JewelryCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllAreaAction } from "../State/Area/Action";
 import Footer from "../Footer/Footer";
-
+import { Navbar } from "../Navbar/Navbar";
 const Home = () => {
     const dispatch = useDispatch();
     const jwt = localStorage.getItem("jwt");
@@ -74,6 +74,7 @@ const Home = () => {
 
     return (
         <div className="pb-10">
+            <Navbar />
             <div className="black-separator"></div> {/* Black line separator */}
             <section 
                 className="banner -z-50 relative flex flex-col justify-center items-center"
@@ -105,7 +106,7 @@ const Home = () => {
                 </div>
             </section>
             <div className="separator"></div> {/* Line separator */}
-            <section id="order-here" className="px-5 lg:px-20 pt-5">
+            {/* <section id="order-here" className="px-5 lg:px-20 pt-5">
                 <p className="order-here-section">Order here</p>
                 <div className="flex flex-wrap items-center justify-around gap-5">
                     {area?.areas?.length > 0 ? area.areas.map((item, index) => (
@@ -114,7 +115,7 @@ const Home = () => {
                         <p>No products available</p>
                     )}
                 </div>
-            </section>
+            </section> */}
             <Footer/>
         </div>
     );

@@ -1,70 +1,55 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+#  HOPE | Jewelry Store System
+### Released versions: ...
 
-In the project directory, you can run:
+--------------------------------------------------
+## Table of Contents
+- [Description](#description)
+- [Technology](#technology)
+- [Documentation](#documentation)
+- [How can get started](#how-can-get-started)
+- [License & Copyright](#license--copyright)
+--------------------------------------------------
+## Description
 
-### `npm start`
+ - Jewelry Store System provides store staff with seamless customer support for shopping at many stalls, order/product/employee management and store statistics; payment gateway integration.
+ - The system supports feature combos for 3 actors: STAFF, ADMIN, MANAGERS
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Technology
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Front-end:** 
+	- React
+	- Vite + Boostrap
+	- MUI (Material-ui)
+- **Back-end:** 
+	- Spring
+	- MySQL
 
-### `npm test`
+## Documentation
+- [Jewelry Store System | SRS](https://github.com/quocthink19/JEWELRY_STORE/blob/tri-admin_panel/Documentation/SRS.docx)
+- [Jewelry Store System | Technical Requirements](https://github.com/quocthink19/JEWELRY_STORE/blob/tri-admin_panel/Documentation/Technical%20Requirements.docx)
+- [Jewelry Store System | Report_Mapping](https://github.com/quocthink19/JEWELRY_STORE/blob/tri-admin_panel/Documentation/N2NJS1806_Report0_Mapping.xlsx)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+-   **Download/Clone the source code.**
+- **Database**: ().
+- **Code | Build & Run**
+	- **Back-end**:
+		- Customize the information in  [application.properties](https://github.com/quocthink19/JEWELRY_STORE/blob/BACKEND/src/main/java/com/jewelry_store/jewelry_store/JewelryStoreApplication.java)  in src/main/java/com/jewelry_store/jewelry_store/JewelryStoreApplication.java for adapting to your case.
+		- Run [Jewelry_Store.Java]() to get started.
+	- **Front-end**:
+ 		-   - Customize the information in  [FrontEnd file](https://github.com/quocthink19/JEWELRY_STORE/tree/Payment)
+		-   **To run, let's run "`npm start`" in the command line.**
+		-   *You also can get more at [https://create-react-app.dev/docs/getting-started/](https://create-react-app.dev/docs/getting-started/).*
+   
+- **Already accounts** to login to the system:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+	| Username | Password | Role     |
+	|----------|----------|----------|
+	| tri      | Anhtri123| MANAGER  |
+	| phat     | Phat123  | STAFF    |
+	| 123tri   | Tri22303 | ADMIN    |
+	
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+> 🤟 Hope to pass SWP 🤟

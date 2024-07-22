@@ -93,11 +93,11 @@ const EventTable = () => {
         />
       </Box>
 
-      {filteredEvents.length === 0 && (
+      {/* {filteredEvents.length === 0 && (
         <Alert severity="warning" sx={{ mb: 3, mx: 15, color: 'white', backgroundColor: '#FF5D5D', '& .MuiAlert-icon': { color: 'white' } }}>
           No events found!
         </Alert>
-      )}
+      )} */}
 
       <Table>
         <TableHead>

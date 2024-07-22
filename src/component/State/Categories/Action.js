@@ -26,7 +26,7 @@ export const createCategoryAction=({reqData,jwt})=>{
             console.log("catch - ", error);
             dispatch({type:CREATE_CATEGORY_FAILURE,payload:error});
             throw error;
-        }
+          }
     };
 };
 

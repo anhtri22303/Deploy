@@ -16,8 +16,7 @@ export const Orders = () => {
   };
 
   return (
-    <div className='px-2'>
-      
+    <div>
       <OrdersCard />
     </div>
   );

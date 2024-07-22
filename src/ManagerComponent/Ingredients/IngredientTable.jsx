@@ -69,7 +69,7 @@ const IngredientTable = () => {
   );
 
   return (
-    <Box sx={{ padding: 2 }}>
+    <Box sx={{ padding: 3, minHeight: "100vh" }}>
       <Card sx={{ mt: 2, boxShadow: 3, borderRadius: 2 }}>
         <CardHeader
           action={
@@ -88,11 +88,12 @@ const IngredientTable = () => {
             color: "#fff",
           }}
         />
-        <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
-          <TextField
-            label="Search by Ingredient Name"
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 2,marginTop: 2 }}>
+        <TextField
+            id="search-input"
+            label="Search by Name"
             variant="outlined"
-            fullWidth
+            size="small"
             value={searchTerm}
             onChange={handleSearch}
             InputProps={{
@@ -105,9 +106,6 @@ const IngredientTable = () => {
               ),
             }}
             sx={{
-              mb: 2,
-              mx: 5,
-              width: "100%",
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
                   borderColor: "gray",
@@ -130,11 +128,11 @@ const IngredientTable = () => {
         </Box>
 
         {/* Display Alert if no component found */}
-        {showNoComponentAlert && (
+        {/* {showNoComponentAlert && (
           <Alert severity="warning" sx={{ mb: 3, mx: "auto", width: "fit-content" }}>
             No ingredients found with the provided name.
           </Alert>
-        )}
+        )} */}
 
         <TableContainer component={Paper}>
           <Table aria-label="ingredient table" sx={{ minWidth: 650 }}>
@@ -212,7 +210,7 @@ const IngredientTable = () => {
               {searchTerm !== "" && filteredComponents.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} align="center">
-                    No ingredients found with the provided name.
+                    No ingredients not found.
                   </TableCell>
                 </TableRow>
               )}

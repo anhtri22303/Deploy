@@ -1,12 +1,16 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
-import { Box, Typography, Card, CardContent, Grid } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Box, Typography, Card, CardContent, Grid,Button } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { green } from '@mui/material/colors';
 
 const InvoiceOut = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { buyback, product, valuation } = location.state;
+  const handleNavigateHome = () => {
+    navigate('/staff/jewelry/Home');
+  };
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" p={3} mt={8} mb={8} maxWidth="600px" mx="auto" bgcolor="#E7E6E0">
@@ -68,6 +72,27 @@ const InvoiceOut = () => {
           </Grid>
         </CardContent>
       </Card>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleNavigateHome}
+        sx={{
+          mt: 2,
+          bgcolor: "#388E3C",
+          color: "white",
+          fontWeight: "bold",
+          height: "40px", // Adjust height as needed
+          padding: "8px",
+          "&:hover": {
+            bgcolor: "#D32F2F",
+          },
+          "&:focus": {
+            bgcolor: "black",
+          },
+        }}
+      >
+        Go to Home
+      </Button>
     </Box>
   );
 };

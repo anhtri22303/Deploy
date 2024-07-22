@@ -14,6 +14,7 @@ export const findCart = (token) => {
             dispatch({type:FIND_CART_SUCCESS,payload:response.data});
         } catch (error) {
             dispatch({type:FIND_CART_FAILURE,payload:error})
+            throw error;
         }
     };
 };
@@ -30,6 +31,7 @@ export const getAllCartItem = ({reqData,jwt}) => {
             dispatch({type:GET_ALL_CART_ITEMS_SUCCESS,payload:response.data});
         } catch (error) {
             dispatch({type:GET_ALL_CART_ITEMS_FAILURE,payload:error});
+            throw error;
         }
     };
 };
@@ -48,6 +50,7 @@ export const addItemToCart = (reqData) => {
         } catch (error) {
             console.log("catch error ", error);
             dispatch({ type: ADD_ITEM_TO_CART_FAILURE, payload: error });
+            throw error;
         }
     };
 };
@@ -87,6 +90,7 @@ export const updateCartItem = (reqData) => {
         } catch (error) {
             console.log("catch error ",error)
             dispatch({type:UPDATE_CARTITEM_FAILURE,payload:error.message});
+            throw error;
         }
     };
 };
@@ -105,6 +109,7 @@ export const removeCartItem = ({cartItemId,jwt}) => {
         } catch (error) {
             console.log("catch error ",error)
             dispatch({type:DELETE_CARTITEM_FAILURE,payload:error.message});
+            throw error;
         }
     };
 };
@@ -123,6 +128,7 @@ export const clearCartAction = () => {
         } catch (error) {
             console.log("catch error ",error)
             dispatch({type:CLEAR_CART_FAILURE,payload:error.message});
+            throw error;
         }
     };
 };
