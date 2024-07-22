@@ -32,6 +32,10 @@ public class Warranty {
 
     private String terms; // Điều khoản bảo hành, ví dụ: 1 năm bảo hành
 
+    public double getWarrantyYears() {
+        return ChronoUnit.YEARS.between(startDate, endDate);
+    }
+
    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "order_id") // Tên cột trong bảng Warranty để ánh xạ tới Order
@@ -40,7 +44,7 @@ public class Warranty {
     // Phương thức tính toán thời gian bảo hành dựa trên totalPrice
     public void calculateWarrantyPeriod(double totalPrice) {
         // Giả sử 1000 đơn vị tiền tệ tương đương với 1 năm bảo hành
-        double unitsPerYear = 1000.0; // Điều này có thể thay đổi tùy thuộc vào yêu cầu của bạn
+        double unitsPerYear = 10000.0; // Điều này có thể thay đổi tùy thuộc vào yêu cầu của bạn
 
         // Tính số năm bảo hành dựa trên tổng giá trị
         double warrantyYears = totalPrice / unitsPerYear;

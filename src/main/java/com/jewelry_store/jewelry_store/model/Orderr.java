@@ -38,6 +38,7 @@ public class Orderr {
 
     private String orderStatus;
 
+
     private Date createdAt;
 
     @OneToMany
@@ -46,6 +47,8 @@ public class Orderr {
     // private Payment payment
 
     private int totalItem;
+
+    private double discountPercentage;
 
     private double totalPrice;
 

@@ -61,7 +61,7 @@ public class Jewelry {
 
     private boolean availabe;
 
-
+    
     private Date creationDate;
 
     private double price;

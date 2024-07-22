@@ -1,33 +1,29 @@
 package com.jewelry_store.jewelry_store.model;
 
-import java.util.List;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderItem {
-    @Id
+@Entity
+public class OrderSumary {
+      @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    private Jewelry jewelry;
+    private Long areaId;
 
-    private int quantity;
+    private String orderStatus;
 
-    private double totalPrice;
+    private double totalAmount;
 
-    private double discountPercentage;
+    private long totalOrlder;
 
-
+    private Long totalItems;
 }

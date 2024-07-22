@@ -79,5 +79,15 @@ public class OrderController {
         return orderService.getAllOrder();
     }
 
+    @GetMapping("/orders/{orderId}")
+    public ResponseEntity<Orderr> getOrderById(@PathVariable Long orderId) {
+        try {
+            Orderr order = orderService.findOrderById(orderId);
+            return ResponseEntity.ok(order);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); 
+        }
+    }
+
 
 }

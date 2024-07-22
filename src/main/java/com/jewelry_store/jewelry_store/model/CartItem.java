@@ -34,6 +34,13 @@ public class CartItem {
 
     private List<String> components;
 
+
+    private Double totalamount;
+
+    private double discountPercentage;
+
+    private double originalPrice;
+
     private double totalPrice;
 
     private double discountedPrice; // Trường mới để lưu giá đã giảm

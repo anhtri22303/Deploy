@@ -20,4 +20,18 @@ public interface OrderService {
     public Orderr findOrderById (Long orderId) throws Exception;
 
     public List<Orderr> getAllOrder() throws Exception;
+
+    public long getTotalNumberOfOrdersByStatus(String status);
+
+    public double getTotalAmountOfOrdersByStatus(String status);
+    
+    public int getTotalSoldItemsByStatus(String status);
+
+    public double getTotalAmountByAreaAndStatus(Long areaId, String orderStatus);
+
+    public long getTotalOrdersByAreaAndStatus(Long areaId, String orderStatus);
+
+    public int getTotalItemsByAreaAndStatus(Long areaId, String orderStatus) ;
+
+    
 }

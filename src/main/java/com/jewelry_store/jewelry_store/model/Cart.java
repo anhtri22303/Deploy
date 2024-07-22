@@ -27,6 +27,7 @@ public class Cart {
     @OneToOne
     private User staff;
 
+
     private Double totalamount;
 
     private Double total = 0.0;

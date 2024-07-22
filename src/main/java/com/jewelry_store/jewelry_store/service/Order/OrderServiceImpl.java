@@ -84,8 +84,8 @@ public class OrderServiceImpl implements OrderService {
         for (CartItem cartItem : cart.getItems()) {
             OrderItem orderItem = new OrderItem();
             orderItem.setJewelry(cartItem.getJewelry());
-            orderItem.setComponents(cartItem.getComponents());
             orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setDiscountPercentage(cartItem.getDiscountPercentage());
             if(cartItem.getDiscountedPrice()==0){
             orderItem.setTotalPrice(cart.getTotal());
             } else {
@@ -94,7 +94,6 @@ public class OrderServiceImpl implements OrderService {
             OrderItem savedOrderItem = orderItemRepository.save(orderItem);
             orderItems.add(savedOrderItem);
         }
-    
         // Tính tổng giá trị của đơn hàng
         double totalPrice = cartService.calculateCartTotals(cart);
         
@@ -102,15 +101,15 @@ public class OrderServiceImpl implements OrderService {
         Warranty warranty = new Warranty();
         warranty.setOrder(createOrder);
         warranty.calculateWarrantyPeriod(totalPrice); // Tính toán thời gian bảo hành dựa trên tổng giá trị
-        warranty.setTerms("nothing");
+        warranty.setTerms("Warranty"+ warranty.getWarrantyYears() + " Years");
         warranty = warrantyRepository.save(warranty); // Lưu Warranty vào cơ sở dữ liệu
     
-        // Thiết lập các mục đơn hàng và tổng giá trị vào đơn hàng
+        // Thiết lập các mục đơn hàng và tổng giá trị vào đơn hàng]
         createOrder.setItems(orderItems);
-        createOrder.setTotalAmount(cart.getTotal()); // giá trước giảm giá
+        createOrder.setTotalAmount(cart.getTotalamount()); // giá trước giảm giá
         createOrder.setTotalPrice(totalPrice);
         createOrder.setWarranty(warranty); // Liên kết đối tượng Warranty đã lưu với Orderr
-    
+        
         // Lưu đơn hàng vào cơ sở dữ liệu
         Orderr savedOrder = orderRepository.save(createOrder);
         area.getOrders().add(savedOrder);
@@ -176,4 +175,47 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findAll();    
     }
 
+    @Override
+    public long getTotalNumberOfOrdersByStatus(String status) {
+        return orderRepository.findByOrderStatus(status).size();
+    }
+
+    @Override
+    public double getTotalAmountOfOrdersByStatus(String status) {
+        return orderRepository.findByOrderStatus(status).stream()
+                              .mapToDouble(Orderr::getTotalPrice)
+                              .sum();
+    }
+    @Override
+    public int getTotalSoldItemsByStatus(String status) {
+        List<Orderr> orders = orderRepository.findByOrderStatus(status);
+        return orders.stream()
+                     .flatMap(order -> order.getItems().stream())
+                     .mapToInt(OrderItem::getQuantity)
+                     .sum();
+    }
+
+
+    @Override
+    public double getTotalAmountByAreaAndStatus(Long areaId, String orderStatus) {
+        List<Orderr> orders = orderRepository.findByAreaIdAndOrderStatus(areaId, orderStatus);
+        return orders.stream()
+                     .mapToDouble(Orderr::getTotalPrice)
+                     .sum();
+    }
+
+    @Override
+    public long getTotalOrdersByAreaAndStatus(Long areaId, String orderStatus) {
+        return orderRepository.findByAreaIdAndOrderStatus(areaId, orderStatus).size();
+    }
+
+
+    @Override
+    public int getTotalItemsByAreaAndStatus(Long areaId, String orderStatus) {
+        List<Orderr> orders = orderRepository.findByAreaIdAndOrderStatus(areaId, orderStatus);
+        return orders.stream()
+                     .flatMap(order -> order.getItems().stream())
+                     .mapToInt(OrderItem::getQuantity)
+                     .sum();
+    }    
 }

@@ -87,7 +87,7 @@ public class JewelryServiceImp implements JewelryService {
     @Override
     public void deleteJewelry(Long jewelryid) throws Exception {
         Jewelry jewelry = FindJewelryById(jewelryid);
-        jewelryRepository.save(jewelry);
+        jewelryRepository.delete(jewelry);
     }
 
     @Override
