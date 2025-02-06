@@ -20,9 +20,11 @@ import {
   DialogContentText,
   DialogTitle,
   Button,
+  Pagination,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import BlockIcon from "@mui/icons-material/Block";
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import {
   getAllStaffAndManagerUsers,
   banUser,
@@ -38,6 +40,8 @@ export default function StaffTableA() {
   const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     dispatch(getAllStaffAndManagerUsers(jwt));
@@ -59,7 +63,7 @@ export default function StaffTableA() {
         .then(() => {
           toast.success("User banned successfully!", {
             position: "top-right",
-            autoClose: 2000,
+            autoClose: 1000,
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,
@@ -81,11 +85,19 @@ export default function StaffTableA() {
     user.fullname.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredStaff.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
   return (
     <Box sx={{ padding: 3, minHeight: "100vh" }}>
       <Card sx={{ mt: 2, boxShadow: 3, borderRadius: 2 }}>
         <CardHeader
-          title={"Staff"}
+          title={"User"}
           sx={{
             pt: 2,
             pb: 1,
@@ -191,8 +203,8 @@ export default function StaffTableA() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredStaff.length > 0 ? (
-                filteredStaff.map((row) => (
+              {currentItems.length > 0 ? (
+                currentItems.map((row) => (
                   <TableRow
                     key={row.username}
                     sx={{
@@ -213,7 +225,7 @@ export default function StaffTableA() {
                     <TableCell align="right">{row.email}</TableCell>
                     <TableCell align="right">
                       <IconButton onClick={() => handleOpenDialog(row.id)}>
-                        <BlockIcon />
+                      <PersonRemoveIcon  sx={{ color: "red" }}/>
                       </IconButton>
                     </TableCell>
                   </TableRow>
@@ -227,6 +239,14 @@ export default function StaffTableA() {
               )}
             </TableBody>
           </Table>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2, pb: 2 }}>
+            <Pagination
+              count={Math.ceil(filteredStaff.length / itemsPerPage)}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+            />
+          </Box>
         </TableContainer>
       </Card>
       <Dialog open={open} onClose={handleCloseDialog} sx={{ borderRadius: 2 }}>

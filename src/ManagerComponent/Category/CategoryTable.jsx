@@ -1,5 +1,6 @@
 import CreateIcon from "@mui/icons-material/Create";
 import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
   Card,
@@ -15,6 +16,7 @@ import {
   TableRow,
   TextField,
   Typography,
+  Pagination,  // Import Pagination
 } from "@mui/material";
 import { getAllCategory } from "../../component/State/Categories/Action";
 import CreateCategoryForm from "./CreateCategoryForm";
@@ -39,6 +41,8 @@ export default function CategoryTable() {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCategories, setFilteredCategories] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const categoriesPerPage = 10;  // Number of categories per page
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -58,7 +62,17 @@ export default function CategoryTable() {
       item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredCategories(filtered);
+    setCurrentPage(1);  // Reset to first page after search
   };
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  // Pagination logic
+  const indexOfLastCategory = currentPage * categoriesPerPage;
+  const indexOfFirstCategory = indexOfLastCategory - categoriesPerPage;
+  const currentCategories = filteredCategories.slice(indexOfFirstCategory, indexOfLastCategory);
 
   return (
     <Box sx={{ padding: 3, minHeight: "100vh" }}>
@@ -152,8 +166,8 @@ export default function CategoryTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredCategories.length > 0 ? (
-                filteredCategories.map((item) => (
+              {currentCategories.length > 0 ? (
+                currentCategories.map((item) => (
                   <TableRow
                     key={item.id}
                     sx={{
@@ -168,12 +182,20 @@ export default function CategoryTable() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={2} align="center">
-                    No categories not found.
+                    No categories found.
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2, pb: 2 }}>
+            <Pagination
+              count={Math.ceil(filteredCategories.length / categoriesPerPage)}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+            />
+          </Box>
         </TableContainer>
       </Card>
 
@@ -184,6 +206,12 @@ export default function CategoryTable() {
         aria-describedby="modal-modal-description"
       >
         <Box sx={modalStyle}>
+          <IconButton
+            onClick={handleClose}
+            sx={{ position: "absolute", top: 8, right: 8 }}
+          >
+            <CloseIcon sx={{ color: 'red' }} />
+          </IconButton>
           <CreateCategoryForm />
         </Box>
       </Modal>

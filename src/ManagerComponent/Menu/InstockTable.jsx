@@ -18,46 +18,48 @@ import {
   DialogContentText,
   DialogTitle,
   Button,
-  Alert,
   TextField,
+  Pagination,
 } from "@mui/material";
 import {
-  Delete,
   Refresh as RefreshIcon,
-  Create as CreateIcon,
   Search as SearchIcon,
 } from "@mui/icons-material";
+import AddIcon from "@mui/icons-material/Add";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
-  getAllMenuItem,
   updateJewelryPrice,
-  deleteFoodAction,
+  getOutOfStockItems,
+  instockItem,
 } from "../../component/State/Menu/Action";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const InstockTable = () => {
   const { menu } = useSelector((store) => store);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const jwt = localStorage.getItem("jwt");
 
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showNoItemAlert, setShowNoItemAlert] = useState(false);
+  const [setShowNoItemAlert] = useState(false);
   const [filteredMenuItems, setFilteredMenuItems] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 12;
 
   useEffect(() => {
-    dispatch(getAllMenuItem({ jwt }));
+    dispatch(getOutOfStockItems({ jwt }));
   }, [dispatch, jwt]);
 
   useEffect(() => {
     setFilteredMenuItems(
-      menu.menuItems.filter((item) =>
+      menu.outOfStock.filter((item) =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
-  }, [searchTerm, menu.menuItems]);
+  }, [searchTerm, menu.outOfStock]);
 
   const handleRefresh = () => {
     dispatch(updateJewelryPrice({ jwt }));
@@ -76,7 +78,24 @@ const InstockTable = () => {
 
   const handleDelete = () => {
     if (selectedItem) {
-      dispatch(deleteFoodAction({ jewelryId: selectedItem.id, jwt }));
+      dispatch(instockItem({ jewelryId: selectedItem.id, jwt }))
+        .then(() => {
+          toast.success("Item added to stock successfully!", {
+            position: "top-right",
+            autoClose: 1000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        })
+        .catch((error) => {
+          console.error("Error adding item to stock", error);
+        });
       handleClose();
     }
   };
@@ -94,9 +113,21 @@ const InstockTable = () => {
     }
   };
 
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  // Calculate the items to display for the current page
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = filteredMenuItems.slice(
+    indexOfFirstOrder,
+    indexOfLastOrder
+  );
+
   return (
     <Box sx={{ padding: 3, minHeight: "100vh" }}>
-            <Card sx={{ mt: 2, boxShadow: 3, borderRadius: 2 }}>
+      <Card sx={{ mt: 2, boxShadow: 3, borderRadius: 2 }}>
         <CardHeader
           title={"OutStock"}
           action={
@@ -229,77 +260,107 @@ const InstockTable = () => {
                     variant="subtitle1"
                     sx={{ fontWeight: "bold", color: "white" }}
                   >
-                    Delete
+                    ADD
                   </Typography>
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {menu.menuItems
-                .filter((row) => row.name.toLowerCase().includes(searchTerm))
-                .map((row) => (
-                  <TableRow
-                    key={row.name}
-                    sx={{
-                      "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
-                      "&:hover": { backgroundColor: "#e0e0e0" },
-                      transition: "background-color 0.3s",
-                    }}
-                  >
-                    <TableCell component="th" scope="row">
-                      <img
-                        src={row.images}
-                        alt="Product Image"
-                        style={{ width: 50, height: 50, borderRadius: 4 }}
-                      />
-                    </TableCell>
-                    <TableCell align="center">{row.code}</TableCell>
-                    <TableCell align="right">{row.name}</TableCell>
-                    <TableCell align="right">
-                      {row.jewelryCategory.name}
-                    </TableCell>
-                    <TableCell align="right">
-                      {row.components[0]?.name} with {row.components[1]?.name}
-                    </TableCell>
-                    <TableCell align="right">{row.price}</TableCell>
-                    <TableCell align="right">
-                      <IconButton onClick={() => handleClickOpen(row)}>
-                        <Delete />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              {/* Show message if no items found */}
-              {searchTerm !== "" &&
-                menu.menuItems.filter((row) =>
-                  row.name.toLowerCase().includes(searchTerm)
-                ).length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={4} align="center">
-                      No buybacks available
-                    </TableCell>
-                  </TableRow>
-                )}
+              {currentOrders.map((row) => (
+                <TableRow
+                  key={row.name}
+                  sx={{
+                    "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
+                    "&:hover": { backgroundColor: "#e0e0e0" },
+                    transition: "background-color 0.3s",
+                  }}
+                >
+                  <TableCell component="th" scope="row">
+                    <img
+                      src={row.images}
+                      alt="Product Image"
+                      style={{ width: 50, height: 50, borderRadius: 4 }}
+                    />
+                  </TableCell>
+                  <TableCell align="center">{row.code}</TableCell>
+                  <TableCell align="right">{row.name}</TableCell>
+                  <TableCell align="right">
+                    {row.jewelryCategory.name}
+                  </TableCell>
+                  <TableCell align="center">
+                    {row.components
+                      ? row.components
+                          .map((component) => component.name)
+                          .join(", ")
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell align="right">{row.price} USD</TableCell>
+                  <TableCell align="right">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      startIcon={<AddIcon />}
+                      onClick={() => handleClickOpen(row)}
+                      sx={{
+                        backgroundColor: "#4caf50", // Custom background color
+                        color: "#ffffff", // Text color
+                        fontWeight: "bold", // Bold text
+                        borderRadius: "8px", // Rounded corners
+                        textTransform: "none", // Keep text case as is
+                        padding: "8px 16px", // Custom padding
+                        transition: "background-color 0.3s ease", // Smooth transition for hover
+                        "&:hover": {
+                          backgroundColor: "#388e3c", // Darker shade on hover
+                        },
+                      }}
+                    >
+                      Add
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            padding: 2,
+          }}
+        >
+          <Pagination
+            count={Math.ceil(filteredMenuItems.length / ordersPerPage)}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+          />
+        </Box>
       </Card>
-      <Dialog open={open} onClose={handleClose} sx={{ borderRadius: 2 }}>
-        <DialogTitle>{"Confirm Delete"}</DialogTitle>
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Add Item to Stock"}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this item?
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to add this item back to stock?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleDelete} color="error" autoFocus>
-            Delete
+          <Button onClick={handleDelete} color="primary" autoFocus>
+            Confirm
           </Button>
         </DialogActions>
       </Dialog>
+
+      <ToastContainer />
     </Box>
   );
 };

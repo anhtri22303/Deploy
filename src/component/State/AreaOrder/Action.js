@@ -1,14 +1,14 @@
 // action.js
 
 import { api } from "../../config/api";
-import { GET_AREA_ORDER_FAILURE, GET_AREA_ORDER_REQUEST, GET_AREA_ORDER_SUCCESS, UPDATE_ORDER_STATUS_FAILURE, UPDATE_ORDER_STATUS_REQUEST, UPDATE_ORDER_STATUS_SUCCESS } from "./ActionType";
+import { CALCULATE_ORDER_PRICE_FAILURE, CALCULATE_ORDER_PRICE_REQUEST, CALCULATE_ORDER_PRICE_SUCCESS, GET_AREA_ORDER_FAILURE, GET_AREA_ORDER_REQUEST, GET_AREA_ORDER_SUCCESS, UPDATE_ORDER_STATUS_FAILURE, UPDATE_ORDER_STATUS_REQUEST, UPDATE_ORDER_STATUS_SUCCESS } from "./ActionType";
 
-export const updateOrderStatus =  ({orderId,orderstatus,jwt}) => {
+export const updateOrderStatus =  ({orderId,orderStatus,jwt}) => {
     return async (dispatch) => {
         try {
             dispatch({type: UPDATE_ORDER_STATUS_REQUEST});
             const response = await api.put(
-                `/api/admin/orders/${orderId}/${orderstatus}`, {}, {
+                `/api/admin/orders/${orderId}/${orderStatus}`, {}, {
                     headers: {
                         Authorization: `Bearer ${jwt}`,
                     },
@@ -23,7 +23,7 @@ export const updateOrderStatus =  ({orderId,orderstatus,jwt}) => {
             });
         } catch (error) {
             console.log("catch error ",error)
-            console.log("order_status",orderstatus)
+            console.log("order_status",orderStatus)
             
             dispatch({ type: UPDATE_ORDER_STATUS_FAILURE, error});
         }
@@ -50,6 +50,34 @@ export const fetchRestaurantsOrder = ({areaId,orderStatus,jwt}) => {
             });
         } catch (error) {
             dispatch({ type: GET_AREA_ORDER_FAILURE, error});
+        }
+    };
+};
+
+
+export const calculateOrderPrice = ({ orderRequest, jwt }) => {
+    return async (dispatch) => {
+        try {
+            dispatch({ type: CALCULATE_ORDER_PRICE_REQUEST });
+            const response = await api.post(
+                '/api/orders/calculate', 
+                orderRequest, 
+                {
+                    headers: {
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                }
+            );
+            const result = response.data;
+            console.log("Calculate Order Price Response: ", result);
+
+            dispatch({
+                type: CALCULATE_ORDER_PRICE_SUCCESS,
+                payload: result
+            });
+        } catch (error) {
+            console.log("Error calculating order price: ", error);
+            dispatch({ type: CALCULATE_ORDER_PRICE_FAILURE, error });
         }
     };
 };

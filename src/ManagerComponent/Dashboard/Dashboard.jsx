@@ -1,26 +1,51 @@
-import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { 
-  Paper, Typography, Grid, TextField, Button, 
-  Table, TableBody, TableCell, TableContainer, 
-  TableHead, TableRow 
+import {
+  Button,
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
 } from "@mui/material";
-import { LocalizationProvider, DateTimePicker } from "@mui/x-date-pickers";
+import {
+  DatePicker,
+  DateTimePicker,
+  LocalizationProvider,
+} from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import {
+  ArcElement,
+  Chart as ChartJS,
+  Legend as ChartLegend,
+  Tooltip as ChartTooltip,
+  Title,
+} from "chart.js";
 import dayjs from "dayjs";
-import { 
-  getDashboardBuybackStats, 
-  getDashboardBuybackStatsByAreas, 
-  getDashboardStats, 
-  getDashboardStatsByAreas 
-} from "../../component/State/DashBoard/Action";
+import React, { useEffect, useState } from "react";
+import { Doughnut } from "react-chartjs-2";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend as RechartsLegend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { getAllAreaAction } from "../../component/State/Area/Action";
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, 
-  Tooltip, Legend as RechartsLegend, ResponsiveContainer 
-} from 'recharts';
-import { Doughnut } from 'react-chartjs-2';
-import { Chart as ChartJS, Title, Tooltip as ChartTooltip, Legend as ChartLegend, ArcElement } from 'chart.js';
+import {
+  getDashboardBuybackStats,
+  getDashboardBuybackStatsByAreas,
+  getDashboardStats,
+  getDashboardStatsByAreas,
+  getTopSellingProducts,
+} from "../../component/State/DashBoard/Action";
 
 ChartJS.register(Title, ChartTooltip, ChartLegend, ArcElement);
 
@@ -35,8 +60,6 @@ const Dashboard = () => {
   const [errors, setErrors] = useState({});
 
   const { dashboard, area } = useSelector((store) => store);
-  const loading = useSelector((state) => state.dashboard.loading);
-  const error = useSelector((state) => state.dashboard.error);
 
   useEffect(() => {
     dispatch(getAllAreaAction(jwt));
@@ -66,6 +89,7 @@ const Dashboard = () => {
         jwt
       )
     );
+    dispatch(getTopSellingProducts(formattedStartDate, formattedEndDate, jwt));
   }, [dispatch, jwt, SDate, EDate, area.areas]);
 
   const validateDates = (newValue, field) => {
@@ -124,26 +148,29 @@ const Dashboard = () => {
           jwt
         )
       );
+      dispatch(
+        getTopSellingProducts(formattedStartDate, formattedEndDate, jwt)
+      );
     }
   };
 
   // Combine the data for the bar chart
   const combinedData = [
     {
-      name: 'Total Orders',
+      name: "Total Orders",
       Orders: dashboard.all?.totalOrders ?? 0,
       Buybacks: dashboard.buybackAll?.totalBuybacks ?? 0,
     },
     {
-      name: 'Total Amount',
+      name: "Total Amount",
       Orders: dashboard.all?.totalAmount ?? 0,
       Buybacks: dashboard.buybackAll?.totalAmount ?? 0,
     },
     {
-      name: 'Total Sold Items',
+      name: "Total Sold Items",
       Orders: dashboard.all?.totalItems ?? 0,
       Buybacks: dashboard.buybackAll?.totalItems ?? 0,
-    }
+    },
   ];
 
   // Prepare data for the Doughnut chart
@@ -151,30 +178,70 @@ const Dashboard = () => {
     labels: area.areas?.map((a) => a.name) || [], // Area names
     datasets: [
       {
-        label: 'Total Orders by Area',
+        label: "Total Orders by Area",
         backgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-          '#4BC0C0',
-          '#9966FF'
+          "#FF6384",
+          "#36A2EB",
+          "#FFCE56",
+          "#4BC0C0",
+          "#9966FF",
         ],
-        data: area.areas?.map((a) => dashboard.areas?.[a.id]?.totalOrders || 0) || []
-      }
-    ]
+        data:
+          area.areas?.map((a) => dashboard.areas?.[a.id]?.totalOrders || 0) ||
+          [],
+      },
+    ],
+  };
+
+  const order = {
+    labels: area.areas?.map((a) => a.name) || [], // Area names
+    datasets: [
+      {
+        label: "Total Orders by Area",
+        backgroundColor: [
+          "#FF6384",
+          "#36A2EB",
+          "#FFCE56",
+          "#4BC0C0",
+          "#9966FF",
+        ],
+        data:
+          area.areas?.map((a) => dashboard.areas?.[a.id]?.totalAmount || 0) ||
+          [],
+      },
+    ],
+  };
+
+  const Items = {
+    labels: area.areas?.map((a) => a.name) || [], // Area names
+    datasets: [
+      {
+        label: "Total Orders by Area",
+        backgroundColor: [
+          "#FF6384",
+          "#36A2EB",
+          "#FFCE56",
+          "#4BC0C0",
+          "#9966FF",
+        ],
+        data:
+          area.areas?.map((a) => dashboard.areas?.[a.id]?.totalItems || 0) ||
+          [],
+      },
+    ],
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: "20px" }}>
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 2, backgroundColor: '#f4f4f4' }}>
+          <Paper elevation={3} sx={{ p: 2, backgroundColor: "#f4f4f4" }}>
             <Typography variant="h5" component="h2" gutterBottom>
-              Ngày bắt đầu
+              Date Start
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateTimePicker
-                label="Chọn ngày bắt đầu"
+              <DatePicker
+                label="Select Date Start"
                 value={startDate}
                 onChange={handleStartDateChange}
                 renderInput={(params) => (
@@ -191,13 +258,13 @@ const Dashboard = () => {
           </Paper>
         </Grid>
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 2, backgroundColor: '#f4f4f4' }}>
+          <Paper elevation={3} sx={{ p: 2, backgroundColor: "#f4f4f4" }}>
             <Typography variant="h5" component="h2" gutterBottom>
-              Ngày kết thúc
+              Date End
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateTimePicker
-                label="Chọn ngày kết thúc"
+              <DatePicker
+                label="Select Date End"
                 value={endDate}
                 onChange={handleEndDateChange}
                 renderInput={(params) => (
@@ -228,17 +295,22 @@ const Dashboard = () => {
             disabled={
               !!errors.startDate || !!errors.endDate || !startDate || !endDate
             }
-            sx={{ backgroundColor: '#4CAF50', color: '#fff' }}
+            sx={{ backgroundColor: "#4CAF50", color: "#fff" }}
           >
-            Tìm kiếm
+            Search
           </Button>
         </Grid>
       </Grid>
 
-      <Typography variant="h4" sx={{ mt: 4, color: '#3f51b5' }}>Order & Buyback Summary</Typography>
-      <div style={{ marginTop: '20px' }}>
+      <Typography variant="h4" sx={{ mt: 4, color: "#3f51b5" }}>
+        Order & Buyback Summary
+      </Typography>
+      <div style={{ marginTop: "20px" }}>
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={combinedData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <BarChart
+            data={combinedData}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis />
@@ -250,57 +322,121 @@ const Dashboard = () => {
         </ResponsiveContainer>
       </div>
 
-      <Typography variant="h4" sx={{ mt: 4, color: '#3f51b5' }}>Statistics by Area</Typography>
-      <div style={{ marginTop: '20px' }}>
-        <ResponsiveContainer width="100%" height={400}>
-          <Doughnut
-            data={doughnutData}
-            options={{
-              plugins: {
-                title: {
-                  display: true,
-                  text: 'Total Orders by Area',
-                  font: {
-                    size: 20
+      <Typography variant="h4" sx={{ mt: 4, color: "#3f51b5" }}>
+        Statistics by Area
+      </Typography>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-around",
+          marginTop: "20px",
+        }}
+      >
+        <div style={{ flex: 1, margin: "0 10px" }}>
+          <ResponsiveContainer width="100%" height={400}>
+            <Doughnut
+              data={doughnutData}
+              options={{
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Total Orders by Area",
+                    font: {
+                      size: 20,
+                    },
+                    color: "#3f51b5",
                   },
-                  color: '#3f51b5'
+                  legend: {
+                    display: true,
+                    position: "right",
+                    labels: {
+                      color: "#333",
+                    },
+                  },
                 },
-                legend: {
-                  display: true,
-                  position: 'right',
-                  labels: {
-                    color: '#333'
-                  }
+              }}
+            />
+          </ResponsiveContainer>
+        </div>
+        <div style={{ flex: 1, margin: "0 10px" }}>
+          <ResponsiveContainer width="100%" height={400}>
+            <Doughnut
+              data={order}
+              options={{
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Total Amount by Area",
+                    font: {
+                      size: 20,
+                    },
+                    color: "#3f51b5",
+                  },
+                  legend: {
+                    display: true,
+                    position: "right",
+                    labels: {
+                      color: "#333",
+                    },
+                  },
                 },
-              },
-            }}
-          />
-        </ResponsiveContainer>
+              }}
+            />
+          </ResponsiveContainer>
+        </div>
+        <div style={{ flex: 1, margin: "0 10px" }}>
+          <ResponsiveContainer width="100%" height={400}>
+            <Doughnut
+              data={Items}
+              options={{
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Total Items by Area",
+                    font: {
+                      size: 20,
+                    },
+                    color: "#3f51b5",
+                  },
+                  legend: {
+                    display: true,
+                    position: "right",
+                    labels: {
+                      color: "#333",
+                    },
+                  },
+                },
+              }}
+            />
+          </ResponsiveContainer>
+        </div>
       </div>
 
-      <Typography variant="h4" sx={{ mt: 4, color: '#3f51b5' }}>Area Breakdown</Typography>
-      <TableContainer component={Paper} sx={{ marginTop: '20px' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Area</TableCell>
-              <TableCell align="right">Total Orders</TableCell>
-              <TableCell align="right">Total Amount</TableCell>
-              <TableCell align="right">Total Items</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {area.areas?.map((a) => (
-              <TableRow key={a.id}>
-                <TableCell>{a.name}</TableCell>
-                <TableCell align="right">{dashboard.areas?.[a.id]?.totalOrders || 0}</TableCell>
-                <TableCell align="right">{dashboard.areas?.[a.id]?.totalAmount || 0}</TableCell>
-                <TableCell align="right">{dashboard.areas?.[a.id]?.totalItems || 0}</TableCell>
+      <div>
+        <Typography variant="h4" sx={{ mt: 4, color: "#3f51b5" }}>
+          Top Product
+        </Typography>
+        <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Product</TableCell>
+                <TableCell align="Center">Jewelry Code</TableCell>
+                <TableCell align="Center">Total</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {dashboard.topSellingProducts?.map((product, index) => (
+                <TableRow key={index}>
+                  <TableCell>{product.jewelry.name}</TableCell>
+                  <TableCell>{product.jewelry.code}</TableCell>
+                  <TableCell align="Center">{product.totalQuantity}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
     </div>
   );
 };

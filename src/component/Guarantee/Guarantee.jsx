@@ -1,201 +1,194 @@
-import React from "react";
-import { Box, Grid, Typography } from "@mui/material";
-import about_1 from '../../assets/about_1.png';
+import React, { useEffect, useState } from "react";
+import { Box, Grid, Typography, CircularProgress } from "@mui/material";
+import about_1 from "../../assets/about_1.png";
 import about_2 from "../../assets/about_2.png";
 import about_3 from "../../assets/about_3.png";
 import about_4 from "../../assets/about_4.png";
 import { Navbar } from "../Navbar/Navbar";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllPolicies } from "../State/Policy/Action";
 
 const About = () => {
+  const dispatch = useDispatch();
+  const jwt = localStorage.getItem("jwt");
+  const policy = useSelector((state) => state.policy);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    dispatch(getAllPolicies(jwt)).then(() => setLoading(false));
+  }, [dispatch, jwt]);
+
+  if (loading) {
+    return (
+      <div>
+        <Navbar />
+        <div
+          className="mt-28"
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+          }}
+        >
+          <CircularProgress />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <Navbar/>
-    <Box sx={{ width: "100%", maxWidth: "1252px", margin: "50px 250px 200px" }}>
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <Typography
-            variant="h4"
-            sx={{
-              color: "#072753",
-              fontSize: "27px",
-              fontWeight: "bold",
-              marginTop: "20px",
-              marginBottom: "10px",
-            }}
-          >
-            About Us
-          </Typography>
-          <Typography
-            sx={{
-              color: "#4f6484",
-              width: "550px",
-            }}
-          >
-            H&TDiamond began as a personal quest to find the right diamond at a
-            fair price. Nowadays we&#39;re helping our users discover their
-            perfect diamond at the lowest price from the top online jewelers.
-            Every day we algorithmically search through millions of diamonds to
-            find the best deals without compromising on quality.
-            <br />
-            <br />
-            Our business model is similar to Kayak or SeatGeek: free for you
-            (the user), and we make a small fee from the jewelers only if you
-            purchase a diamond from their site. We experienced how stressful
-            this search process can be firsthand. Our goal is to make your
-            search easier and align our interests with yours.
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Box
-            component="img"
-            sx={{
-              width: "550px",
-              height: "300px",
-            }}
-            alt="Image"
-            src={about_1}
-          />
-        </Grid>
-      </Grid>
+      <Navbar />
+      <div className="mt-28">
+        <Box
+          sx={{ width: "100%", maxWidth: "1252px", margin: "50px 250px 200px" }}
+        >
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <Typography
+                variant="h4"
+                sx={{
+                  color: "#072753",
+                  fontSize: "27px",
+                  fontWeight: "bold",
+                  marginTop: "20px",
+                  marginBottom: "10px",
+                }}
+              >
+                {policy.policies[0].name}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "#4f6484",
+                  width: "550px",
+                }}
+              >
+                {policy.policies[0].description}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box
+                component="img"
+                sx={{
+                  width: "550px",
+                  height: "300px",
+                }}
+                alt="Image"
+                src={about_1}
+              />
+            </Grid>
+          </Grid>
 
-      <Grid container spacing={2} marginTop="30px">
-        <Grid item xs={12} md={6}>
-          <Box
-            component="img"
-            sx={{
-              width: "550px",
-              height: "300px",
-            }}
-            alt="Image"
-            src={about_2}
-          />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Typography
-            variant="h4"
-            sx={{
-              color: "#072753",
-              fontSize: "27px",
-              fontWeight: "bold",
-              marginTop: "20px",
-              marginBottom: "10px",
-            }}
-          >
-            Outstanding Service
-          </Typography>
+          <Grid container spacing={2} marginTop="30px">
+            <Grid item xs={12} md={6}>
+              <Box
+                component="img"
+                sx={{
+                  width: "550px",
+                  height: "300px",
+                }}
+                alt="Image"
+                src={about_2}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography
+                variant="h4"
+                sx={{
+                  color: "#072753",
+                  fontSize: "27px",
+                  fontWeight: "bold",
+                  marginTop: "20px",
+                  marginBottom: "10px",
+                }}
+              >
+                {policy.policies[1].name}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "#4f6484",
+                  width: "550px",
+                }}
+              >
+                {policy.policies[1].description}
+              </Typography>
+            </Grid>
+          </Grid>
 
-          <Typography
-            sx={{
-              color: "#4f6484",
-              width: "550px",
-            }}
-          >
-            We cherish our customers like family. Our dedicated team follows a
-            simple principle: providing exceptional care, contributing to theirhappiness, and ensuring fairness. In a world where genuine
-            connections are rare, we value the art of building authentic
-            relationships. We want our customers to feel like they are part of
-            the family.
-            <br />
-            <br />
-            Jewelry holds profound emotional significance. It accompanies us
-            during life&#39;s most treasured moments, from engagements to
-            anniversaries, birthdays to heirlooms. We deeply understand the
-            importance and intimacy of these events, and we consider it a
-            privilege to be a part of them. Trust us to honor your milestones
-            with the utmost care and dedication.
-          </Typography>
-        </Grid>
-      </Grid>
+          <Grid container spacing={2} marginTop="30px">
+            <Grid item xs={12} md={6}>
+              <Typography
+                variant="h4"
+                sx={{
+                  color: "#072753",
+                  fontSize: "27px",
+                  fontWeight: "bold",
+                  marginTop: "20px",
+                  marginBottom: "10px",
+                }}
+              >
+                {policy.policies[2].name}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "#4f6484",
+                  width: "550px",
+                }}
+              >
+                {policy.policies[2].description}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box
+                component="img"
+                sx={{
+                  width: "550px",
+                  height: "300px",
+                }}
+                alt="Image"
+                src={about_3}
+              />
+            </Grid>
+          </Grid>
 
-      <Grid container spacing={2} marginTop="30px">
-        <Grid item xs={12} md={6}>
-          <Typography
-            variant="h4"
-            sx={{
-              color: "#072753",
-              fontSize: "27px",
-              fontWeight: "bold",
-              marginTop: "20px",
-              marginBottom: "10px",
-            }}
-          >
-            A Memorable Experience
-          </Typography>
-          <Typography
-            sx={{
-              color: "#4f6484",
-              width: "550px",
-            }}
-          >
-            Explore enchanting natural ethically-sourced GIA certified diamonds
-            and exquisite jewelry at our exclusive store in . By appointment
-            only, we offer a private and personalized experience, ensuring
-            utmost privacy and undivided attention.
-            <br />
-            <br /> With our thoughtful service, exceptional care, and unbeatable
-            value, every visit promises a satisfying and delightful
-            consultation. Build a special relationship that spans a lifetime of
-            diamond and jewel-worthy milestones and successes. Schedule your
-            appointment today for an intimate and unforgettable experience.
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Box
-            component="img"
-            sx={{
-              width: "550px",
-              height: "300px",
-            }}
-            alt="Image"
-            src={about_3}
-          />
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={2} marginTop="30px">
-        <Grid item xs={12} md={6}>
-          <Box
-            component="img"
-            sx={{
-              width: "550px",
-              height: "300px",
-            }}
-            alt="Image"
-            src={about_4}
-          />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Typography
-            variant="h4"
-            sx={{
-              color: "#072753",
-              fontSize: "27px",
-              fontWeight: "bold",
-              marginTop: "20px",
-              marginBottom: "10px",
-            }}
-          >
-            Get To Know Us
-          </Typography>
-          <Typography
-            sx={{
-              color: "#4f6484",width: "550px",
-            }}
-          >
-            Throughout the years, our commitment to customers and the joy we
-            share with them remains steadfast. Our studio exudes warmth and
-            intimacy, ensuring that each person feels truly special and valued.
-            Just like diamonds, our relationships with customers endure,
-            celebrating their most cherished milestones with everlasting
-            brilliance. Join us in creating unforgettable memories that shine
-            bright for a lifetime. Explore our exquisite collection of quality
-            diamonds, precious gems, and fine jewelry. Plan your visit today
-            schedule an appointment online or call our store at 703-536-3600
-            during our store hours. We look forward to working with you.
-          </Typography>
-        </Grid>
-      </Grid>
-    </Box>
+          <Grid container spacing={2} marginTop="30px">
+            <Grid item xs={12} md={6}>
+              <Box
+                component="img"
+                sx={{
+                  width: "550px",
+                  height: "300px",
+                }}
+                alt="Image"
+                src={about_4}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography
+                variant="h4"
+                sx={{
+                  color: "#072753",
+                  fontSize: "27px",
+                  fontWeight: "bold",
+                  marginTop: "20px",
+                  marginBottom: "10px",
+                }}
+              >
+                {policy.policies[3].name}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "#4f6484",
+                  width: "550px",
+                }}
+              >
+                {policy.policies[3].description}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Box>
+      </div>
     </div>
   );
 };

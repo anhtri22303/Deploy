@@ -1,20 +1,18 @@
 import React from "react";
-import { Card, CardActionArea, CardContent, CardMedia, Typography } from "@mui/material";
+import {
+  Card,
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  Typography,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 
 const JewelryCard = ({ item }) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const jwt = localStorage.getItem("jwt");
-  const { auth } = useSelector((store) => store);
 
   const handleNavigate = () => {
     navigate(`/item/${item.id}`);
-  };
-
-  const handleFavoriteToggle = () => {
-    // Implement favorite toggle logic
   };
 
   return (
@@ -28,7 +26,12 @@ const JewelryCard = ({ item }) => {
           sx={{ borderRadius: "8px 8px 0 0" }}
         />
         <CardContent>
-          <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+          <Typography
+            gutterBottom
+            variant="h6"
+            component="div"
+            sx={{ fontWeight: "bold" }}
+          >
             {item.name}
           </Typography>
           <Typography variant="body2" color="text.secondary">

@@ -17,7 +17,7 @@ import { getAllCategory } from '../../component/State/Categories/Action';
 import { getAllComponent } from '../../component/State/Components/Action';
 import { createMenuItem } from '../../component/State/Menu/Action';
 import { uploadImageToCloudinary } from '../util/UploadToCloudinary';
-
+import {Link} from "react-router-dom"
 const initialValues = {
     name: "",
     description: "",
@@ -45,26 +45,25 @@ const validationSchema = Yup.object({
         .matches(/^[^\s].*$/, 'The category cannot start with a space')
         .required('Category is required'),
 
-    goldWeight: Yup.number()
-    .required('Gold Weight is required')
-    .test(
-        'is-not-space',
-        'Gold Weight cannot contain spaces',
-        value => String(value).trim() === String(value)
-    )
+        goldWeight: Yup.number()
+        .required('Gold Weight is required')
+        .test(
+            'is-not-space',
+            'Gold Weight cannot contain spaces',
+            value => String(value).trim() === String(value)
+        )
         .typeError('Gold Weight must be a number')
-        .positive('Gold Weight must be positive')
-        
-        ,
+        .min(0, 'Gold Weight must be 0 or a positive number'), // Updated line
+            
     diamondWeight: Yup.number()
-    .required('Diamond Weight is required')
-    .test(
-        'is-not-space',
-        'Diamond Weight cannot contain spaces',
-        value => String(value).trim() === String(value)
-    )
+        .required('Diamond Weight is required')
+        .test(
+            'is-not-space',
+            'Diamond Weight cannot contain spaces',
+            value => String(value).trim() === String(value)
+        )
         .typeError('Diamond Weight must be a number')
-        .positive('Diamond Weight must be positive'),
+        .min(0, 'Diamond Weight must be 0 or a positive number'), // Updated line
 
     // selectedComponents: Yup.array()
     //     .of(Yup.string().required('A component selection is required'))
@@ -105,7 +104,7 @@ const CreateMenuForm = () => {
     
                 toast.success("Category created successfully!");
 
-                navigate('/manager/jewelry/menu');
+                navigate('/manager/jewelry/instock');
                 
                 } catch (error) {
                     if (error.response && error.response.data && error.response.data.message) {
@@ -517,6 +516,25 @@ const CreateMenuForm = () => {
                         Create
                     </Button>
                 </form>
+                <Link to={'/manager/jewelry/instock'}>
+              <Button
+                variant="outlined"
+                t
+                sx={{
+                    mt: 2,
+                  color: "red",
+                  fontWeight: 'bold',
+                  height: '40px', // Adjust height as needed
+                  padding: '8px',
+                  "&:hover": {
+                    borderColor: "darkred",
+                    backgroundColor: "lightcoral",
+                  },
+                }}
+              >
+                Close
+              </Button>
+              </Link>
             </div>
         </div>
         <ToastContainer/>

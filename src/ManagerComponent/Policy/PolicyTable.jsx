@@ -14,34 +14,30 @@ import {
   TableHead,
   TableRow,
   Typography,
-  TextField,
-  InputAdornment,
-  Pagination, // Import Pagination
+  Alert,
+  TextField,         // Add this import for TextField
+  InputAdornment,    // Add this import for InputAdornment
 } from "@mui/material";
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import { useSelector, useDispatch } from "react-redux";
 import { getAllComponent } from "../../component/State/Components/Action";
-import UpdateForm from "./UpdateForm";
-import CreateIngredientsForm from "./CreateIngredientsForm";
-import SearchIcon from '@mui/icons-material/Search';
+import Update from './Update' ;
+import CreatePolicy from "./CreatePolicy";
+import SearchIcon from '@mui/icons-material/Search';  // Add this import for SearchIcon
 import UpgradeIcon from "@mui/icons-material/Upgrade";
-import CloseIcon from '@mui/icons-material/Close';  // Import CloseIcon
+import { getAllPolicies } from "../../component/State/Policy/Action";
 
-const IngredientTable = () => {
+
+const PolicyTable = () => {
   const [open, setOpen] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showDialog, setShowDialog] = useState(false);  // State for dialog visibility
   const { components } = useSelector((state) => state.component);
   const dispatch = useDispatch();
   const jwt = localStorage.getItem("jwt");
-  const [showNoComponentAlert, setShowNoComponentAlert] = useState(false);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const ordersPerPage = 12;
-
+  const [ setShowNoComponentAlert] = useState(false); // State for showing no component alert
+  const policy = useSelector((state) => state.policy);
   useEffect(() => {
-    dispatch(getAllComponent({ jwt }));
+    dispatch(getAllPolicies(jwt));
   }, [dispatch, jwt]);
 
   const handleOpen = () => setOpen(true);
@@ -68,17 +64,9 @@ const IngredientTable = () => {
     }
   };
 
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
-  };
-
+  // Filter components based on search term
   const filteredComponents = components.filter((component) =>
     component.name.toLowerCase().includes(searchTerm)
-  );
-
-  const paginatedComponents = filteredComponents.slice(
-    (currentPage - 1) * ordersPerPage,
-    currentPage * ordersPerPage
   );
 
   return (
@@ -90,7 +78,7 @@ const IngredientTable = () => {
               <CreateIcon />
             </IconButton>
           }
-          title={"Ingredients"}
+          title={"Policy"}
           sx={{
             pt: 2,
             pb: 1,
@@ -101,8 +89,8 @@ const IngredientTable = () => {
             color: "#fff",
           }}
         />
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 2, marginTop: 2 }}>
-          <TextField
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 2,marginTop: 2 }}>
+        <TextField
             id="search-input"
             label="Search by Name"
             variant="outlined"
@@ -139,6 +127,14 @@ const IngredientTable = () => {
             }}
           />
         </Box>
+
+        {/* Display Alert if no component found */}
+        {/* {showNoComponentAlert && (
+          <Alert severity="warning" sx={{ mb: 3, mx: "auto", width: "fit-content" }}>
+            No ingredients found with the provided name.
+          </Alert>
+        )} */}
+
         <TableContainer component={Paper}>
           <Table aria-label="ingredient table" sx={{ minWidth: 650 }}>
             <TableHead>
@@ -159,20 +155,12 @@ const IngredientTable = () => {
                     Name
                   </Typography>
                 </TableCell>
-                <TableCell align="left">
+                <TableCell align="center">
                   <Typography
                     variant="subtitle1"
                     sx={{ fontWeight: "bold", color: "white" }}
                   >
-                    Price
-                  </Typography>
-                </TableCell>
-                <TableCell align="left">
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: "bold", color: "white" }}
-                  >
-                    Price BuyBack
+                    Description
                   </Typography>
                 </TableCell>
                 <TableCell align="left">
@@ -186,7 +174,7 @@ const IngredientTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedComponents.map((item, index) => (
+              {policy.policies.map((item, index) => (
                 <TableRow
                   key={item.id}
                   sx={{
@@ -195,42 +183,33 @@ const IngredientTable = () => {
                   }}
                 >
                   <TableCell component="th" scope="row">
-                    {(currentPage - 1) * ordersPerPage + index + 1}
+                    {index + 1}
                   </TableCell>
                   <TableCell align="left">{item.name}</TableCell>
-                  <TableCell align="left">{item.price}</TableCell>
-                  <TableCell align="left">{item.pricebuyback}</TableCell>
+                  <TableCell align="left">{item.description}</TableCell>
                   <TableCell align="left">
                     <IconButton
                       onClick={() => handleUpdateClick(item)}
                       aria-label="update"
                       sx={{ color: "red", width: 60, height: 60 }} // Adjust the width and height to make the button larger
                     >
-                      <ArrowCircleUpIcon sx={{color: "green" , fontSize: 30 }} />
+                      <UpgradeIcon sx={{ fontSize: 40 }} />
                     </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
+              {/* Show message if no ingredients found */}
               {searchTerm !== "" && filteredComponents.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} align="center">
-                    No ingredients found.
+                    No ingredients not found.
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 2, pb: 2 }}>
-            <Pagination
-              count={Math.ceil(filteredComponents.length / ordersPerPage)}
-              page={currentPage}
-              onChange={handlePageChange}
-              color="primary"
-            />
-          </Box>
         </TableContainer>
       </Card>
-
       <Modal
         open={open}
         onClose={handleClose}
@@ -251,17 +230,10 @@ const IngredientTable = () => {
             borderRadius: 2,
           }}
         >
-          <IconButton
-            aria-label="close"
-            onClick={handleClose}
-            sx={{ position: "absolute", top: 8, right: 8 }}
-          >
-            <CloseIcon sx={{ color: 'red' }}  />
-          </IconButton>
           {selectedComponent ? (
-            <UpdateForm component={selectedComponent} onClose={handleClose} />
+            <Update component={selectedComponent} onClose={handleClose} />
           ) : (
-            <CreateIngredientsForm onClose={handleClose} />
+            <CreatePolicy onClose={handleClose} />
           )}
         </Box>
       </Modal>
@@ -269,4 +241,4 @@ const IngredientTable = () => {
   );
 };
 
-export default IngredientTable;
+export default PolicyTable;

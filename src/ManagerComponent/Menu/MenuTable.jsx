@@ -18,23 +18,25 @@ import {
   DialogContentText,
   DialogTitle,
   Button,
-  Alert,
   TextField,
+  Pagination,
 } from "@mui/material";
 import {
   Refresh as RefreshIcon,
   Create as CreateIcon,
   Search as SearchIcon,
 } from "@mui/icons-material";
-import DoDisturbOnIcon from '@mui/icons-material/DoDisturbOn';
+import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
+import DoDisturbOnIcon from "@mui/icons-material/DoDisturbOn";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   getAllMenuItem,
   updateJewelryPrice,
-  deleteFoodAction,
   instockItem,
 } from "../../component/State/Menu/Action";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const MenuTable = () => {
   const { menu } = useSelector((store) => store);
@@ -43,10 +45,12 @@ const MenuTable = () => {
   const jwt = localStorage.getItem("jwt");
 
   const [open, setOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false); // New state for the details dialog
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showNoItemAlert, setShowNoItemAlert] = useState(false);
   const [filteredMenuItems, setFilteredMenuItems] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     dispatch(getAllMenuItem({ jwt }));
@@ -58,11 +62,20 @@ const MenuTable = () => {
         item.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
+    setCurrentPage(1);
   }, [searchTerm, menu.menuItems]);
+
+  const paginatedItems = filteredMenuItems.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handleRefresh = () => {
     dispatch(updateJewelryPrice({ jwt }));
-    window.location.reload();
+    toast.success("Jewelry prices updated successfully!");
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
   };
 
   const handleClickOpen = (item) => {
@@ -78,28 +91,45 @@ const MenuTable = () => {
   const handleDelete = () => {
     if (selectedItem) {
       dispatch(instockItem({ jewelryId: selectedItem.id, jwt }));
+      toast.success("Item marked as out of stock!");
       handleClose();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     }
   };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    setShowNoItemAlert(false);
   };
 
   const handleSearch = () => {
     if (searchTerm && filteredMenuItems.length === 0) {
-      setShowNoItemAlert(true);
-    } else {
-      setShowNoItemAlert(false);
+      toast.info("No items match your search criteria.");
     }
+  };
+
+  // Function to handle details dialog open
+  const handleDetailsOpen = (item) => {
+    setSelectedItem(item);
+    setDetailsOpen(true);
+  };
+
+  // Function to handle details dialog close
+  const handleDetailsClose = () => {
+    setDetailsOpen(false);
+    setSelectedItem(null);
+  };
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
   };
 
   return (
     <Box sx={{ padding: 3, minHeight: "100vh" }}>
-            <Card sx={{ mt: 2, boxShadow: 3, borderRadius: 2 }}>
+      <Card sx={{ mt: 2, boxShadow: 3, borderRadius: 2 }}>
         <CardHeader
-          title={"Menu"}
+          title={"Instock"}
           action={
             <>
               <IconButton
@@ -242,60 +272,64 @@ const MenuTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {menu.menuItems
-                .filter((row) => row.name.toLowerCase().includes(searchTerm))
-                .map((row) => (
-                  <TableRow
-                    key={row.name}
-                    sx={{
-                      "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
-                      "&:hover": { backgroundColor: "#e0e0e0" },
-                      transition: "background-color 0.3s",
-                    }}
-                  >
-                    <TableCell component="th" scope="row">
-                      <img
-                        src={row.images}
-                        alt="Product Image"
-                        style={{ width: 50, height: 50, borderRadius: 4 }}
-                      />
-                    </TableCell>
-                    <TableCell align="center">{row.code}</TableCell>
-                    <TableCell align="right">{row.name}</TableCell>
-                    <TableCell align="right">
-                      {row.jewelryCategory.name}
-                    </TableCell>
-                    <TableCell align="right">
-                      {row.components[0]?.name} with {row.components[1]?.name}
-                    </TableCell>
-                    <TableCell align="right">{row.price}</TableCell>
-                    <TableCell align="right">
-                      <IconButton onClick={() => handleClickOpen(row)}>
-                        <DoDisturbOnIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              {/* Show message if no items found */}
-              {searchTerm !== "" &&
-                menu.menuItems.filter((row) =>
-                  row.name.toLowerCase().includes(searchTerm)
-                ).length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={4} align="center">
-                      No buybacks available
-                    </TableCell>
-                  </TableRow>
-                )}
+              {paginatedItems.map((row) => (
+                <TableRow
+                  key={row.name}
+                  sx={{
+                    "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
+                    "&:hover": { backgroundColor: "#e0e0e0" },
+                    transition: "background-color 0.3s",
+                  }}
+                >
+                  <TableCell component="th" scope="row">
+                    <img
+                      src={row.images[0]} // Adjusted to use the first image URL
+                      alt="Product Image"
+                      style={{ width: 50, height: 50, borderRadius: 4 }}
+                      onClick={() => handleDetailsOpen(row)} // Open details dialog
+                    />
+                  </TableCell>
+                  <TableCell align="center">{row.code}</TableCell>
+                  <TableCell align="right">{row.name}</TableCell>
+                  <TableCell align="right">
+                    {row.jewelryCategory.name}
+                  </TableCell>
+                  <TableCell align="right">
+                    {row.components[0]?.name} with {row.components[1]?.name}
+                  </TableCell>
+                  <TableCell align="right">{row.price}</TableCell>
+                  <TableCell align="right">
+                    <IconButton onClick={() => handleClickOpen(row)}>
+                      <DeleteSweepIcon sx={{ color: "red", fontSize: 30 }} />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {searchTerm !== "" && paginatedItems.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    No items match your search criteria.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
+        <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
+          <Pagination
+            count={Math.ceil(filteredMenuItems.length / itemsPerPage)}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+          />
+        </Box>
       </Card>
+
       <Dialog open={open} onClose={handleClose} sx={{ borderRadius: 2 }}>
         <DialogTitle>{"Confirm Out Of Stock"}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to Out Of Stock this item?
+            Are you sure you want to mark this item as out of stock?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -303,12 +337,45 @@ const MenuTable = () => {
             Cancel
           </Button>
           <Button onClick={handleDelete} color="error" autoFocus>
-          Out Of Stock
+            Out Of Stock
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* New dialog for showing item details */}
+      <Dialog
+        open={detailsOpen}
+        onClose={handleDetailsClose}
+        sx={{ borderRadius: 2 }}
+      >
+        <DialogTitle>{"Item Details"}</DialogTitle>
+        <DialogContent>
+          {selectedItem && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Typography variant="h6">{selectedItem.name}</Typography>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                <Typography variant="subtitle1">
+                  <strong>Gold Weight:</strong> {selectedItem.goldWeight} grams
+                </Typography>
+                <Typography variant="subtitle1">
+                  <strong>Diamond Weight:</strong> {selectedItem.diamondWeight}{" "}
+                  carats
+                </Typography>
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDetailsClose} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <ToastContainer />
     </Box>
   );
 };
 
 export default MenuTable;
+

@@ -139,6 +139,7 @@ export const deleteFoodAction = ({ jewelryId, jwt }) =>
                     });
                 console.log("data --------- ", data);
                 dispatch({type:GET_MENU_ITEM_BY_CODE_SUCCESS,payload:data});
+                return data;
             } catch (error) {
                 console.log("get error",error)
                 dispatch({type:GET_MENU_ITEM_BY_CODE_FAILURE,payload:error});
@@ -200,7 +201,7 @@ export const deleteFoodAction = ({ jewelryId, jwt }) =>
     };
 
 
-    export const getOutOfStockItems = (jwt) => {
+    export const getOutOfStockItems = ({jwt}) => {
         return async (dispatch) => {
             dispatch({ type: GET_OUT_OF_STOCk_ITEM_REQUEST });
             try {

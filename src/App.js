@@ -7,6 +7,7 @@ import { darkTheme } from "./Theme/DarkTheme";
 import { getUser } from "./component/State/Authentication/Action";
 import { findCart } from "./component/State/Cart/Action";
 import { getAreaByUserId } from "./component/State/Area/Action";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Routers />
+      <ToastContainer />
     </ThemeProvider>
   );
 }

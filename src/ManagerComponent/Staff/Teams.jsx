@@ -120,7 +120,7 @@ const Teams = () => {
   return (
     <>
       <div>
-        <Button
+        {/* <Button
           onClick={handleOpen}
           variant="contained"
           sx={{
@@ -139,7 +139,7 @@ const Teams = () => {
           }}
         >
           Create Account
-        </Button>
+        </Button> */}
 
         <Modal
           open={open}

@@ -19,7 +19,7 @@ const CreateIngredientsForm = () => {
   const jwt = localStorage.getItem("jwt");
 
   const validateForm = () => {
-    if (!formData.name || !formData.price || !formData.pricebuyback) {
+    if (!formData.name || formData.price === "" || formData.pricebuyback === "") {
       setError('All fields are required.');
       return false;
     }
@@ -31,8 +31,12 @@ const CreateIngredientsForm = () => {
       setError('Price and Price Buyback must be numbers.');
       return false;
     }
-    if (formData.price <= 0 || formData.pricebuyback <= 0) {
-      setError('Price and Price Buyback must be positive numbers.');
+    if (formData.price < 0 || formData.pricebuyback < 0) { // Updated condition to allow 0
+      setError('Price and Price Buyback must be non-negative numbers.');
+      return false;
+    }
+    if (parseFloat(formData.price) <= parseFloat(formData.pricebuyback)) {
+      setError('Price must be greater than Price Buyback.');
       return false;
     }
     setError('');

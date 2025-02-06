@@ -60,26 +60,46 @@ const cartReducer = (state = initialState, action) => {
                 },
             };
 
-        case actionTypes.ADD_ITEM_TO_CART_SUCCESS:
-        case actionTypes.ADD_ITEM_TO_CART_BY_CODE_SUCCESS:
-            if (!action.payload) {
-                console.error("Payload is invalid:", action.payload);
-                return {
-                    ...state,
-                    loading: false,
-                    error: 'Invalid payload format',
-                };
-            }
-            const newCartItems = [action.payload, ...state.cartItems];
+            case actionTypes.ADD_ITEM_TO_CART_SUCCESS:
+case actionTypes.ADD_ITEM_TO_CART_BY_CODE_SUCCESS:
+    if (!action.payload) {
+        console.error("Payload is invalid:", action.payload);
+        return {
+            ...state,
+            loading: false,
+            error: 'Invalid payload format',
+        };
+    }
+
+    const newCartItems = state.cartItems.map(item => {
+        if (item.id === action.payload.id) {
             return {
-                ...state,
-                loading: false,
-                cartItems: newCartItems,
-                cart: {
-                    ...state.cart,
-                    total: calculateCartTotal(newCartItems), // Cập nhật tổng sau khi thêm sản phẩm
-                },
+                ...item,
+                quantity: item.quantity + 1,
+                totalPrice: item.totalPrice + action.payload.totalPrice
             };
+        }
+        return item;
+    });
+
+    const isExistingItem = state.cartItems.some(item => item.id === action.payload.id);
+
+    if (!isExistingItem) {
+        newCartItems.push(action.payload);
+    }
+
+    return {
+        ...state,
+        loading: false,
+        cartItems: newCartItems,
+        cart: {
+            ...state.cart,
+            total: calculateCartTotal(newCartItems),
+            items: newCartItems,
+        },
+    };
+
+                
 
         case actionTypes.UPDATE_CARTITEM_SUCCESS:
             if (!action.payload) {

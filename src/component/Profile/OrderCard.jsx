@@ -1,37 +1,43 @@
-import React, { useEffect, useState } from "react";
-import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
-import { useDispatch, useSelector } from "react-redux";
-import { updateOrderStatus } from "../State/AreaOrder/Action";
-import { getUsersOrders } from "../State/Order/Action";
-
 import {
+  Alert,
   Box,
+  Button,
   Card,
   CardHeader,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  IconButton,
+  Menu,
+  MenuItem,
+  Pagination,
   Paper,
+  Radio,
+  RadioGroup,
+  Snackbar,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  MenuItem,
-  Menu,
-  Button,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
   TextField,
-  IconButton,
-  Pagination,
+  Typography,
 } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { updateOrderStatus } from "../State/AreaOrder/Action";
+import { getUsersOrders } from "../State/Order/Action";
 
 export default function OrderCard() {
-  const { order } = useSelector((store) => store);
+  const { orders } = useSelector((store) => store.order);
   const dispatch = useDispatch();
   const jwt = localStorage.getItem("jwt");
+
   const orderStatus = [
     { label: "PENDING", value: "PENDING" },
     { label: "COMPLETED", value: "COMPLETED" },
@@ -41,17 +47,33 @@ export default function OrderCard() {
     dispatch(getUsersOrders(jwt));
   }, [dispatch, jwt]);
 
+  const formatDate = (dateString) => {
+    const options = {
+      year: "numeric",
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [filterStatus, setFilterStatus] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [error, setError] = useState(""); // State for error message
   const ordersPerPage = 10;
   const open = Boolean(anchorEl);
-  //window.scrollTo(9,9);
 
   const handleClick = (event, orderId) => {
+    event.stopPropagation();
     setAnchorEl(event.currentTarget);
     setSelectedOrderId(orderId);
   };
@@ -60,30 +82,78 @@ export default function OrderCard() {
     setAnchorEl(null);
     setSelectedOrderId(null);
   };
-
-  const handleUpdateOrder = (orderstatus) => {
-    dispatch(updateOrderStatus({ orderId: selectedOrderId, orderstatus, jwt }))
-      .then(() => {
-        dispatch(getUsersOrders(jwt));
+  const handleSearchByDate = () => {
+    // Validate date range
+    if (new Date(startDate) > new Date(endDate)) {
+      toast.error("Start date cannot be later than end date.");
+      return;
+    } else {
+      setError("");
+    }
+    // Filter orders based on date range
+    const filtered = orders
+      ?.filter((order) => {
+        const orderDate = new Date(order.createdAt).toLocaleDateString();
+        return (
+          (!startDate || new Date(order.createdAt) >= new Date(startDate)) &&
+          (!endDate || new Date(order.createdAt) <= new Date(endDate))
+        );
       })
-      .catch((error) => {
-        console.error("Failed to update order status", error);
-      });
-    handleClose();
+      .reverse();
+    setFilteredOrders(filtered);
+    setCurrentPage(1); // Reset to first page
+  };
+
+  const handleUpdateOrder = (orderStatus) => {
+    if (selectedOrderId && orderStatus) {
+      dispatch(
+        updateOrderStatus({ orderId: selectedOrderId, orderStatus, jwt })
+      )
+        .then(() => {
+          dispatch(getUsersOrders(jwt));
+          toast.success("Order status updated successfully.", {
+            autoClose: 500,
+          });
+        })
+        .catch((error) => {
+          console.error("Failed to update order status", error);
+          toast.error("Failed to update order status."); // Optional: error message
+        });
+      handleClose();
+    } else {
+      toast.error("Order ID or status is missing.");
+    }
   };
 
   useEffect(() => {
-    if (order.orders) {
+    if (orders) {
       handleSearch();
     }
-  }, [order.orders, filterStatus, searchTerm, currentPage]);
+  }, [orders, filterStatus, searchTerm, startDate, endDate, currentPage]);
 
   const handleSearch = () => {
-    const filtered = order.orders?.filter(
-      (order) =>
-        (filterStatus === "ALL" || order.orderStatus === filterStatus) &&
-        order.customer.fullname.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Validate date range
+    if (new Date(startDate) > new Date(endDate)) {
+      toast.error("Start date cannot be later than end date.");
+      return;
+    } else {
+      setError("");
+    }
+    const filtered = orders
+      ?.filter((order) => {
+        const isStatusMatch =
+          filterStatus === "ALL" || order.orderStatus === filterStatus;
+        const isNameMatch = order.customer.fullname
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+        const orderDate = new Date(order.createdAt).toLocaleDateString();
+        const isDateInRange =
+          (!startDate || new Date(order.createdAt) >= new Date(startDate)) &&
+          (!endDate || new Date(order.createdAt) <= new Date(endDate));
+
+        return isStatusMatch && isNameMatch && isDateInRange;
+      })
+      .reverse();
     setFilteredOrders(filtered);
   };
 
@@ -91,9 +161,23 @@ export default function OrderCard() {
     setCurrentPage(value);
   };
 
-  const startIndex = (currentPage - 1) * ordersPerPage;
-  const currentOrders = filteredOrders.slice(startIndex, startIndex + ordersPerPage);
+  const handleRowClick = (order) => {
+    if (order.id !== selectedOrderId) {
+      setSelectedOrder(order);
+      setOpenDialog(true);
+    }
+  };
 
+  const closeDialog = () => {
+    setOpenDialog(false);
+    setSelectedOrder(null);
+  };
+
+  const startIndex = (currentPage - 1) * ordersPerPage;
+  const currentOrders = filteredOrders.slice(
+    startIndex,
+    startIndex + ordersPerPage
+  );
 
   return (
     <Box sx={{ padding: 3, minHeight: "100vh" }}>
@@ -122,48 +206,174 @@ export default function OrderCard() {
             sx={{ display: "flex", justifyContent: "center" }}
           >
             <FormControlLabel value="ALL" control={<Radio />} label="All" />
-            <FormControlLabel value="PENDING" control={<Radio />} label="Pending" />
-            <FormControlLabel value="COMPLETED" control={<Radio />} label="Completed" />
+            <FormControlLabel
+              value="PENDING"
+              control={<Radio />}
+              label="PENDING"
+            />
+            <FormControlLabel
+              value="COMPLETED"
+              control={<Radio />}
+              label="COMPLETED"
+            />
           </RadioGroup>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 3, marginRight: 2 }}>
-          <TextField
-            id="search-input"
-            label="Search by Name"
-            variant="outlined"
-            size="small"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                handleSearch();
-              }
-            }}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: 2,
+            gap: 1,
+          }}
+        >
+          <Box
             sx={{
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#0B4CBB",
-                },
-                "&:hover fieldset": {
-                  borderColor: "#0B4CBB",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#0B4CBB",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                color: "#0B4CBB",
-              },
-              "& .MuiInputLabel-root.Mui-focused": {
-                color: "#0B4CBB",
-              },
+              display: "flex",
+              gap: 1,
             }}
-          />
-          <IconButton aria-label="search" onClick={handleSearch} sx={{ color: "#0B4CBB" }}>
-            <SearchIcon />
-          </IconButton>
+          >
+            <TextField
+              id="start-date-input"
+              label="Start Date"
+              type="date"
+              variant="outlined"
+              size="small"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#0B4CBB",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#0B4CBB",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#0B4CBB",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#0B4CBB",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#0B4CBB",
+                },
+              }}
+            />
+            <TextField
+              id="end-date-input"
+              label="End Date"
+              type="date"
+              variant="outlined"
+              size="small"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#0B4CBB",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#0B4CBB",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#0B4CBB",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#0B4CBB",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#0B4CBB",
+                },
+              }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSearchByDate}
+              sx={{
+                backgroundColor: "#007bff",
+                color: "#fff",
+                fontWeight: "bold",
+                "&:hover": {
+                  backgroundColor: "#0056b3",
+                },
+                borderRadius: 2,
+                boxShadow: "none",
+                textTransform: "none",
+              }}
+            >
+              Search
+            </Button>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <TextField
+              id="search-input"
+              label="Search by Name"
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
+              InputLabelProps={{ shrink: true }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#0B4CBB",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#0B4CBB",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#0B4CBB",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#0B4CBB",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#0B4CBB",
+                },
+              }}
+            />
+            <IconButton
+              aria-label="search"
+              onClick={handleSearch}
+              sx={{ color: "#0B4CBB" }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </Box>
         </Box>
+
+        {/* Show error message if date range is invalid */}
+        {error && (
+          <Snackbar
+            open={Boolean(error)}
+            autoHideDuration={6000}
+            onClose={() => setError("")}
+          >
+            <Alert onClose={() => setError("")} severity="error">
+              {error}
+            </Alert>
+          </Snackbar>
+        )}
+
         <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
@@ -205,6 +415,22 @@ export default function OrderCard() {
                     variant="subtitle1"
                     sx={{ fontWeight: "bold", color: "white" }}
                   >
+                    Discount
+                  </Typography>
+                </TableCell>
+                <TableCell align="center">
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: "bold", color: "white" }}
+                  >
+                    Creation Date
+                  </Typography>
+                </TableCell>
+                <TableCell align="center">
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: "bold", color: "white" }}
+                  >
                     Status
                   </Typography>
                 </TableCell>
@@ -225,74 +451,106 @@ export default function OrderCard() {
                     key={order.id}
                     sx={{
                       "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
-                      "&:hover": { backgroundColor: "#e0e0e0" },
+                      "&:hover": {
+                        backgroundColor: "#e0e0e0",
+                        cursor: "pointer",
+                      },
                     }}
+                    onClick={() => handleRowClick(order)}
                   >
-                    <TableCell sx={{ fontWeight: "bold" }}>{order.id}</TableCell>
-                    <TableCell align="center">{order.customer.fullname}</TableCell>
+                    <TableCell component="th" scope="row">
+                      {order.id}
+                    </TableCell>
+                    <TableCell align="center">
+                      {order.customer.fullname}
+                    </TableCell>
                     <TableCell align="center">{order.totalPrice}</TableCell>
                     <TableCell align="center">{order.areaName}</TableCell>
                     <TableCell align="center">
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontWeight: "bold",
-                          color: order.orderStatus === "COMPLETED" ? "green" : "red",
-                        }}
-                      >
-                        {order.orderStatus}
-                      </Typography>
+                      {order.items[0].discountPercentage}%
+                    </TableCell>
+                    <TableCell align="center">
+                      {formatDate(order.createdAt)}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        color:
+                          order.orderStatus === "PENDING" ? "red" : "green",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {order.orderStatus}
                     </TableCell>
                     <TableCell align="center">
                       <Button
-                        id="basic-button"
-                        aria-controls={open ? "basic-menu" : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={open ? "true" : undefined}
-                        onClick={(event) => handleClick(event, order.id)}
-                        sx={{
-                          color: "#fff",
-                          fontWeight: "bold",
-                          backgroundColor: "#0B4CBB",
-                          "&:hover": {
-                            backgroundColor: "#1976d2",
-                          },
-                        }}
+                        variant="contained"
+                        color="primary"
+                        onClick={(e) => handleClick(e, order.id)}
                       >
                         Update
                       </Button>
-                      <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={open && selectedOrderId === order.id}
-                        onClose={handleClose}
-                        MenuListProps={{
-                          "aria-labelledby": "basic-button",
-                        }}
-                      >
-                        {orderStatus.map((status) => (
-                          <MenuItem
-                            key={status.value}
-                            onClick={() => handleUpdateOrder(status.value)}
-                          >
-                            {status.label}
-                          </MenuItem>
-                        ))}
-                      </Menu>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} align="center">
-                    No found orders
+                  <TableCell colSpan={8} align="center">
+                    No orders found
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
+          {openDialog && selectedOrder && (
+            <Dialog
+              open={openDialog}
+              onClose={closeDialog}
+              fullWidth
+              maxWidth="md"
+            >
+              <DialogTitle>Order Details</DialogTitle>
+              <DialogContent>
+                {selectedOrder && (
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Code</TableCell>
+                          <TableCell align="center">Name</TableCell>
+                          <TableCell align="center">Quantity</TableCell>
+                          <TableCell align="center">Total Price</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {selectedOrder.items.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell>{item.jewelry.code}</TableCell>
+                            <TableCell align="center">
+                              {item.jewelry.name}
+                            </TableCell>
+                            <TableCell align="center">
+                              {item.quantity}
+                            </TableCell>
+                            <TableCell align="center">
+                              {item.totalPrice}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={closeDialog} color="primary">
+                  Close
+                </Button>
+              </DialogActions>
+            </Dialog>
+          )}
         </TableContainer>
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 3, mb: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 3, mb: 3 }}>
           <Pagination
             count={Math.ceil(filteredOrders.length / ordersPerPage)}
             page={currentPage}
@@ -301,6 +559,30 @@ export default function OrderCard() {
           />
         </Box>
       </Card>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        PaperProps={{
+          style: {
+            width: "20ch",
+          },
+        }}
+      >
+        {orderStatus.map((status) => (
+          <MenuItem
+            key={status.value}
+            selected={status.value === filterStatus}
+            onClick={() => {
+              // Kiểm tra và xử lý status.value tại đây
+              console.log("Selected status:", status.value);
+              handleUpdateOrder(status.value);
+            }}
+          >
+            {status.label}
+          </MenuItem>
+        ))}
+      </Menu>
     </Box>
   );
 }

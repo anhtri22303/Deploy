@@ -1,20 +1,10 @@
-import GiftIcon from "@mui/icons-material/CardGiftcard";
-import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import PaymentIcon from "@mui/icons-material/Payment";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import RedeemIcon from "@mui/icons-material/Redeem";
-import StoreIcon from "@mui/icons-material/Store";
-import SupportIcon from "@mui/icons-material/Support";
-import ServiceIcon from "@mui/icons-material/SupportAgent";
-import SwapHorizontalCircleIcon from "@mui/icons-material/SwapHorizontalCircle";
 import AddCardIcon from "@mui/icons-material/AddCard";
+import { Link, useLocation } from "react-router-dom";
 import {
   Box,
   Button,
   Card,
   Divider,
-  Grid,
   Modal,
   Paper,
   Table,
@@ -26,17 +16,21 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import PaymentsIcon from "@mui/icons-material/Payments";
 import React, { useState } from "react";
-import { CartItem } from "./CartItem";
-import { useLocation, useNavigate } from "react-router-dom";
+import CartItem from "./CartItem";
+import { useNavigate } from "react-router-dom";
 import { Form, Formik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import * as Yup from "yup";
+import { Navbar } from "../Navbar/Navbar";
+import Footer from "../Footer/Footer";
 import {
   addItemToCartByCode,
   applyCoupon,
   clearCartAction,
+  findCart,
 } from "../State/Cart/Action";
 import { createOrder } from "../State/Order/Action";
 import { EventShow } from "../Profile/EventShow";
@@ -63,7 +57,9 @@ const validationSchema = Yup.object({
     .matches(/^\S.*$/, "Cannot start with a space"),
   mobile: Yup.string()
     .required("Mobile is required")
-    .matches(/^\S.*$/, "Cannot start with a space"),
+    .matches(/^[^\s].*[^\s]$/, "Mobile cannot have spaces")
+    .length(10, "Mobile must be exactly 10 characters")
+    .matches(/^\d+$/, "Mobile must be a number"),
   email: Yup.string()
     .required("Email is required")
     .matches(/^\S.*$/, "Cannot start with a space"),
@@ -73,10 +69,12 @@ const Cart = () => {
   const [open, setOpen] = useState(false);
   const [productCode, setProductCode] = useState("");
   const [couponCode, setCouponCode] = useState("");
-  const [customInvoicePercentage, setCustomInvoicePercentage] = useState("");
-  const navigate = useNavigate();
+  const [customInvoicePercentage] = useState("");
   const { cart } = useSelector((store) => store);
+  // const location = useLocation();
+  // const { cart } = location.state || {};
   const dispatch = useDispatch();
+  const jwt = localStorage.getItem("jwt");
 
   const handleClose = () => setOpen(false);
 
@@ -118,7 +116,7 @@ const Cart = () => {
 
   const handleAddToCart = async () => {
     if (productCode.trim() === "") {
-      alert("Please enter a product code.");
+      toast.error("Please enter a product code.");
       return;
     }
 
@@ -133,6 +131,9 @@ const Cart = () => {
     try {
       await dispatch(addItemToCartByCode(reqData));
       setProductCode("");
+      toast.success("Item added to cart successfully!", {
+        autoClose: 500,
+      });
     } catch (error) {
       if (error.response && error.response.data) {
         toast.error(`${error.response.data}`); // Show specific error message
@@ -141,29 +142,33 @@ const Cart = () => {
       }
       console.error("error:", error);
     }
+    dispatch(findCart(jwt));
   };
 
   const handleApplyCoupon = async () => {
     if (couponCode.trim() === "") {
-      alert("Please enter a coupon code.");
+      toast.error("Please enter a coupon code.");
       return;
     }
 
     try {
+      // Áp dụng mã giảm giá
       await dispatch(
         applyCoupon(cart.cart.id, couponCode, localStorage.getItem("jwt"))
       );
-      toast.success("COUPON APPLIDED SUCCESSFULLY!"); // Show success message
-      setCouponCode("");
+
+      // Tìm giỏ hàng sau khi áp dụng mã giảm giá
+      await dispatch(findCart(localStorage.getItem("jwt")));
+
+      toast.success("Coupon applied successfully!", {
+        autoClose: 500,
+      });
+      setCouponCode(""); // Xóa mã giảm giá sau khi áp dụng
     } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        toast.error(`${error.response.data.message}`); // Show specific error message
+      if (error.response && error.response.data) {
+        toast.error(`${error.response.data}`); // Hiển thị thông báo lỗi cụ thể
       } else {
-        toast.error("Failed to apply coupon. Please try again."); // Fallback error message
+        toast.error("Failed to apply coupon. Please try again."); // Thông báo lỗi dự phòng
       }
       console.error("Coupon apply error:", error);
     }
@@ -191,72 +196,26 @@ const Cart = () => {
     }
   };
 
-  const handleCustomInvoiceChange = (e) => {
-    setCustomInvoicePercentage(e.target.value);
-  };
-  const handleNavigateHome = () => {
-    navigate("/staff/jewelry/Home");
-  };
+  // const handleNavigateHome = (name, id) => {
+  //   navigate(`/staff/jewelry/area/${name}/${id}`);
+  // };
 
   return (
     <>
-      <div>
+      <Navbar />
+      <div className="mt-24">
         <main className="lg:flex justify-between  bg-[#fbfbfb]">
           <section className="lg:w-[40%] space-y-6 lg:min-h-screen pt-10">
-            {cart.cartItems.length > 0 ? (
-              <TableContainer
-                component={Paper}
-                className="mt-5 mx-auto"
-                sx={{ maxWidth: "500px" }}
-              >
-                <Typography variant="h6" className="p-3">
-                  Cart Items
-                </Typography>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-
-                      <TableCell align="center">Product</TableCell>
-                      <TableCell align="right">Price</TableCell>
-                      <TableCell align="right">Quantity</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {cart.cartItems.map((item, index) => (
-                      <TableRow key={`${item.id}-${index}`}>
-                        <CartItem key={`${item.id}-${index}`} item={item} />
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell align="right">{item.quantity}</TableCell>
-                        <TableCell text-align="left">{item.price}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            ) : (
-              <Typography
-                variant="h6"
-                className="p-1"
-                sx={{
-                  textAlign: "center",
-                  backgroundColor: "#F22B2B", // Thêm màu nền
-                  color: "white", // Thay đổi màu chữ nếu cần để dễ đọc
-                  padding: "2px", // Điều chỉnh padding để đảm bảo văn bản không dính sát vào cạnh
-                  borderRadius: "1px", // Thêm viền bo tròn nếu muốn
-                  fontWeight: "bold", // Làm cho văn bản đậm
-                  //display: "inline-block", // Làm cho chiều rộng phù hợp với nội dung
-                }}
-              >
-                No Product In Cart
-              </Typography>
-            )}
-            <Divider />
             {/* Product Code Input */}
             <Card
-              className="flex gap-90 w-80 p-2 mt-2"
+              className="w-80 p-2 mt-2"
               sx={{
                 margin: "auto", // Center horizontally
                 textAlign: "center", // Center content inside the card
+                display: "flex", // Use flexbox layout
+                flexDirection: "column", // Stack items vertically
+                gap: 2, // Add space between items
+                alignItems: "center", // Center items horizontally
               }}
             >
               <TextField
@@ -287,28 +246,160 @@ const Cart = () => {
               />
               <Button
                 variant="outlined"
-                fullWidth
                 onClick={handleAddToCart}
                 sx={{
                   color: "green",
-                  borderColor: "green",
+                  backgroundColor: "#007bff",
+                  color: "#fff",
                   fontWeight: "bold",
-                  width: "120px",
+                  width: "200px",
                   "&:hover": {
-                    borderColor: "darkyellow",
-                    backgroundColor: "lightyellow",
+                    backgroundColor: "#0056b3",
                   },
+                  borderRadius: 2,
+                  boxShadow: "none",
+                  textTransform: "none",
+                  // Add margin to top for spacing from TextField
                 }}
               >
                 Add
               </Button>
             </Card>
-            {/* Coupon Code Input */}
-            <Card
-              className="flex gap-90 w-80 p-2 mt-2"
+            {cart.cartItems.length > 0 ? (
+              <TableContainer
+                component={Paper}
+                className="mt-5 mx-auto"
+                sx={{ maxWidth: "500px" }}
+              >
+                <Typography variant="h6" className="p-3">
+                  Cart Items
+                </Typography>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center">Product</TableCell>
+                      <TableCell align="center">Price</TableCell>
+                      <TableCell align="center">Quantity</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {cart.cartItems.map((item, index) => (
+                      <TableRow key={`${item.id}-${index}`}>
+                        <CartItem key={`${item.id}-${index}`} item={item} />
+                        <TableCell align="center">
+                          ${item.originalPrice}
+                        </TableCell>
+                        <TableCell align="center">{item.quantity}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : (
+              <TableContainer
+                component={Paper}
+                className="mt-5 mx-auto"
+                sx={{ maxWidth: "500px" }}
+              >
+                <Typography variant="h6" className="p-3">
+                  Cart Items
+                </Typography>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center">Product</TableCell>
+                      <TableCell align="center">Price</TableCell>
+                      <TableCell align="center">Quantity</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        colSpan={6} // Adjust the colspan according to the number of columns in your table
+                        sx={{
+                          color: "red", // Set the text color to red
+                          textAlign: "center", // Center the text
+                          fontWeight: "bold", // Optional: make the text bold
+                        }}
+                      >
+                        No Product in Cart
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+            <Divider />
+            {/* Product Code Input */}
+            {/* <Card
+              className="w-80 p-2 mt-2"
               sx={{
                 margin: "auto", // Center horizontally
                 textAlign: "center", // Center content inside the card
+                display: "flex", // Use flexbox layout
+                flexDirection: "column", // Stack items vertically
+                gap: 2, // Add space between items
+                alignItems: "center", // Center items horizontally
+              }}
+            >
+              <TextField
+                label="Product Code"
+                variant="outlined"
+                fullWidth
+                value={productCode}
+                onChange={(e) => setProductCode(e.target.value)}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "gray",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "gray",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "gray",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "gray",
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "gray",
+                  },
+                }}
+              />
+              <Button
+                variant="outlined"
+                onClick={handleAddToCart}
+                sx={{
+                  color: "green",
+                  backgroundColor: "#007bff",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  width: "200px",
+                  "&:hover": {
+                    backgroundColor: "#0056b3",
+                  },
+                  borderRadius: 2,
+                  boxShadow: "none",
+                  textTransform: "none",
+                  // Add margin to top for spacing from TextField
+                }}
+              >
+                Add
+              </Button>
+            </Card> */}
+            {/* Coupon Code Input */}
+            <Card
+              className="w-80 p-1 mt-2"
+              sx={{
+                margin: "auto", // Center horizontally
+                textAlign: "center", // Center content inside the card
+                display: "flex", // Use flexbox layout
+                flexDirection: "column", // Stack items vertically
+                gap: 2, // Add space between items
+                alignItems: "center", // Center items horizontally
               }}
             >
               <TextField
@@ -339,24 +430,27 @@ const Cart = () => {
               />
               <Button
                 variant="outlined"
-                fullWidth
                 onClick={handleApplyCoupon}
                 sx={{
                   color: "green",
-                  borderColor: "green",
+                  backgroundColor: "#007bff",
+                  color: "#fff",
                   fontWeight: "bold",
-                  width: "120px",
+                  width: "200px",
                   "&:hover": {
-                    borderColor: "darkyellow",
-                    backgroundColor: "lightyellow",
+                    backgroundColor: "#0056b3",
                   },
+                  borderRadius: 2,
+                  boxShadow: "none",
+                  textTransform: "none",
+                  // Add margin to top for spacing from TextField
                 }}
               >
                 Coupon
               </Button>
             </Card>
             {/* Clear Cart Button */}
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center mt-1">
               <Button
                 variant="outlined"
                 onClick={handleClearCart}
@@ -375,7 +469,9 @@ const Cart = () => {
                 Clear Cart
               </Button>
             </div>
-
+          </section>
+          <Divider orientation="vertical" flexItem />
+          <section className="lg:w-[60%] space-y-6 lg:min-h-screen pt-10">
             {/* Bill Details */}
             <TableContainer
               component={Paper}
@@ -396,6 +492,7 @@ const Cart = () => {
                   <TableRow>
                     <TableCell>Item Total</TableCell>
                     <TableCell align="right">
+                      $
                       {cart.cart?.coupon
                         ? cart.cart.totalamount
                         : calculateTotal()}
@@ -411,32 +508,33 @@ const Cart = () => {
                   </TableRow>
                   <TableRow>
                     <TableCell>Total Pay</TableCell>
-                    <TableCell align="right">{calculateTotal()}</TableCell>
+                    <TableCell align="right">${calculateTotal()}</TableCell>
                   </TableRow>
                 </TableBody>
+                
               </Table>
             </TableContainer>
-          </section>
-          <Divider orientation="vertical" flexItem />
-          <section className="lg:w-[60%] flex justify-center px-5 pb-0 lg:pb-0">
             <Box>
-              <Button
-                variant="outlined"
-                onClick={handleNavigateHome}
-                sx={{
-                  color: "red",
-                  borderColor: "red",
-                  fontWeight: "bold",
-                  width: "200px",
-                  marginTop: "10px",
-                  "&:hover": {
-                    borderColor: "darkred",
-                    backgroundColor: "lightcoral",
-                  },
-                }}
-              >
-                Go to Home
-              </Button>
+              {/* <Link to={"/staff/jewelry/area/sale/1"}>
+                <Button
+                  variant="outlined"
+                  // onClick={handleNavigateHome}
+                  t
+                  sx={{
+                    color: "red",
+                    borderColor: "red",
+                    fontWeight: "bold",
+                    width: "200px",
+                    marginTop: "10px",
+                    "&:hover": {
+                      borderColor: "darkred",
+                      backgroundColor: "lightcoral",
+                    },
+                  }}
+                >
+                  Go to Home
+                </Button>
+              </Link> */}
               <Typography
                 variant="h4"
                 component="h1"
@@ -445,7 +543,7 @@ const Cart = () => {
                 gutterBottom
                 py={4}
               >
-                Payment Here
+                Click To Payment
               </Typography>
               <Box
                 display="flex"
@@ -463,7 +561,7 @@ const Cart = () => {
                     boxShadow: 3,
                   }}
                 >
-                  <AddCardIcon sx={{ fontSize: 40, color: "gray" }} />
+                  <PaymentsIcon sx={{ fontSize: 40, color: "#007bff" }} />
                   <Box textAlign="center" color="gray">
                     {/* <Typography variant="body1" gutterBottom>
                       Customer Information
@@ -486,8 +584,8 @@ const Cart = () => {
                     </Button>
                   </Box>
                 </Card>
-                <EventShow/>
               </Box>
+              {/* <EventShow /> */}
               {/* aaaaaa */}
             </Box>
           </section>
@@ -540,7 +638,23 @@ const Cart = () => {
                     error={touched.email && Boolean(errors.email)}
                     helperText={touched.email && errors.email}
                   />
-                  <Button type="submit" variant="contained" fullWidth>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                      mt: 2,
+                      backgroundColor: "#007bff",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      "&:hover": {
+                        backgroundColor: "#0056b3",
+                      },
+                      borderRadius: 2,
+                      boxShadow: "none",
+                      textTransform: "none",
+                    }}
+                  >
                     Submit
                   </Button>
                 </Form>
@@ -549,7 +663,7 @@ const Cart = () => {
           </Box>
         </Modal>
       </div>
-      <ToastContainer />
+      {/* {<Footer />} */}
     </>
   );
 };

@@ -16,6 +16,7 @@ import {
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { useDispatch } from "react-redux";
 import { addItemToCart } from "../State/Cart/Action";
+import { toast } from "react-toastify";
 
 const MenuCart = ({ item }) => {
   const dispatch = useDispatch();
@@ -29,9 +30,13 @@ const MenuCart = ({ item }) => {
       jwt: localStorage.getItem("jwt"),
       cartItem: {
         jewelryId: item.id,
+        quantity: 1,
       },
     };
     dispatch(addItemToCart(reqData));
+    toast.success("Item added to cart successfully!", {
+      autoClose: 500,
+    });
     console.log("req Data", reqData);
   };
 
@@ -88,9 +93,9 @@ const MenuCart = ({ item }) => {
             </Typography>
           </Box>
         </Box>
-        <CardContent sx={{ padding: "1rem" }}>
+        <CardContent>
           <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
-            {item.name}
+            <span className="font-medium">{item.name}</span>
           </Typography>
         </CardContent>
         <CardActions sx={{ padding: "1rem" }}>
@@ -98,9 +103,19 @@ const MenuCart = ({ item }) => {
             variant="contained"
             onClick={handleAddItemToCart}
             fullWidth
-            color="primary"
             startIcon={<AddShoppingCartIcon />}
-            sx={{ fontWeight: "bold" }}
+            sx={{
+              mt: 2,
+              backgroundColor: "#007bff",
+              color: "#fff",
+              fontWeight: "bold",
+              "&:hover": {
+                backgroundColor: "#0056b3",
+              },
+              borderRadius: 2,
+              boxShadow: "none",
+              textTransform: "none",
+            }}
           >
             Add to Cart
           </Button>
@@ -109,9 +124,28 @@ const MenuCart = ({ item }) => {
       <Dialog open={showDialog} onClose={handleCloseDialog}>
         <DialogTitle>{item.code}</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="textSecondary">
-            {item.name}
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <img
+              src={item.images[0]}
+              alt={item.name}
+              style={{
+                width: "100%",
+                maxWidth: "300px",
+                height: "auto",
+                borderRadius: "10%",
+                marginBottom: "1rem",
+              }}
+            />
+            <Typography variant="body1" sx={{ fontWeight: "bold", mb: 1 }}>
+              {item.name}
+            </Typography>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="primary">

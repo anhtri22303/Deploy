@@ -16,6 +16,7 @@ import Customer from '../Customer/Customer'
 import Buyback from '../Buyback/Buyback'
 import Area from '../Area/Area';
 import { Instock } from '../Menu/Instock';
+import {Policy }from '../Policy/Policy';
 export const Manager = () => {
     const dispatch = useDispatch();
     const jwt = localStorage.getItem('jwt');
@@ -34,11 +35,12 @@ export const Manager = () => {
                         <Route path='/' element={<Home />} />
                         <Route path='/dashboard' element={<Dashboard />} />
                         <Route path='/orders' element={<Orders />} />
-                        <Route path='/menu' element={<Menu />} />
-                        <Route path='/instock' element={<Instock />} />
+                        <Route path='/instock' element={<Menu />} />
+                        <Route path='/outstock' element={<Instock />} />
                         <Route path='/category' element={<Category />} />
                         <Route path='/ingredients' element={<Ingredients />} />
                         <Route path='/event' element={<Events />} />
+                        <Route path='/policy' element={<Policy />} />
                         <Route path='/details' element={<JewelryDetails />} />
                         <Route path='/add-menu' element={<CreateMenuForm />} />
                         <Route path='/buyback' element={<Buyback/>} />
