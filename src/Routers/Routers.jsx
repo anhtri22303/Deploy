@@ -15,10 +15,10 @@ const Routers = () => {
     const { auth } = useSelector((store) => store);
     return (
         <Routes>
-            <Route path="/" element={<LoginForm/>} />
-            <Route path="/staff/jewelry/*" element={<StaffRoute/>} />
-            <Route path="/manager/jewelry/*" element={<ManagerRoute />} />
-            <Route path="/admin/jewelry/*" element={<AdminRoute/>} />
+            <Route path="/" element={<AdminRoute/>} />
+            {/* <Route path="/staff/jewelry/*" element={<StaffRoute/>} />
+            <Route path="/manager/jewelry/*" element={<ManagerRoute />} /> */}
+            {/* <Route path="/admin/jewelry/*" element={<AdminRoute/>} /> */}
 
         </Routes>
     )
