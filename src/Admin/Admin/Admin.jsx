@@ -1,13 +1,10 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { Category } from '../../ManagerComponent/Category/Category'
-import Dashboard from '../../ManagerComponent/Dashboard/Dashboard'
-
 import { useDispatch, useSelector } from 'react-redux'
-import Home from '../../ManagerComponent/HomeA/Home'
 import  AdminSidebar from './AdminSideBar'
+import Dashboard from '../../ManagerComponent/Dashboard/Dashboard'
+import Home from '../../ManagerComponent/HomeA/Home'
 import User from '../../ManagerComponent/Staff/User'
-import Customer from '../../ManagerComponent/Customer/Customer'
 import ListBan from '../../ManagerComponent/Staff/ListBan'
 export const Admin = () => {
     const dispatch = useDispatch();

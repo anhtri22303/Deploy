@@ -16,9 +16,9 @@ const Routers = () => {
     return (
         <Routes>
             <Route path="/" element={<AdminRoute/>} />
-            <Route path="/staff/jewelry/*" element={<StaffRoute/>} />
-            <Route path="/manager/jewelry/*" element={<ManagerRoute />} />
-            <Route path="/admin/jewelry/*" element={<AdminRoute/>} />
+            <Route path="/staff/*" element={<StaffRoute/>} />
+            <Route path="/manager/*" element={<ManagerRoute />} />
+            <Route path="/admin/*" element={<AdminRoute/>} />
 
         </Routes>
     )

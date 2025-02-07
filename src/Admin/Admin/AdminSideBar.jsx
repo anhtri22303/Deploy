@@ -36,13 +36,13 @@ const AdminSidebar = () => {
             dispatch(logout());
             navigate("/");
         } else {
-            navigate(`/admin/jewelry${item.path}`);
+            navigate(`/admin${item.path}`);
         }
         if (isSmallScreen) setDrawerOpen(false);
     };
 
     const handleLogoClick = () => {
-        navigate("/admin/jewelry");
+        navigate("/admin");
         if (isSmallScreen) setDrawerOpen(false);
     };
 
