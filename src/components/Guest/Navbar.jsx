@@ -61,11 +61,8 @@ function Header() {
           <div className='flex items-center gap-x-6'>
             {/* nav */}
             <ul className="flex items-center cursor-pointer gap-8 text-black font-semibold">
-              <li className='hover:text-red-500 transition-all' to={'/'}>Home</li>
-              <li className='hover:text-red-500 transition-all' to={'#menu'}>Menu</li>
-              <li className='hover:text-red-500 transition-all' to={'#about'}>About</li>
-              <li className='hover:text-red-500 transition-all' to={'#contact'}>Contact</li>
-              <button className='bg-red-500 px-4 py-2 text-white rounded-lg'>Order Now</button>
+              <li className='hover:text-red-500 transition-all' to={'/'}>Tables</li>
+              <button className='bg-red-500 px-4 py-2 text-white rounded-lg'>Login</button>
             </ul>
           </div>
         </div>
